@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { supabase } from '@/lib/supabase'
-import { Trash2, ExternalLink, AlertTriangle } from 'lucide-vue-next'
+import { Trash2, ExternalLink, AlertTriangle, Image as ImageIcon, HardDrive } from 'lucide-vue-next'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 interface Img {
@@ -125,7 +125,7 @@ onMounted(loadImages)
 
   <div v-else class="space-y-8">
     <!-- Premium Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div class="flex flex-row items-center justify-between gap-6">
       <div class="space-y-1">
         <h2 class="text-3xl font-black italic tracking-tighter uppercase text-zinc-950 dark:text-white">
           Imágenes
@@ -135,11 +135,11 @@ onMounted(loadImages)
       <!-- Estadísticas -->
       <div class="flex gap-6">
         <div class="flex items-center gap-2">
-          <span class="text-zinc-500 text-xs font-black uppercase tracking-widest">Total:</span>
+          <ImageIcon class="w-4 h-4 text-zinc-500" />
           <span class="text-yellow-500 text-lg font-black italic tracking-tighter">{{ images.length }}</span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-zinc-500 text-xs font-black uppercase tracking-widest">Peso:</span>
+          <HardDrive class="w-4 h-4 text-zinc-500" />
           <span class="text-yellow-500 text-lg font-black italic tracking-tighter">{{ formatBytes(totalSize) }} MB</span>
         </div>
       </div>
@@ -147,7 +147,7 @@ onMounted(loadImages)
 
     <!-- Images Grid -->
     <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div v-if="images.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div v-if="images.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div v-for="img in images" :key="img.path"
           class="group relative overflow-hidden bg-zinc-950 shadow-2xl transition-all hover:ring-2 hover:ring-yellow-500/50 rounded-[2.5rem]">
 
