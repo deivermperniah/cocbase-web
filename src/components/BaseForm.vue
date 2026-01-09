@@ -451,7 +451,7 @@ async function handleSubmit() {
                     <label 
                         v-if="!previewUrl" 
                         for="fileInModal"
-                        class="flex flex-col items-center justify-center border-2 border-dashed border-zinc-800 rounded-2xl p-6 text-center cursor-pointer bg-zinc-900/40 hover:bg-zinc-900/60 hover:border-yellow-500/40 transition-all"
+                        class="flex flex-col items-center justify-center border-2 border-dashed border-zinc-800 rounded-2xl p-4 text-center cursor-pointer bg-zinc-900/40 hover:bg-zinc-900/60 hover:border-yellow-500/40 transition-all"
                         :class="loading ? 'opacity-50 cursor-not-allowed' : ''"
                     >
                         <ImageIcon class="w-6 h-6 text-zinc-500 mb-2" />

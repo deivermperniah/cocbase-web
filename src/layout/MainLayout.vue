@@ -45,7 +45,7 @@ const isMobileMenuOpen = ref(false)
 
       <!-- Scrollable Content -->
       <main class="flex-1 overflow-y-auto overflow-x-hidden p-4 custom-scrollbar relative w-full">
-        <div class="max-w-7xl mx-auto space-y-6 pb-20 sm:pb-0">
+        <div class="max-w-7xl mx-auto space-y-4">
           <slot />
         </div>
       </main>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { supabase } from '@/lib/supabase'
-import { Trash2, ExternalLink, AlertTriangle, Image as ImageIcon, HardDrive } from 'lucide-vue-next'
+import { Trash2, ExternalLink, Image as ImageIcon, HardDrive } from 'lucide-vue-next'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 interface Img {
@@ -41,6 +41,13 @@ async function loadImages() {
 
   if (error) {
     console.error('❌ ERROR LISTANDO STORAGE:', error)
+    loading.value = false
+    return
+  }
+
+  // Ensure data is not null before proceeding
+  if (!data) {
+    console.warn('No data returned from storage list operation.')
     loading.value = false
     return
   }
@@ -125,7 +132,7 @@ onMounted(loadImages)
 
   <div v-else class="space-y-4">
     <!-- Premium Header -->
-    <div class="flex flex-row items-center justify-between gap-6">
+    <div class="flex flex-row items-center justify-between gap-4">
       <div class="space-y-1">
         <h2 class="text-xl font-black italic tracking-tighter uppercase text-zinc-950 dark:text-white">
           Imágenes
@@ -133,7 +140,7 @@ onMounted(loadImages)
       </div>
       
       <!-- Estadísticas -->
-      <div class="flex gap-4 sm:gap-6">
+      <div class="flex gap-4">
         <div class="flex items-center gap-2">
           <ImageIcon class="w-4 h-4 text-zinc-500" />
           <span class="text-yellow-500 text-sm font-black italic tracking-tighter">{{ images.length }}</span>
@@ -184,15 +191,11 @@ onMounted(loadImages)
         </div>
       </div>
 
-      <!-- Empty State -->
-      <div v-else class="flex flex-col items-center justify-center py-32 bg-zinc-950 rounded-[3rem] border border-zinc-800 space-y-6">
-        <div class="h-20 w-20 rounded-3xl bg-zinc-900 flex items-center justify-center border border-zinc-800">
-          <AlertTriangle class="h-10 w-10 text-zinc-700" />
-        </div>
-        <div class="text-center space-y-2">
-          <p class="text-white font-black italic text-2xl uppercase tracking-tighter">Sin imágenes en storage</p>
-          <p class="text-zinc-500 text-sm font-bold uppercase tracking-widest">No hay archivos para mostrar</p>
-        </div>
+      <!-- Empty State Simplificado -->
+      <div v-else class="flex items-center justify-center min-h-[400px] text-center">
+        <p class="text-zinc-500 text-sm font-bold uppercase tracking-widest">
+          Sin imágenes en el storage
+        </p>
       </div>
     </div>
 
@@ -203,7 +206,7 @@ onMounted(loadImages)
 
         <div
           class="relative bg-zinc-950 w-full max-w-md rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-red-500/20 animate-in zoom-in-95 duration-300">
-          <div class="p-8 space-y-6">
+          <div class="p-4 space-y-4">
             <!-- Header del Modal -->
             <div class="text-center space-y-4">
               <div class="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mx-auto border border-red-500/20">

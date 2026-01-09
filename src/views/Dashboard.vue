@@ -60,7 +60,7 @@ onMounted(() => fetchStats())
                 Dashboard
             </h2>
             <router-link to="/bases"
-                class="hidden sm:flex items-center gap-3 px-6 sm:px-8 h-[36px] sm:h-[44px] rounded-full bg-zinc-950 border-2 border-yellow-500 text-yellow-500 font-black uppercase tracking-[0.15em] text-[8px] sm:text-[10px] hover:bg-yellow-500 hover:text-zinc-950 transition-all duration-300 shadow-xl shadow-yellow-500/10 active:scale-95">
+                class="hidden sm:flex items-center gap-3 px-4 h-[36px] sm:h-[44px] rounded-full bg-zinc-950 border-2 border-yellow-500 text-yellow-500 font-black uppercase tracking-[0.15em] text-[8px] sm:text-[10px] hover:bg-yellow-500 hover:text-zinc-950 transition-all duration-300 shadow-xl shadow-yellow-500/10 active:scale-95">
                 <span class="text-[10px] sm:text-xs">Ver Bases</span>
                 <ChevronRight class="h-3 w-3 sm:h-4 sm:w-4 stroke-[3px] group-hover:translate-x-1 transition-transform" />
             </router-link>
@@ -71,7 +71,7 @@ onMounted(() => fetchStats())
             <!-- Total Bases (Full width en tablets, 2/3 en desktop) -->
             <div class="lg:col-span-2">
                 <div
-                    class="h-[180px] flex flex-col items-center justify-center text-center p-8 rounded-[2.5rem] bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 shadow-2xl relative overflow-hidden ring-1 ring-black/5 group">
+                    class="h-[200px] flex flex-col items-center justify-center text-center p-3 rounded-[2.5rem] bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 shadow-2xl relative overflow-hidden ring-1 ring-black/5 group">
                     <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity">
                     </div>
                     <div class="absolute -right-10 -top-10 sm:-right-20 sm:-top-20 h-32 w-32 sm:h-64 sm:w-64 rounded-full bg-white/20 blur-2xl sm:blur-3xl"></div>
@@ -89,11 +89,11 @@ onMounted(() => fetchStats())
             <!-- Guerra (Oculta en tablets, visible en desktop) -->
             <div class="hidden lg:block lg:col-span-1">
                 <Card
-                    class="h-[180px] group relative overflow-hidden border-none bg-zinc-950 shadow-xl transition-all p-1 rounded-[2.5rem]">
+                    class="h-[200px] group relative overflow-hidden border-none bg-zinc-950 shadow-xl transition-all p-1 rounded-[2.5rem]">
                     <div
                         class="absolute right-0 top-0 h-24 w-24 sm:h-32 sm:w-32 bg-yellow-500/5 rounded-bl-[3rem] sm:rounded-bl-[4rem] translate-x-8 sm:translate-x-12 -translate-y-8 sm:-translate-y-12 transition-transform group-hover:scale-110">
                     </div>
-                    <CardContent class="h-full p-6 relative flex flex-col justify-center gap-4">
+                    <CardContent class="h-full p-3 relative flex flex-col justify-center gap-4">
                         <div
                             class="h-12 w-12 rounded-[1.2rem] bg-yellow-500/10 flex items-center justify-center group-hover:bg-yellow-500 transition-all duration-500 shadow-lg shadow-yellow-500/10">
                             <Sword class="h-5 w-5 text-yellow-500 group-hover:text-zinc-950 transition-colors" />
@@ -112,11 +112,11 @@ onMounted(() => fetchStats())
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <!-- Guerra (Visible solo en tablets, oculta en desktop) -->
             <Card
-                class="sm:block hidden lg:hidden group relative overflow-hidden border-none bg-zinc-950 shadow-xl transition-all p-1 rounded-[2.5rem] h-[180px]">
+                class="sm:block hidden lg:hidden group relative overflow-hidden border-none bg-zinc-950 shadow-xl transition-all p-1 rounded-[2.5rem] h-[200px]">
                 <div
                     class="absolute right-0 top-0 h-24 w-24 sm:h-32 sm:w-32 bg-yellow-500/5 rounded-bl-[3rem] sm:rounded-bl-[4rem] translate-x-8 sm:translate-x-12 -translate-y-8 sm:-translate-y-12 transition-transform group-hover:scale-110">
                 </div>
-                <CardContent class="h-full p-6 relative flex flex-col justify-center gap-4">
+                <CardContent class="h-full p-3 relative flex flex-col justify-center gap-4">
                     <div
                         class="h-12 w-12 rounded-[1.2rem] bg-yellow-500/10 flex items-center justify-center group-hover:bg-yellow-500 transition-all duration-500 shadow-lg shadow-yellow-500/10">
                         <Sword class="h-5 w-5 text-yellow-500 group-hover:text-zinc-950 transition-colors" />
@@ -130,11 +130,11 @@ onMounted(() => fetchStats())
             </Card>
             <!-- Liga Card -->
             <Card
-                class="group relative overflow-hidden border-none bg-zinc-950 shadow-xl transition-all p-1 rounded-[2.5rem] h-[180px]">
+                class="group relative overflow-hidden border-none bg-zinc-950 shadow-xl transition-all p-1 rounded-[2.5rem] h-[200px]">
                 <div
                     class="absolute right-0 top-0 h-24 w-24 sm:h-32 sm:w-32 bg-yellow-500/5 rounded-bl-[3rem] sm:rounded-bl-[4rem] translate-x-8 sm:translate-x-12 -translate-y-8 sm:-translate-y-12 transition-transform group-hover:scale-110">
                 </div>
-                <CardContent class="h-full p-6 relative flex flex-col justify-center gap-4">
+                <CardContent class="h-full p-3 relative flex flex-col justify-center gap-4">
                     <div
                         class="h-12 w-12 rounded-[1.2rem] bg-yellow-500/10 flex items-center justify-center group-hover:bg-yellow-500 transition-all duration-500 shadow-lg shadow-yellow-500/10">
                         <Trophy class="h-5 w-5 text-yellow-500 group-hover:text-zinc-950 transition-colors" />
@@ -149,11 +149,11 @@ onMounted(() => fetchStats())
 
             <!-- Mejora Card -->
             <Card
-                class="group relative overflow-hidden border-none bg-zinc-950 shadow-xl transition-all p-1 rounded-[2.5rem] h-[180px]">
+                class="group relative overflow-hidden border-none bg-zinc-950 shadow-xl transition-all p-1 rounded-[2.5rem] h-[200px]">
                 <div
                     class="absolute right-0 top-0 h-24 w-24 sm:h-32 sm:w-32 bg-yellow-500/5 rounded-bl-[3rem] sm:rounded-bl-[4rem] translate-x-8 sm:translate-x-12 -translate-y-8 sm:-translate-y-12 transition-transform group-hover:scale-110">
                 </div>
-                <CardContent class="h-full p-6 relative flex flex-col justify-center gap-4">
+                <CardContent class="h-full p-3 relative flex flex-col justify-center gap-4">
                     <div
                         class="h-12 w-12 rounded-[1.2rem] bg-yellow-500/10 flex items-center justify-center group-hover:bg-yellow-500 transition-all duration-500 shadow-lg shadow-yellow-500/10">
                         <Hammer class="h-5 w-5 text-yellow-500 group-hover:text-zinc-950 transition-colors" />
@@ -168,11 +168,11 @@ onMounted(() => fetchStats())
 
             <!-- Recursos Card -->
             <Card
-                class="group relative overflow-hidden border-none bg-zinc-950 shadow-xl transition-all p-1 rounded-[2.5rem] h-[180px]">
+                class="group relative overflow-hidden border-none bg-zinc-950 shadow-xl transition-all p-1 rounded-[2.5rem] h-[200px]">
                 <div
                     class="absolute right-0 top-0 h-24 w-24 sm:h-32 sm:w-32 bg-yellow-500/5 rounded-bl-[3rem] sm:rounded-bl-[4rem] translate-x-8 sm:translate-x-12 -translate-y-8 sm:-translate-y-12 transition-transform group-hover:scale-110">
                 </div>
-                <CardContent class="h-full p-6 relative flex flex-col justify-center gap-4">
+                <CardContent class="h-full p-3 relative flex flex-col justify-center gap-4">
                     <div
                         class="h-12 w-12 rounded-[1.2rem] bg-yellow-500/10 flex items-center justify-center group-hover:bg-yellow-500 transition-all duration-500 shadow-lg shadow-yellow-500/10">
                         <Shield class="h-5 w-5 text-yellow-500 group-hover:text-zinc-950 transition-colors" />

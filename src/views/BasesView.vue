@@ -57,7 +57,7 @@ onMounted(() => {
 
     <div v-else class="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <!-- Premium Header -->
-        <div class="flex flex-row items-center justify-between gap-6 mb-4">
+        <div class="flex flex-row items-center justify-between gap-4 mb-4">
             <!-- Título -->
             <div class="space-y-1">
                 <h2 class="text-xl font-black italic tracking-tighter uppercase text-zinc-950 dark:text-white">
@@ -85,7 +85,7 @@ onMounted(() => {
 
                 <div class="order-2 ml-auto">
                     <button @click="isModalOpen = true"
-                        class="group flex items-center justify-center gap-3 w-[44px] sm:w-auto px-0 sm:px-8 h-[44px] rounded-full bg-zinc-950 border-2 border-yellow-500 text-yellow-500 font-black uppercase tracking-[0.15em] text-[10px] sm:text-[10px] hover:bg-yellow-500 hover:text-zinc-950 transition-all duration-300 shadow-xl shadow-yellow-500/10 active:scale-95">
+                        class="group flex items-center justify-center gap-3 w-[44px] sm:w-auto px-0 sm:px-4 h-[44px] rounded-full bg-zinc-950 border-2 border-yellow-500 text-yellow-500 font-black uppercase tracking-[0.15em] text-[10px] sm:text-[10px] hover:bg-yellow-500 hover:text-zinc-950 transition-all duration-300 shadow-xl shadow-yellow-500/10 active:scale-95">
                         <Plus class="w-4 h-4 stroke-[3px]" />
                         <span class="hidden sm:inline text-[10px] sm:text-xs">Nueva Base</span>
                     </button>
@@ -126,7 +126,7 @@ onMounted(() => {
                         </div>
                     </div>
 
-                    <div class="p-6">
+                    <div class="p-4">
                         <div class="flex items-center justify-between">
                             <h3
                                 class="text-lg font-black italic tracking-tighter text-white uppercase group-hover:text-yellow-500 transition-colors leading-none">
@@ -154,45 +154,45 @@ onMounted(() => {
                     <table class="w-full text-left min-w-[900px]">
                         <thead class="bg-zinc-900/50 border-b border-zinc-800">
                             <tr>
-                                <th class="p-6 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500">
+                                <th class="p-4 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500">
                                     Fotografía</th>
-                                <th class="p-6 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500">Nivel - Categoría</th>
-                                <th class="p-6 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500 text-center">
+                                <th class="p-4 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500">Nivel - Categoría</th>
+                                <th class="p-4 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500 text-center">
                                     ID</th>
-                                <th class="p-6 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500 text-center">
+                                <th class="p-4 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500 text-center">
                                     Publicado</th>
-                                <th class="p-6 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500 text-right">
+                                <th class="p-4 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500 text-right">
                                     Acciones</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-zinc-800/50">
                             <tr v-for="base in bases" :key="base.id" class="group hover:bg-zinc-900/40 transition-colors">
-                                <td class="p-6">
+                                <td class="p-4">
                                     <div
                                         class="w-24 h-14 rounded-xl bg-zinc-900 overflow-hidden ring-1 ring-zinc-800 group-hover:ring-yellow-500/50 transition-all">
                                         <img :src="base.url_foto"
                                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                                     </div>
                                 </td>
-                                <td class="p-6">
+                                <td class="p-4">
                                     <span
                                         class="px-3 py-1.5 rounded-lg text-[10px] font-black bg-yellow-500 text-zinc-950 uppercase tracking-widest shadow-lg">
                                         NIVEL {{ base.level_th }} <span class="text-white">➖</span> {{ base.type }}
                                     </span>
                                 </td>
-                                <td class="p-6 text-center">
+                                <td class="p-4 text-center">
                                     <span
                                         class="text-sm font-black italic tracking-tighter text-white uppercase group-hover:text-yellow-500 transition-colors">
                                         {{ base.id }}
                                     </span>
                                 </td>
-                                <td class="p-6 text-center">
+                                <td class="p-4 text-center">
                                     <span
                                         class="px-3 py-1.5 rounded-lg text-[10px] font-black bg-zinc-950 text-yellow-500 uppercase tracking-widest shadow-lg border border-yellow-500/20">
                                         {{ new Date(base.created_at).toLocaleDateString('es-ES') }}
                                     </span>
                                 </td>
-                                <td class="p-6">
+                                <td class="p-4">
                                     <div class="flex gap-3 justify-end items-center">
                                         <a :href="base.link" target="_blank"
                                             class="p-2.5 rounded-xl bg-zinc-900 text-zinc-400 hover:bg-yellow-500 hover:text-zinc-950 transition-all">
@@ -210,19 +210,11 @@ onMounted(() => {
                 </div>
             </div>
 
-            <!-- Empty State -->
-            <div v-if="bases.length === 0"
-                class="flex flex-col items-center justify-center py-32 bg-zinc-950 rounded-[3rem] border border-zinc-800 space-y-6">
-                <div class="text-center space-y-2">
-                    <p class="text-white font-black italic text-2xl uppercase tracking-tighter">Sin despliegues
-                        registrados</p>
-                    <p class="text-zinc-500 text-sm font-bold uppercase tracking-widest">Inicia la recolección de
-                        inteligencia táctica</p>
-                </div>
-                <button @click="isModalOpen = true"
-                    class="mt-4 px-10 py-4 bg-yellow-500 text-zinc-950 font-black rounded-full uppercase tracking-widest text-xs hover:bg-white transition-all">
-                    Registrar Primera Base
-                </button>
+            <!-- Empty State Simplificado -->
+            <div v-if="bases.length === 0" class="flex items-center justify-center min-h-[400px] text-center">
+                <p class="text-zinc-500 text-sm font-bold uppercase tracking-widest">
+                    Sin bases registradas
+                </p>
             </div>
         </div>
 
