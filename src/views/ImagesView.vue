@@ -192,7 +192,7 @@ onMounted(loadImages)
       </div>
 
       <!-- Empty State Simplificado -->
-      <div v-else class="flex items-center justify-center min-h-[400px] text-center">
+      <div v-else class="text-center">
         <p class="text-zinc-500 text-sm font-bold uppercase tracking-widest">
           Sin imágenes en el storage
         </p>

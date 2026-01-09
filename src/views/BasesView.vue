@@ -211,7 +211,7 @@ onMounted(() => {
             </div>
 
             <!-- Empty State Simplificado -->
-            <div v-if="bases.length === 0" class="flex items-center justify-center min-h-[400px] text-center">
+            <div v-if="bases.length === 0" class="text-center">
                 <p class="text-zinc-500 text-sm font-bold uppercase tracking-widest">
                     Sin bases registradas
                 </p>
