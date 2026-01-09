@@ -119,35 +119,35 @@ onMounted(loadImages)
 
 <template>
   <!-- Loading State Centralizado -->
-  <div v-if="loading" class="flex items-center justify-center min-h-screen">
+  <div v-if="loading" class="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950/80 backdrop-blur-sm md:pl-20">
     <LoadingSpinner size="lg" />
   </div>
 
-  <div v-else class="space-y-8">
+  <div v-else class="space-y-4">
     <!-- Premium Header -->
     <div class="flex flex-row items-center justify-between gap-6">
       <div class="space-y-1">
-        <h2 class="text-3xl font-black italic tracking-tighter uppercase text-zinc-950 dark:text-white">
+        <h2 class="text-xl font-black italic tracking-tighter uppercase text-zinc-950 dark:text-white">
           Imágenes
         </h2>
       </div>
       
       <!-- Estadísticas -->
-      <div class="flex gap-6">
+      <div class="flex gap-4 sm:gap-6">
         <div class="flex items-center gap-2">
           <ImageIcon class="w-4 h-4 text-zinc-500" />
-          <span class="text-yellow-500 text-lg font-black italic tracking-tighter">{{ images.length }}</span>
+          <span class="text-yellow-500 text-sm font-black italic tracking-tighter">{{ images.length }}</span>
         </div>
         <div class="flex items-center gap-2">
           <HardDrive class="w-4 h-4 text-zinc-500" />
-          <span class="text-yellow-500 text-lg font-black italic tracking-tighter">{{ formatBytes(totalSize) }} MB</span>
+          <span class="text-yellow-500 text-sm font-black italic tracking-tighter">{{ formatBytes(totalSize) }} MB</span>
         </div>
       </div>
     </div>
 
     <!-- Images Grid -->
-    <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div v-if="images.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div v-if="images.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div v-for="img in images" :key="img.path"
           class="group relative overflow-hidden bg-zinc-950 shadow-2xl transition-all hover:ring-2 hover:ring-yellow-500/50 rounded-[2.5rem]">
 
@@ -162,10 +162,10 @@ onMounted(loadImages)
             </div>
           </div>
 
-          <div class="p-6">
-            <div class="flex items-center justify-between">
+          <div class="p-4">
+            <div class="flex items-center justify-between gap-3">
               <h3
-                class="text-lg font-black italic tracking-tighter text-white uppercase group-hover:text-yellow-500 transition-colors leading-none truncate max-w-[200px]" :title="img.name">
+                class="text-sm font-black italic tracking-tighter text-white uppercase group-hover:text-yellow-500 transition-colors leading-none truncate flex-1" :title="img.name">
                 {{ img.name }}
               </h3>
 

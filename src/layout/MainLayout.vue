@@ -44,7 +44,7 @@ const isMobileMenuOpen = ref(false)
       </header>
 
       <!-- Scrollable Content -->
-      <main class="flex-1 overflow-y-auto overflow-x-hidden p-6 custom-scrollbar relative w-full">
+      <main class="flex-1 overflow-y-auto overflow-x-hidden p-4 custom-scrollbar relative w-full">
         <div class="max-w-7xl mx-auto space-y-6 pb-20 sm:pb-0">
           <slot />
         </div>
@@ -54,20 +54,12 @@ const isMobileMenuOpen = ref(false)
 </template>
 
 <style scoped>
+.custom-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground) / 0.2);
-  border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground) / 0.4);
+  display: none; /* Chrome, Safari and Opera */
 }
 </style>

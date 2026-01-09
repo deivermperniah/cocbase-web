@@ -19,7 +19,7 @@ const sizeClasses = {
 <template>
   <div class="flex flex-col items-center justify-center">
     <Loader2 :class="[sizeClasses[size], 'animate-spin text-yellow-500']" />
-    <p class="text-zinc-500 text-sm font-medium uppercase tracking-widest mt-4">
+    <p class="text-white text-sm font-medium uppercase tracking-widest mt-4">
       Cargando...
     </p>
   </div>

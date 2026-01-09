@@ -51,16 +51,16 @@ onMounted(() => {
 
 <template>
     <!-- Loading State Centralizado -->
-    <div v-if="loading" class="flex items-center justify-center min-h-screen">
+    <div v-if="loading" class="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950/80 backdrop-blur-sm md:pl-20">
       <LoadingSpinner size="lg" />
     </div>
 
-    <div v-else class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div v-else class="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <!-- Premium Header -->
-        <div class="flex flex-row items-center justify-between gap-6 mb-6">
+        <div class="flex flex-row items-center justify-between gap-6 mb-4">
             <!-- Título -->
             <div class="space-y-1">
-                <h2 class="text-3xl font-black italic tracking-tighter uppercase text-zinc-950 dark:text-white">
+                <h2 class="text-xl font-black italic tracking-tighter uppercase text-zinc-950 dark:text-white">
                     Bases
                 </h2>
             </div>
@@ -69,25 +69,25 @@ onMounted(() => {
             <div class="flex flex-row items-center gap-4">
                 <!-- View Toggle -->
                 <div class="order-1">
-                    <div class="bg-zinc-950 p-1.5 rounded-full flex gap-1 border border-zinc-800 shadow-2xl h-[52px]">
+                    <div class="bg-zinc-950 p-1.5 rounded-full flex gap-1 border border-zinc-800 shadow-2xl h-[44px]">
                         <button class="px-4 rounded-full transition-all duration-300 flex items-center justify-center"
                             :class="viewMode === 'grid' ? 'bg-yellow-500 text-zinc-950 shadow-[0_0_15px_rgba(234,179,8,0.3)]' : 'text-zinc-500 hover:text-yellow-500 hover:bg-zinc-900'"
                             @click="viewMode = 'grid'">
-                            <LayoutGrid class="w-5 h-5 stroke-[2.5px]" />
+                            <LayoutGrid class="w-4 h-4 stroke-[2.5px]" />
                         </button>
                         <button class="px-4 rounded-full transition-all duration-300 flex items-center justify-center"
                             :class="viewMode === 'list' ? 'bg-yellow-500 text-zinc-950 shadow-[0_0_15px_rgba(234,179,8,0.3)]' : 'text-zinc-500 hover:text-yellow-500 hover:bg-zinc-900'"
                             @click="viewMode = 'list'">
-                            <ListIcon class="w-5 h-5 stroke-[2.5px]" />
+                            <ListIcon class="w-4 h-4 stroke-[2.5px]" />
                         </button>
                     </div>
                 </div>
 
                 <div class="order-2 ml-auto">
                     <button @click="isModalOpen = true"
-                        class="group flex items-center justify-center gap-3 px-4 sm:px-8 h-[52px] w-auto rounded-full bg-zinc-950 border-2 border-yellow-500 text-yellow-500 font-black uppercase tracking-[0.15em] text-[11px] hover:bg-yellow-500 hover:text-zinc-950 transition-all duration-300 shadow-xl shadow-yellow-500/10 active:scale-95">
+                        class="group flex items-center justify-center gap-3 w-[44px] sm:w-auto px-0 sm:px-8 h-[44px] rounded-full bg-zinc-950 border-2 border-yellow-500 text-yellow-500 font-black uppercase tracking-[0.15em] text-[10px] sm:text-[10px] hover:bg-yellow-500 hover:text-zinc-950 transition-all duration-300 shadow-xl shadow-yellow-500/10 active:scale-95">
                         <Plus class="w-4 h-4 stroke-[3px]" />
-                        <span class="hidden sm:inline text-sm">Nueva Base</span>
+                        <span class="hidden sm:inline text-[10px] sm:text-xs">Nueva Base</span>
                     </button>
                 </div>
             </div>
@@ -95,7 +95,7 @@ onMounted(() => {
 
         <div>
             <!-- Grid View -->
-            <div v-if="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div v-if="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div v-for="base in bases" :key="base.id"
                     class="group relative overflow-hidden bg-zinc-950 shadow-2xl transition-all hover:ring-2 hover:ring-yellow-500/50 rounded-[2.5rem]">
 
@@ -129,7 +129,7 @@ onMounted(() => {
                     <div class="p-6">
                         <div class="flex items-center justify-between">
                             <h3
-                                class="text-2xl font-black italic tracking-tighter text-white uppercase group-hover:text-yellow-500 transition-colors leading-none">
+                                class="text-lg font-black italic tracking-tighter text-white uppercase group-hover:text-yellow-500 transition-colors leading-none">
                                 {{ base.id }}
                             </h3>
 
