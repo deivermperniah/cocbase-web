@@ -375,8 +375,8 @@ async function handleSubmit() {
 </script>
 
 <template>
-    <Card class="w-full bg-zinc-950 border border-zinc-800 rounded-[2.5rem] shadow-2xl">
-        <CardContent class="space-y-8 p-8">
+    <Card class="w-full bg-zinc-950 border border-zinc-800 rounded-[2rem] shadow-2xl py-0">
+        <CardContent class="space-y-4 pt-4 px-4 pb-0">
             <!-- Link Input -->
             <div class="space-y-2">
                 <label for="link" class="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500">Link *</label>
@@ -386,7 +386,7 @@ async function handleSubmit() {
                         placeholder="https://link.clashofclans.com/..." 
                         v-model="baseLink"
                         :class="[
-                            'h-12 rounded-2xl bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500 focus-visible:ring-yellow-500/40',
+                            'h-[44px] rounded-xl bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500 focus-visible:ring-yellow-500/40',
                             hasSpacesInLink ? 'border-red-500 focus-visible:ring-red-500/30' : ''
                         ]"
                     />
@@ -395,7 +395,7 @@ async function handleSubmit() {
                         <CheckCircle2 v-else-if="isValidLink && baseLink.trim()" class="w-4 h-4 text-yellow-500" />
                     </div>
                 </div>
-                <p class="text-xs font-bold uppercase tracking-widest text-zinc-500">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
                     Ingresa el enlace compartido de Clash of Clans (sin espacios)
                 </p>
             </div>
@@ -406,7 +406,7 @@ async function handleSubmit() {
                 <div class="space-y-2">
                     <label for="type" class="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500">Categoría *</label>
                     <Select v-model="baseType">
-                        <SelectTrigger class="h-12 rounded-2xl bg-zinc-900 border border-zinc-800 text-white">
+                        <SelectTrigger class="h-[44px] rounded-xl bg-zinc-900 border border-zinc-800 text-white">
                             <SelectValue placeholder="Tipo de Unidad" />
                         </SelectTrigger>
                         <SelectContent class="z-[9999] bg-zinc-950 border border-zinc-800 text-white" data-select-content>
@@ -422,7 +422,7 @@ async function handleSubmit() {
                 <div class="space-y-2">
                     <label for="level" class="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500">Nivel *</label>
                     <Select v-model="baseLevel">
-                        <SelectTrigger class="h-12 rounded-2xl bg-zinc-900 border border-zinc-800 text-white">
+                        <SelectTrigger class="h-[44px] rounded-xl bg-zinc-900 border border-zinc-800 text-white">
                             <SelectValue placeholder="Nivel TH" />
                         </SelectTrigger>
                         <SelectContent class="z-[9999] bg-zinc-950 border border-zinc-800 text-white" data-select-content>
@@ -451,22 +451,22 @@ async function handleSubmit() {
                     <label 
                         v-if="!previewUrl" 
                         for="fileInModal"
-                        class="flex flex-col items-center justify-center border-2 border-dashed border-zinc-800 rounded-[2rem] p-8 text-center cursor-pointer bg-zinc-900/40 hover:bg-zinc-900/60 hover:border-yellow-500/40 transition-all"
+                        class="flex flex-col items-center justify-center border-2 border-dashed border-zinc-800 rounded-2xl p-6 text-center cursor-pointer bg-zinc-900/40 hover:bg-zinc-900/60 hover:border-yellow-500/40 transition-all"
                         :class="loading ? 'opacity-50 cursor-not-allowed' : ''"
                     >
-                        <ImageIcon class="w-8 h-8 text-zinc-500 mb-3" />
-                        <p class="text-sm font-black italic tracking-tighter text-white uppercase">Subir Captura</p>
-                        <p class="text-xs font-bold uppercase tracking-widest text-zinc-500 mt-2">
+                        <ImageIcon class="w-6 h-6 text-zinc-500 mb-2" />
+                        <p class="text-xs font-black italic tracking-tighter text-white uppercase">Subir Captura</p>
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mt-1">
                             JPG, PNG, WebP • Max 5MB
                         </p>
                     </label>
                     
                     <!-- Estado con imagen preview -->
                     <div v-else class="relative">
-                        <div class="relative w-full overflow-hidden rounded-[2rem] border border-zinc-800 bg-zinc-900">
+                        <div class="relative w-full overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
                             <img 
                                 :src="previewUrl" 
-                                class="w-full h-56 object-cover" 
+                                class="w-full h-40 object-cover" 
                                 alt="Preview de la captura"
                             />
                             <!-- Overlay para cambiar imagen -->
@@ -476,7 +476,7 @@ async function handleSubmit() {
                                 :class="loading ? 'pointer-events-none' : ''"
                             >
                                 <div class="text-center text-white">
-                                    <p class="text-sm font-black uppercase tracking-widest">Cambiar Fotografía</p>
+                                    <p class="text-xs font-black uppercase tracking-widest">Cambiar Fotografía</p>
                                 </div>
                             </label>
                         </div>
@@ -500,7 +500,7 @@ async function handleSubmit() {
 
             <!-- Botón de Envío -->
             <button
-                class="w-full h-[52px] rounded-full bg-yellow-500 text-zinc-950 font-black uppercase tracking-[0.15em] text-[11px] hover:bg-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                class="w-full h-[44px] rounded-full bg-yellow-500 text-zinc-950 font-black uppercase tracking-[0.15em] text-[10px] hover:bg-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
                 :disabled="loading || !isFormValid" 
                 @click="handleSubmit"
             >
@@ -518,18 +518,18 @@ async function handleSubmit() {
             <div class="space-y-2">
                 <!-- Estado de éxito -->
                 <div v-if="successMessage"
-                    class="flex items-center gap-3 p-4 rounded-2xl bg-zinc-900 border border-yellow-500/20 text-white">
-                    <CheckCircle2 class="w-5 h-5 shrink-0 text-yellow-500" />
-                    <p class="text-sm font-bold uppercase tracking-widest">
+                    class="flex items-center gap-3 p-3 rounded-xl bg-zinc-900 border border-yellow-500/20 text-white">
+                    <CheckCircle2 class="w-4 h-4 shrink-0 text-yellow-500" />
+                    <p class="text-xs font-bold uppercase tracking-widest">
                         {{ successMessage }}
                     </p>
                 </div>
 
                 <!-- Estado de error -->
                 <div v-if="errorMessage"
-                    class="flex items-center gap-3 p-4 rounded-2xl bg-zinc-900 border border-red-500/30 text-white">
-                    <AlertTriangle class="w-5 h-5 shrink-0 text-red-500" />
-                    <p class="text-sm font-bold uppercase tracking-widest">
+                    class="flex items-center gap-3 p-3 rounded-xl bg-zinc-900 border border-red-500/30 text-white">
+                    <AlertTriangle class="w-4 h-4 shrink-0 text-red-500" />
+                    <p class="text-xs font-bold uppercase tracking-widest">
                         {{ errorMessage }}
                     </p>
                 </div>

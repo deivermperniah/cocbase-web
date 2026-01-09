@@ -234,14 +234,14 @@ onMounted(() => {
                 <div
                     class="relative bg-zinc-950 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-yellow-500/20 animate-in zoom-in-95 duration-300 custom-scrollbar">
                     <div
-                        class="sticky top-0 right-0 p-6 flex justify-end items-center bg-zinc-950/80 backdrop-blur-md z-10 border-b border-zinc-900">
+                        class="sticky top-0 right-0 p-4 flex justify-end items-center bg-zinc-950/80 backdrop-blur-md z-10 border-zinc-900">
                         <button @click="isModalOpen = false"
                             class="p-2 rounded-xl bg-zinc-900 text-zinc-500 hover:bg-yellow-500 hover:text-zinc-950 transition-all">
                             <Plus class="w-6 h-6 rotate-45 stroke-[3px]" />
                         </button>
                     </div>
 
-                    <div class="p-8">
+                    <div class="px-4 pb-4">
                         <BaseForm @success="handleSuccess" />
                     </div>
                 </div>
