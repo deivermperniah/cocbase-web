@@ -31,7 +31,7 @@ function handleNavClick(navigate: () => void) {
   <aside
     :class="
       cn(
-        'bg-card border-r flex flex-col h-screen transition-all duration-300',
+        'bg-card border-r flex flex-col h-full transition-all duration-300',
         showLabels ? 'w-64' : 'w-20',
         className
       )
