@@ -57,7 +57,7 @@ onMounted(() => {
 
     <div v-else class="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <!-- Premium Header -->
-        <div class="flex flex-row items-center justify-between gap-4 mb-4">
+        <div class="flex flex-row items-center justify-between gap-4">
             <!-- Título -->
             <div class="space-y-1">
                 <h2 class="text-xl font-black italic tracking-tighter uppercase text-zinc-950 dark:text-white">
@@ -149,7 +149,7 @@ onMounted(() => {
             </div>
 
             <!-- List View (Versión Táctica) -->
-            <div v-else class="rounded-[2.5rem] border border-zinc-800 bg-zinc-950 overflow-hidden shadow-2xl">
+            <div v-else class="rounded-3xl border border-zinc-800 bg-zinc-950 overflow-hidden shadow-2xl">
                 <div class="overflow-x-auto w-full custom-scrollbar">
                     <table class="w-full text-left min-w-[900px]">
                         <thead class="bg-zinc-900/50 border-b border-zinc-800">
@@ -211,7 +211,7 @@ onMounted(() => {
             </div>
 
             <!-- Empty State Simplificado -->
-            <div v-if="bases.length === 0" class="text-center">
+            <div v-if="bases.length === 0" class="mt-8 text-center">
                 <p class="text-zinc-500 text-sm font-bold uppercase tracking-widest">
                     Sin bases registradas
                 </p>
@@ -242,8 +242,12 @@ onMounted(() => {
     </div>
 </template>
 
-
-
 <style scoped>
-/* No additional styles needed as we removed the custom scrollbar CSS to use the global one or just classes */
+.custom-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  display: none;
+}
 </style>

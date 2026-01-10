@@ -39,7 +39,7 @@ const isMobileMenuOpen = ref(false);
     <div class="flex-1 flex flex-col min-w-0 w-full relative">
       <!-- Mobile Header -->
       <header
-        class="md:hidden h-16 border-b flex items-center justify-between px-4 bg-card/80 backdrop-blur sticky top-0 z-30"
+        class="md:hidden h-16 border-b flex items-center justify-between px-4 bg-card sticky top-0 z-30"
       >
         <button
           @click="isMobileMenuOpen = true"
@@ -61,9 +61,9 @@ const isMobileMenuOpen = ref(false);
 
       <!-- Scrollable Content -->
       <main
-        class="flex-1 md:overflow-y-auto overflow-x-hidden p-4 custom-scrollbar relative w-full"
+        class="flex-1 md:overflow-y-auto overflow-x-hidden p-4 relative w-full"
       >
-        <div class="max-w-7xl mx-auto space-y-4">
+        <div class="max-w-7xl mx-auto">
           <slot />
         </div>
       </main>

@@ -55,7 +55,7 @@ onMounted(() => fetchStats())
     <div v-else class="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
 
         <!-- Header Actions -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <h2 class="text-xl font-black italic tracking-tighter uppercase text-zinc-950 dark:text-white">
                 Dashboard
             </h2>
