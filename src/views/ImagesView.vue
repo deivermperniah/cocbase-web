@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { supabase } from '@/lib/supabase'
-import { Trash2, ExternalLink, Image as ImageIcon, HardDrive } from 'lucide-vue-next'
+import { Trash2, ExternalLink, Image as ImageIcon, HardDrive, Plus } from 'lucide-vue-next'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 interface Img {
@@ -208,36 +208,40 @@ onMounted(loadImages)
           class="relative bg-zinc-950 w-full max-w-md rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-red-500/20 animate-in zoom-in-95 duration-300">
           <div class="p-4 space-y-4">
             <!-- Header del Modal -->
-            <div class="text-center space-y-4">
-              <div class="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mx-auto border border-red-500/20">
-                <Trash2 class="w-8 h-8 text-red-500" />
-              </div>
-              <div>
-                <h3 class="text-xl font-black italic text-white uppercase tracking-tighter">Confirmar Eliminación</h3>
-                <p class="text-zinc-500 text-sm mt-2">
-                  Esta acción no se puede deshacer
-                </p>
-              </div>
+            <div class="flex items-center justify-between">
+                <h3 class="text-xl font-black italic text-white uppercase tracking-tighter">
+                    Eliminar
+                </h3>
+                <button
+                    @click="closeDeleteModal"
+                    class="p-2 rounded-xl bg-zinc-900 text-zinc-500 hover:text-white transition-all"
+                >
+                    <Plus class="w-5 h-5 rotate-45" />
+                </button>
             </div>
 
             <!-- Información del archivo -->
             <div class="bg-zinc-900 rounded-2xl p-4 border border-zinc-800">
-              <p class="text-zinc-400 text-xs font-black uppercase tracking-widest mb-2">Archivo a eliminar:</p>
-              <p class="text-white font-medium truncate">
-                {{ deleteModal.imageName }}
-              </p>
+                <p class="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Archivo:</p>
+                <p class="text-white font-medium truncate text-sm">
+                    {{ deleteModal.imageName }}
+                </p>
             </div>
 
             <!-- Botones de Acción -->
-            <div class="flex gap-4">
-              <button @click="closeDeleteModal"
-                class="flex-1 h-12 rounded-xl bg-zinc-900 text-zinc-400 font-black uppercase tracking-widest text-xs hover:bg-zinc-800 transition-all border border-zinc-800">
-                Cancelar
-              </button>
-              <button @click="confirmDelete"
-                class="flex-1 h-12 rounded-xl bg-red-600 text-white font-black uppercase tracking-widest text-xs hover:bg-red-700 transition-all">
-                Eliminar
-              </button>
+            <div class="flex gap-4 pt-2">
+                <button 
+                    @click="closeDeleteModal"
+                    class="flex-1 h-[44px] rounded-full bg-zinc-900 border border-zinc-800 text-zinc-500 font-black uppercase tracking-[0.15em] text-[10px] hover:text-white transition-all active:scale-95"
+                >
+                    Cancelar
+                </button>
+                <button 
+                    @click="confirmDelete"
+                    class="flex-1 h-[44px] rounded-full bg-red-600 text-white font-black uppercase tracking-[0.15em] text-[10px] hover:bg-red-500 transition-all active:scale-95 shadow-xl shadow-red-600/20"
+                >
+                    Eliminar
+                </button>
             </div>
           </div>
         </div>
