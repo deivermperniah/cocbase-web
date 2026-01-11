@@ -17,6 +17,13 @@ const loading = ref(true);
 const isModalOpen = ref(false);
 const isFilterModalOpen = ref(false);
 
+// Estado del Modal de Eliminación
+const deleteModal = ref({
+  isOpen: false,
+  baseId: null as number | null,
+  baseTitle: "",
+});
+
 // Filtros
 const selectedLevel = ref<string>("all");
 const selectedType = ref<string>("all");
@@ -72,13 +79,33 @@ async function fetchBases() {
   }
 }
 
-async function deleteBase(id: number) {
-  if (!confirm("¿Estás seguro de que quieres eliminar esta base?")) return;
+function openDeleteModal(base: any) {
+  deleteModal.value = {
+    isOpen: true,
+    baseId: base.id,
+    baseTitle: `#${base.id} - Nivel ${base.level_th} - ${base.type}`,
+  };
+}
+
+function closeDeleteModal() {
+  deleteModal.value = {
+    isOpen: false,
+    baseId: null,
+    baseTitle: "",
+  };
+}
+
+async function confirmDelete() {
+  if (!deleteModal.value.baseId) return;
 
   try {
-    const { error } = await supabase.from("bases").delete().eq("id", id);
+    const { error } = await supabase
+      .from("bases")
+      .delete()
+      .eq("id", deleteModal.value.baseId);
     if (error) throw error;
-    allBases.value = allBases.value.filter((b) => b.id !== id);
+    allBases.value = allBases.value.filter((b) => b.id !== deleteModal.value.baseId);
+    closeDeleteModal();
   } catch (error) {
     console.error("Error deleting base:", error);
   }
@@ -200,7 +227,7 @@ onMounted(() => {
                   <ExternalLink class="w-4 h-4" />
                 </a>
                 <button
-                  @click="deleteBase(base.id)"
+                  @click="openDeleteModal(base)"
                   class="p-2.5 rounded-xl bg-zinc-900 text-zinc-400 hover:bg-red-600 hover:text-white transition-all border border-zinc-800"
                 >
                   <Trash2 class="w-4 h-4" />
@@ -320,6 +347,51 @@ onMounted(() => {
           <div class="p-4">
             <BaseForm @success="handleSuccess" />
           </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- Modal de Confirmación de Eliminación -->
+    <Teleport to="body">
+      <div v-if="deleteModal.isOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-zinc-950/90 backdrop-blur-xl" @click="closeDeleteModal"></div>
+
+        <div class="relative bg-zinc-950 w-full max-w-md rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-red-500/20 animate-in zoom-in-95 duration-300 overflow-hidden">
+            <div class="p-4 space-y-4">
+                <!-- Header -->
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xl font-black italic text-white uppercase tracking-tighter">
+                        Eliminar
+                    </h3>
+                    <button @click="closeDeleteModal" class="p-2 rounded-xl bg-zinc-900 text-zinc-500 hover:text-white transition-all">
+                        <Plus class="w-5 h-5 rotate-45" />
+                    </button>
+                </div>
+
+                <!-- Info -->
+                <div class="bg-zinc-900 rounded-2xl p-4 border border-zinc-800">
+                    <p class="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Base seleccionada:</p>
+                    <p class="text-white font-medium truncate text-sm">
+                        {{ deleteModal.baseTitle }}
+                    </p>
+                </div>
+
+                <!-- Footer -->
+                <div class="flex gap-4 pt-2">
+                    <button 
+                        @click="closeDeleteModal" 
+                        class="flex-1 h-[44px] rounded-full bg-zinc-900 border border-zinc-800 text-zinc-500 font-black uppercase tracking-[0.15em] text-[10px] hover:text-white transition-all active:scale-95"
+                    >
+                        Cancelar
+                    </button>
+                    <button 
+                        @click="confirmDelete" 
+                        class="flex-1 h-[44px] rounded-full bg-red-600 text-white font-black uppercase tracking-[0.15em] text-[10px] hover:bg-red-500 transition-all active:scale-95 shadow-xl shadow-red-600/20"
+                    >
+                        Confirmar
+                    </button>
+                </div>
+            </div>
         </div>
       </div>
     </Teleport>
