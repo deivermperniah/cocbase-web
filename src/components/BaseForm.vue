@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { supabase } from '@/lib/supabase'
 
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { PlusCircle, Image as ImageIcon, CheckCircle2, AlertTriangle, Loader2 } from 'lucide-vue-next'
+import { PlusCircle, Image as ImageIcon, CheckCircle2, AlertTriangle, Loader2, Plus } from 'lucide-vue-next'
 
 const emit = defineEmits(['success'])
 
@@ -22,12 +22,13 @@ const errorMessage = ref('')
 
 // Validaciones reactivas
 const isFormValid = computed(() => {
-    return baseLink.value.trim() && 
+    const isLevel3 = baseLevel.value === '3'
+    const linkValid = isLevel3 ? true : (baseLink.value.trim() && !hasSpacesInLink.value && isValidLink.value)
+    
+    return linkValid && 
            baseType.value && 
            baseLevel.value && 
-           baseImage.value &&
-           !hasSpacesInLink.value &&
-           isValidLink.value
+           baseImage.value
 })
 
 const hasSpacesInLink = computed(() => /\s/.test(baseLink.value))
@@ -43,40 +44,6 @@ const isValidLink = computed(() => {
 })
 
 // Validadores específicos
-function validateLink(): string | null {
-    if (!baseLink.value.trim()) {
-        return 'El enlace es requerido.'
-    }
-    
-    if (hasSpacesInLink.value) {
-        return 'El enlace no puede contener espacios.'
-    }
-    
-    if (!isValidLink.value) {
-        return 'El enlace debe ser un link válido de Clash of Clans.'
-    }
-    
-    return null
-}
-
-function validateType(): string | null {
-    if (!baseType.value) {
-        return 'El tipo de base es requerido.'
-    }
-    return null
-}
-
-function validateLevel(): string | null {
-    if (!baseLevel.value) {
-        return 'El nivel TH es requerido.'
-    }
-    const level = Number(baseLevel.value)
-    if (level < 3 || level > 18) {
-        return 'El nivel TH debe estar entre 3 y 18.'
-    }
-    return null
-}
-
 function validateImage(): string | null {
     if (!baseImage.value) {
         return 'La imagen es requerida.'
@@ -99,6 +66,8 @@ function validateImage(): string | null {
 
 // Verificar si el link ya existe
 async function checkExistingLink(): Promise<string | null> {
+    if (baseLevel.value === '3' && !baseLink.value.trim()) return null
+    
     try {
         const url = new URL(baseLink.value)
         const baseId = url.searchParams.get('id')
@@ -250,44 +219,28 @@ onMounted(() => {
     document.head.appendChild(style)
 })
 
+// Limpiar link si se selecciona nivel 3
+watch(() => baseLevel.value, (newLevel) => {
+    if (newLevel === '3') {
+        baseLink.value = ''
+    }
+})
+
 // Submit principal con todas las validaciones
 async function handleSubmit() {
     // Limpiar mensajes previos
     errorMessage.value = ''
     successMessage.value = ''
     
-    // Validación 1: Campos vacíos
-    const linkError = validateLink()
-    if (linkError) {
-        errorMessage.value = linkError
-        return
-    }
-    
-    const typeError = validateType()
-    if (typeError) {
-        errorMessage.value = typeError
-        return
-    }
-    
-    const levelError = validateLevel()
-    if (levelError) {
-        errorMessage.value = levelError
-        return
-    }
-    
-    const imageError = validateImage()
-    if (imageError) {
-        errorMessage.value = imageError
-        return
-    }
-    
     loading.value = true
     
     try {
-        // Validación 2: Link duplicado
+        // Validación 2: Link duplicado (Verificación en servidor)
         const duplicateLinkError = await checkExistingLink()
         if (duplicateLinkError) {
             errorMessage.value = duplicateLinkError
+            loading.value = false
+            setTimeout(() => { if (errorMessage.value === duplicateLinkError) errorMessage.value = '' }, 2000)
             return
         }
         
@@ -295,15 +248,22 @@ async function handleSubmit() {
         const duplicateImageError = await checkDuplicateImage()
         if (duplicateImageError) {
             errorMessage.value = duplicateImageError
+            loading.value = false
+            setTimeout(() => { if (errorMessage.value === duplicateImageError) errorMessage.value = '' }, 2000)
             return
         }
         
-        // Extraer ID del enlace
-        const url = new URL(baseLink.value)
-        const baseId = url.searchParams.get('id')
-        if (!baseId) {
-            errorMessage.value = 'No se pudo extraer el ID del enlace.'
-            return
+        // Extraer ID del enlace (solo si existe)
+        let baseId = null
+        if (baseLink.value.trim()) {
+            const url = new URL(baseLink.value)
+            baseId = url.searchParams.get('id')
+            if (!baseId) {
+                errorMessage.value = 'No se pudo extraer el ID del enlace.'
+                loading.value = false
+                setTimeout(() => { if (errorMessage.value === 'No se pudo extraer el ID del enlace.') errorMessage.value = '' }, 2000)
+                return
+            }
         }
         
         // Subir imagen con nombre único directamente en la raíz del bucket
@@ -319,6 +279,8 @@ async function handleSubmit() {
         if (uploadError) {
             console.error('Error subiendo imagen:', uploadError)
             errorMessage.value = 'Error al subir la imagen. Intenta con otra.'
+            loading.value = false
+            setTimeout(() => { if (errorMessage.value === 'Error al subir la imagen. Intenta con otra.') errorMessage.value = '' }, 2000)
             return
         }
 
@@ -329,7 +291,7 @@ async function handleSubmit() {
 
         // Guardar en base de datos
         const { error: insertError } = await supabase.from('bases').insert({
-            link: baseLink.value.trim(),
+            link: baseLink.value.trim() || null,
             type: baseType.value,
             level_th: Number(baseLevel.value),
             url_foto: urlData.publicUrl,
@@ -339,6 +301,8 @@ async function handleSubmit() {
         if (insertError) {
             console.error('Error guardando en BD:', insertError)
             errorMessage.value = 'Error al guardar la base. Intenta nuevamente.'
+            loading.value = false
+            setTimeout(() => { if (errorMessage.value === 'Error al guardar la base. Intenta nuevamente.') errorMessage.value = '' }, 2000)
             
             // Intentar eliminar la imagen subida si falló la BD
             try {
@@ -361,6 +325,7 @@ async function handleSubmit() {
     } catch (error: any) {
         console.error('Error general en handleSubmit:', error)
         errorMessage.value = error.message || 'Error inesperado. Intenta nuevamente.'
+        setTimeout(() => { errorMessage.value = '' }, 2000)
     } finally {
         loading.value = false
     }
@@ -369,28 +334,23 @@ async function handleSubmit() {
 
 <template>
     <div class="space-y-4">
-        <!-- Link Input -->
-        <div class="flex flex-col">
-            <label for="link" class="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-2">Link *</label>
-            <div class="relative">
-                <Input 
-                    id="link"
-                    placeholder="https://link.clashofclans.com/..." 
-                    v-model="baseLink"
-                    :class="[
-                        'h-[44px] rounded-xl bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500 focus-visible:ring-yellow-500/40',
-                        hasSpacesInLink ? 'border-red-500 focus-visible:ring-red-500/30' : ''
-                    ]"
-                />
-                <div class="absolute right-2 top-1/2 -translate-y-1/2">
-                    <AlertTriangle v-if="hasSpacesInLink" class="w-4 h-4 text-red-500" />
-                    <CheckCircle2 v-else-if="isValidLink && baseLink.trim()" class="w-4 h-4 text-yellow-500" />
-                </div>
-            </div>
-        </div>
-
         <!-- Selects -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-2 gap-4">
+            <!-- Select de Nivel -->
+            <div class="flex flex-col">
+                <label for="level" class="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-2">Nivel *</label>
+                <Select v-model="baseLevel">
+                    <SelectTrigger class="h-[44px] rounded-xl bg-zinc-900 border border-zinc-800 text-white">
+                        <SelectValue placeholder="Selecciona" />
+                    </SelectTrigger>
+                    <SelectContent side="bottom" :side-offset="4" :avoid-collisions="false" class="z-[9999] bg-zinc-950 border border-zinc-800 text-white mt-1" data-select-content>
+                        <SelectItem v-for="n in 16" :key="n + 2" :value="String(n + 2)">
+                            Nivel {{ n + 2 }}
+                        </SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+
             <!-- Select de Tipo -->
             <div class="flex flex-col">
                 <label for="type" class="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-2">Categoría *</label>
@@ -406,20 +366,33 @@ async function handleSubmit() {
                     </SelectContent>
                 </Select>
             </div>
+        </div>
 
-            <!-- Select de Nivel -->
-            <div class="flex flex-col">
-                <label for="level" class="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-2">Nivel *</label>
-                <Select v-model="baseLevel">
-                    <SelectTrigger class="h-[44px] rounded-xl bg-zinc-900 border border-zinc-800 text-white">
-                        <SelectValue placeholder="Selecciona" />
-                    </SelectTrigger>
-                    <SelectContent side="bottom" :side-offset="4" :avoid-collisions="false" class="z-[9999] bg-zinc-950 border border-zinc-800 text-white mt-1" data-select-content>
-                        <SelectItem v-for="n in 16" :key="n + 2" :value="String(n + 2)">
-                            Nivel {{ n + 2 }}
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
+        <!-- Link Input -->
+        <div v-if="baseLevel !== '3'" class="flex flex-col">
+            <label for="link" class="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-2">
+                Link *
+            </label>
+            <div class="relative">
+                <Input 
+                    id="link"
+                    placeholder="https://link.clashofclans.com/..." 
+                    v-model="baseLink"
+                    :class="[
+                        'h-[44px] rounded-xl bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500 focus-visible:ring-yellow-500/40 pr-10',
+                        hasSpacesInLink ? 'border-red-500 focus-visible:ring-red-500/30' : ''
+                    ]"
+                />
+                <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center pr-1">
+                    <button 
+                        v-if="baseLink" 
+                        @click="baseLink = ''"
+                        type="button"
+                        class="p-1 rounded-lg text-zinc-500 hover:text-white transition-colors"
+                    >
+                        <Plus class="w-4 h-4 rotate-45" />
+                    </button>
+                </div>
             </div>
         </div>
 

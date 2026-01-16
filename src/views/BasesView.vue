@@ -190,9 +190,21 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen], ([modal,
               </h3>
 
               <div class="flex gap-2">
-                <a :href="base.link" target="_blank" class="p-2.5 rounded-xl bg-zinc-900 text-zinc-400 hover:bg-yellow-500 hover:text-zinc-950 transition-all border border-zinc-800">
+                <a 
+                  v-if="base.link"
+                  :href="base.link" 
+                  target="_blank" 
+                  class="p-2.5 rounded-xl bg-zinc-900 text-zinc-400 hover:bg-yellow-500 hover:text-zinc-950 transition-all border border-zinc-800"
+                >
                   <ExternalLink class="w-4 h-4" />
                 </a>
+                <div 
+                  v-else
+                  class="p-2.5 rounded-xl bg-zinc-900 text-zinc-700 border border-zinc-800 cursor-not-allowed"
+                  title="Esta base no tiene enlace (Nivel 3)"
+                >
+                  <ExternalLink class="w-4 h-4" />
+                </div>
                 <button @click="openDeleteModal(base)" class="p-2.5 rounded-xl bg-zinc-900 text-zinc-400 hover:bg-red-600 hover:text-white transition-all border border-zinc-800">
                   <Trash2 class="w-4 h-4" />
                 </button>
@@ -224,19 +236,6 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen], ([modal,
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="flex flex-col">
-                        <label class="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-2">Categoría</label>
-                        <Select v-model="tempType">
-                            <SelectTrigger class="h-[44px] rounded-xl bg-zinc-900 border border-zinc-800 text-white">
-                                <SelectValue placeholder="Seleccionar" />
-                            </SelectTrigger>
-                            <SelectContent side="bottom" :side-offset="4" :avoid-collisions="false" class="z-[9999] bg-zinc-950 border border-zinc-800 text-white mt-1" data-select-content>
-                                <SelectItem value="all">Todos</SelectItem>
-                                <SelectItem v-for="t in types" :key="t" :value="t">{{ t }}</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <div class="flex flex-col">
                         <label class="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-2">Nivel</label>
                         <Select v-model="tempLevel">
                             <SelectTrigger class="h-[44px] rounded-xl bg-zinc-900 border border-zinc-800 text-white">
@@ -247,6 +246,19 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen], ([modal,
                                 <SelectItem v-for="n in 16" :key="n + 2" :value="String(n + 2)">
                                     Nivel {{ n + 2 }}
                                 </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div class="flex flex-col">
+                        <label class="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-2">Categoría</label>
+                        <Select v-model="tempType">
+                            <SelectTrigger class="h-[44px] rounded-xl bg-zinc-900 border border-zinc-800 text-white">
+                                <SelectValue placeholder="Seleccionar" />
+                            </SelectTrigger>
+                            <SelectContent side="bottom" :side-offset="4" :avoid-collisions="false" class="z-[9999] bg-zinc-950 border border-zinc-800 text-white mt-1" data-select-content>
+                                <SelectItem value="all">Todos</SelectItem>
+                                <SelectItem v-for="t in types" :key="t" :value="t">{{ t }}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
