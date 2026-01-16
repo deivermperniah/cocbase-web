@@ -24,7 +24,6 @@ const deleteModal = ref<{
   imageName: null
 })
 
-// 👇 RAÍZ DEL BUCKET
 const FOLDER = ''
 
 async function loadImages() {
@@ -44,9 +43,7 @@ async function loadImages() {
     return
   }
 
-  // Ensure data is not null before proceeding
   if (!data) {
-    console.warn('No data returned from storage list operation.')
     loading.value = false
     return
   }
@@ -54,11 +51,8 @@ async function loadImages() {
   for (const file of data) {
     if (!file.name.match(/\.(jpg|jpeg|png|webp)$/i)) continue
 
-    const fullPath = file.name // 👈 SIN public/
-
-    const { data: publicUrl } = supabase.storage
-      .from('bases-fotos')
-      .getPublicUrl(fullPath)
+    const fullPath = file.name
+    const { data: publicUrl } = supabase.storage.from('bases-fotos').getPublicUrl(fullPath)
 
     images.value.push({
       name: file.name,
@@ -67,7 +61,6 @@ async function loadImages() {
       size: file.metadata?.size
     })
 
-    // Acumular tamaño total
     if (file.metadata?.size) {
       totalSize.value += file.metadata.size
     }
@@ -110,7 +103,6 @@ async function confirmDelete() {
     return
   }
 
-  // Restar tamaño del archivo eliminado
   const deletedImage = images.value.find(img => img.path === deleteModal.value.imagePath)
   if (deletedImage?.size) {
     totalSize.value -= deletedImage.size
@@ -122,7 +114,6 @@ async function confirmDelete() {
 
 onMounted(loadImages)
 
-// Bloquear scroll cuando el modal está abierto
 watch(() => deleteModal.value.isOpen, (val) => {
   if (val) {
     document.body.style.overflow = 'hidden'
@@ -138,7 +129,6 @@ watch(() => deleteModal.value.isOpen, (val) => {
   </div>
 
   <div v-else class="space-y-4">
-    <!-- Premium Header -->
     <div class="flex flex-row items-center justify-between gap-4">
       <div class="space-y-1">
         <h2 class="text-xl font-black italic tracking-tighter uppercase text-zinc-950 dark:text-white">
@@ -146,7 +136,6 @@ watch(() => deleteModal.value.isOpen, (val) => {
         </h2>
       </div>
       
-      <!-- Estadísticas -->
       <div class="flex gap-4">
         <div class="flex items-center gap-2">
           <ImageIcon class="w-4 h-4 text-zinc-500" />
@@ -159,37 +148,27 @@ watch(() => deleteModal.value.isOpen, (val) => {
       </div>
     </div>
 
-    <!-- Images Grid -->
     <div class="space-y-4">
       <div v-if="images.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div v-for="img in images" :key="img.path"
           class="group relative overflow-hidden bg-zinc-950 shadow-2xl transition-all hover:ring-2 hover:ring-yellow-500/50 rounded-[2.5rem]">
 
-          <!-- Image Container -->
           <div class="aspect-video relative overflow-hidden bg-zinc-900">
-            <img :src="img.url"
-              class="block w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-
-            <!-- Overlay Táctico -->
-            <div
-              class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity">
-            </div>
+            <img :src="img.url" class="block w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+            <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
           </div>
 
           <div class="p-4">
             <div class="flex items-center justify-between gap-3">
-              <h3
-                class="text-sm font-black italic tracking-tighter text-white uppercase group-hover:text-yellow-500 transition-colors leading-none truncate flex-1" :title="img.name">
+              <h3 class="text-sm font-black italic tracking-tighter text-white uppercase group-hover:text-yellow-500 transition-colors leading-none truncate flex-1" :title="img.name">
                 {{ img.name }}
               </h3>
 
               <div class="flex gap-2">
-                <a :href="img.url" target="_blank"
-                  class="p-2.5 rounded-xl bg-zinc-900 text-zinc-400 hover:bg-yellow-500 hover:text-zinc-950 transition-all border border-zinc-800">
+                <a :href="img.url" target="_blank" class="p-2.5 rounded-xl bg-zinc-900 text-zinc-400 hover:bg-yellow-500 hover:text-zinc-950 transition-all border border-zinc-800">
                   <ExternalLink class="w-4 h-4" />
                 </a>
-                <button @click="openDeleteModal(img.path, img.name)"
-                  class="p-2.5 rounded-xl bg-zinc-900 text-zinc-400 hover:bg-red-600 hover:text-white transition-all border border-zinc-800">
+                <button @click="openDeleteModal(img.path, img.name)" class="p-2.5 rounded-xl bg-zinc-900 text-zinc-400 hover:bg-red-600 hover:text-white transition-all border border-zinc-800">
                   <Trash2 class="w-4 h-4" />
                 </button>
               </div>
@@ -198,7 +177,6 @@ watch(() => deleteModal.value.isOpen, (val) => {
         </div>
       </div>
 
-      <!-- Empty State Simplificado -->
       <div v-else class="text-center">
         <p class="text-zinc-500 text-sm font-bold uppercase tracking-widest">
           Sin imágenes en el storage
@@ -206,47 +184,29 @@ watch(() => deleteModal.value.isOpen, (val) => {
       </div>
     </div>
 
-    <!-- Modal de Confirmación de Eliminación -->
     <Teleport to="body">
       <div v-if="deleteModal.isOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-zinc-950/90 backdrop-blur-xl" @click="closeDeleteModal"></div>
 
-        <div
-          class="relative bg-zinc-950 w-full max-w-md rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-red-500/20 animate-in zoom-in-95 duration-300">
+        <div class="relative bg-zinc-950 w-full max-w-md rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-red-500/20 animate-in zoom-in-95 duration-300">
           <div class="p-4 space-y-4">
-            <!-- Header del Modal -->
             <div class="flex items-center justify-between">
-                <h3 class="text-xl font-black italic text-white uppercase tracking-tighter">
-                    Eliminar
-                </h3>
-                <button
-                    @click="closeDeleteModal"
-                    class="p-2 rounded-xl bg-zinc-900 text-zinc-500 hover:text-white transition-all"
-                >
+                <h3 class="text-xl font-black italic text-white uppercase tracking-tighter">Eliminar</h3>
+                <button @click="closeDeleteModal" class="p-2 rounded-xl bg-zinc-900 text-zinc-500 hover:text-white transition-all">
                     <Plus class="w-5 h-5 rotate-45" />
                 </button>
             </div>
 
-            <!-- Información del archivo -->
             <div class="bg-zinc-900 rounded-2xl p-4 border border-zinc-800">
                 <p class="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Archivo:</p>
-                <p class="text-white font-medium truncate text-sm">
-                    {{ deleteModal.imageName }}
-                </p>
+                <p class="text-white font-medium truncate text-sm">{{ deleteModal.imageName }}</p>
             </div>
 
-            <!-- Botones de Acción -->
             <div class="flex gap-4 pt-2">
-                <button 
-                    @click="closeDeleteModal"
-                    class="flex-1 h-[44px] rounded-full bg-zinc-900 border border-zinc-800 text-zinc-500 font-black uppercase tracking-[0.15em] text-[10px] hover:text-white transition-all active:scale-95"
-                >
+                <button @click="closeDeleteModal" class="flex-1 h-[44px] rounded-full bg-zinc-900 border border-zinc-800 text-zinc-500 font-black uppercase tracking-[0.15em] text-[10px] hover:text-white transition-all active:scale-95">
                     Cancelar
                 </button>
-                <button 
-                    @click="confirmDelete"
-                    class="flex-1 h-[44px] rounded-full bg-red-600 text-white font-black uppercase tracking-[0.15em] text-[10px] hover:bg-red-500 transition-all active:scale-95 shadow-xl shadow-red-600/20"
-                >
+                <button @click="confirmDelete" class="flex-1 h-[44px] rounded-full bg-red-600 text-white font-black uppercase tracking-[0.15em] text-[10px] hover:bg-red-500 transition-all active:scale-95 shadow-xl shadow-red-600/20">
                     Eliminar
                 </button>
             </div>

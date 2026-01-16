@@ -2,21 +2,17 @@
 import { ref } from "vue";
 import Sidebar from "./Sidebar.vue";
 import { Menu } from "lucide-vue-next";
-import logo from "@/assets/logo.png"; // Ensure we have the logo here too for mobile header
+import logo from "@/assets/logo.png";
 
 const isMobileMenuOpen = ref(false);
 </script>
 
 <template>
-  <div
-    class="flex min-h-dvh md:h-dvh bg-background md:overflow-hidden relative"
-  >
-    <!-- Desktop Sidebar (Hidden on mobile) -->
+  <div class="flex min-h-dvh md:h-dvh bg-background md:overflow-hidden relative">
     <div class="hidden md:block shrink-0 h-full">
       <Sidebar :showLabels="false" />
     </div>
 
-    <!-- Mobile Sidebar Backdrop -->
     <div
       v-if="isMobileMenuOpen"
       class="fixed inset-0 z-40 bg-zinc-950/80 backdrop-blur-sm md:hidden animate-in fade-in duration-200"
@@ -35,12 +31,8 @@ const isMobileMenuOpen = ref(false);
       />
     </div>
 
-    <!-- Main Content Area -->
     <div class="flex-1 flex flex-col min-w-0 w-full relative">
-      <!-- Mobile Header -->
-      <header
-        class="md:hidden h-16 border-b flex items-center justify-between px-4 bg-card sticky top-0 z-30"
-      >
+      <header class="md:hidden h-16 border-b flex items-center justify-between px-4 bg-card sticky top-0 z-30">
         <button
           @click="isMobileMenuOpen = true"
           class="p-2 -ml-2 text-zinc-400 hover:text-white"
@@ -50,19 +42,13 @@ const isMobileMenuOpen = ref(false);
 
         <div class="flex items-center gap-2">
           <img :src="logo" class="w-10 h-10 object-contain" />
-          <span class="font-black text-lg tracking-tighter"
-            >cocbase</span
-          >
+          <span class="font-black text-lg tracking-tighter uppercase">cocbase</span>
         </div>
 
         <div class="w-8"></div>
-        <!-- Spacer for centering -->
       </header>
 
-      <!-- Scrollable Content -->
-      <main
-        class="flex-1 md:overflow-y-auto overflow-x-hidden p-4 relative w-full"
-      >
+      <main class="flex-1 md:overflow-y-auto overflow-x-hidden p-4 relative w-full">
         <div class="max-w-7xl mx-auto">
           <slot />
         </div>
@@ -73,11 +59,10 @@ const isMobileMenuOpen = ref(false);
 
 <style scoped>
 .custom-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
-
 .custom-scrollbar::-webkit-scrollbar {
-  display: none; /* Chrome, Safari and Opera */
+  display: none;
 }
 </style>

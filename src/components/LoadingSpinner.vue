@@ -19,7 +19,7 @@ const sizeClasses = {
 <template>
   <div class="flex flex-col items-center justify-center">
     <Loader2 :class="[sizeClasses[size], 'animate-spin text-yellow-500 mb-4']" />
-    <span class="text-foreground text-sm font-black italic uppercase tracking-[0.2em] animate-pulse">
+    <span class="text-foreground text-sm font-black italic uppercase tracking-[0.2em]">
       Cargando...
     </span>
   </div>

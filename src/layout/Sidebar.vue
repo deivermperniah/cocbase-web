@@ -38,24 +38,20 @@ function handleNavClick(e: MouseEvent, navigate: () => void) {
       )
     "
   >
-    <!-- Logo / Header -->
     <div v-if="showLogo" class="h-16 flex flex-col shrink-0">
       <div class="flex-1 flex items-center justify-center">
         <div class="flex items-center shrink-0">
           <div class="flex items-center justify-center shrink-0 w-10 h-10 transition-all">
             <img :src="logo" alt="Logo" class="w-full h-full object-contain" />
           </div>
-          <span
-            v-if="showLabels"
-            class="ml-3 font-black text-lg tracking-tighter uppercase"
-            >CocBase</span
-          >
+          <span v-if="showLabels" class="ml-3 font-black text-lg tracking-tighter uppercase">
+            CocBase
+          </span>
         </div>  
       </div>
       <div class="border-b mx-2"></div>
     </div>
 
-    <!-- Navigation -->
     <nav class="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar">
       <router-link v-for="item in navItems" :key="item.name" :to="item.path" custom v-slot="{ navigate, href, isActive, isExactActive }">
         <a :href="href" @click="(e) => handleNavClick(e, navigate)" 
@@ -80,6 +76,4 @@ function handleNavClick(e: MouseEvent, navigate: () => void) {
   </aside>
 </template>
 
-<style scoped>
-/* No styles needed, using utility classes to avoid @apply linter issues */
-</style>
+<style scoped></style>
