@@ -48,7 +48,7 @@ onMounted(() => fetchStats());
     <LoadingSpinner size="lg" />
   </div>
 
-  <div v-else class="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+  <div v-else class="space-y-4 animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-500 ease-out">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <h2 class="text-xl font-black italic tracking-tighter uppercase text-zinc-950 dark:text-white">
         Dashboard
