@@ -21,7 +21,8 @@ const navItems = [
   { name: "Imagenes", icon: Image, path: "/imagenes" },
 ];
 
-function handleNavClick(navigate: () => void) {
+function handleNavClick(e: MouseEvent, navigate: () => void) {
+    e.preventDefault()
     navigate()
     emit('link-click')
 }
@@ -57,7 +58,7 @@ function handleNavClick(navigate: () => void) {
     <!-- Navigation -->
     <nav class="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar">
       <router-link v-for="item in navItems" :key="item.name" :to="item.path" custom v-slot="{ navigate, href, isActive, isExactActive }">
-        <a :href="href" @click="handleNavClick(navigate)" 
+        <a :href="href" @click="(e) => handleNavClick(e, navigate)" 
            :class="cn(
                'flex items-center rounded-lg hover:bg-muted group relative py-3 transition-all',
                showLabels ? 'justify-start px-4' : 'justify-center',

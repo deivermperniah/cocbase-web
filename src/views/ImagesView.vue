@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { Trash2, ExternalLink, Image as ImageIcon, HardDrive, Plus } from 'lucide-vue-next'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
@@ -28,7 +28,6 @@ const deleteModal = ref<{
 const FOLDER = ''
 
 async function loadImages() {
-  loading.value = true
   images.value = []
   totalSize.value = 0
 
@@ -122,11 +121,19 @@ async function confirmDelete() {
 }
 
 onMounted(loadImages)
+
+// Bloquear scroll cuando el modal está abierto
+watch(() => deleteModal.value.isOpen, (val) => {
+  if (val) {
+    document.body.style.overflow = 'hidden'
+  } else {
+    document.body.style.overflow = ''
+  }
+})
 </script>
 
 <template>
-  <!-- Loading State Centralizado -->
-  <div v-if="loading" class="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950/80 backdrop-blur-sm md:pl-20">
+  <div v-if="loading" class="flex flex-col items-center justify-center min-h-[50vh]">
     <LoadingSpinner size="lg" />
   </div>
 
@@ -153,7 +160,7 @@ onMounted(loadImages)
     </div>
 
     <!-- Images Grid -->
-    <div class="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div class="space-y-4">
       <div v-if="images.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div v-for="img in images" :key="img.path"
           class="group relative overflow-hidden bg-zinc-950 shadow-2xl transition-all hover:ring-2 hover:ring-yellow-500/50 rounded-[2.5rem]">

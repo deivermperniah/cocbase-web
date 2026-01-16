@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { supabase } from "@/lib/supabase";
 import { Plus, ExternalLink, Trash2, Filter } from "lucide-vue-next";
 import BaseForm from "@/components/BaseForm.vue";
@@ -63,7 +63,6 @@ const filteredBases = computed(() => {
 });
 
 async function fetchBases() {
-  loading.value = true;
   try {
     const { data, error } = await supabase
       .from("bases")
@@ -119,13 +118,21 @@ function handleSuccess() {
 onMounted(() => {
   fetchBases();
 });
+
+// Bloquear scroll cuando hay modales abiertos
+watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen], ([modal, filter, del]) => {
+  if (modal || filter || del) {
+    document.body.style.overflow = 'hidden'
+  } else {
+    document.body.style.overflow = ''
+  }
+})
 </script>
 
 <template>
-  <!-- Loading State Centralizado -->
   <div
     v-if="loading"
-    class="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950/80 backdrop-blur-sm md:pl-20"
+    class="flex flex-col items-center justify-center min-h-[50vh]"
   >
     <LoadingSpinner size="lg" />
   </div>
@@ -150,8 +157,8 @@ onMounted(() => {
         <button @click="openFilterModal" 
             class="flex items-center justify-center w-[44px] h-[44px] rounded-full transition-all active:scale-95 shadow-xl"
             :class="selectedLevel !== 'all' || selectedType !== 'all' 
-                ? 'bg-yellow-500 border-yellow-500 text-zinc-950 shadow-[0_0_20px_rgba(234,179,8,0.3)]' 
-                : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-yellow-500 hover:border-yellow-500/30'"
+                ? 'bg-yellow-500 border-2 border-yellow-500 text-zinc-950 shadow-[0_0_20px_rgba(234,179,8,0.3)]' 
+                : 'bg-zinc-900 border-2 border-zinc-400 text-zinc-400 hover:text-yellow-500 hover:border-yellow-500'"
         >
             <Filter class="w-4 h-4 stroke-[2.5px]" />
         </button>
