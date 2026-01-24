@@ -42,7 +42,7 @@ const isMobileMenuOpen = ref(false);
 
         <div class="flex items-center gap-2">
           <img :src="logo" class="w-10 h-10 object-contain" />
-          <span class="font-black text-lg tracking-tighter uppercase">cocbase</span>
+          <span class="font-black text-lg tracking-tighter">cocbase-admin</span>
         </div>
 
         <div class="w-8"></div>
