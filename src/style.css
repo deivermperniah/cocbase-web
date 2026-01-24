@@ -118,3 +118,19 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Global Styles */
+.custom-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Radix UI Select Fixes */
+[data-radix-select-content],
+[data-radix-popper-content-wrapper],
+.radix-select-content {
+  z-index: 99999 !important;
+}

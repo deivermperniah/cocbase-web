@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { supabase } from '@/lib/supabase'
 
 import { Input } from '@/components/ui/input'
@@ -201,23 +201,6 @@ function resetForm() {
     successMessage.value = ''
 }
 
-// Forzar estilos globales para selects
-onMounted(() => {
-    const style = document.createElement('style')
-    style.textContent = `
-        [data-radix-select-content] {
-            z-index: 99999 !important;
-            position: fixed !important;
-        }
-        [data-radix-popper-content-wrapper] {
-            z-index: 99999 !important;
-        }
-        .radix-select-content {
-            z-index: 99999 !important;
-        }
-    `
-    document.head.appendChild(style)
-})
 
 // Limpiar link si se selecciona nivel 3
 watch(() => baseLevel.value, (newLevel) => {
@@ -499,30 +482,3 @@ async function handleSubmit() {
     </div>
 </template>
 
-<style scoped>
-/* Asegurar que los selects se muestren sobre el modal */
-:deep([data-radix-select-content]) {
-    z-index: 9999 !important;
-    position: fixed !important;
-}
-
-:deep([data-radix-select-viewport]) {
-    z-index: 9999 !important;
-}
-
-/* Target directo con data attribute */
-:deep([data-select-content]) {
-    z-index: 9999 !important;
-    position: fixed !important;
-}
-
-/* Forzar el portal content */
-:deep([data-radix-popper-content-wrapper]) {
-    z-index: 9999 !important;
-}
-
-/* Solución global - targeting todos los select contents */
-:deep(div[data-radix-select-content]) {
-    z-index: 9999 !important;
-}
-</style>
