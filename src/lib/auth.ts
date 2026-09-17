@@ -48,7 +48,7 @@ export async function signIn(email: string, password: string) {
   if (error) throw error
 
   if (!isAuthorizedUser(data.session)) {
-    await supabase.auth.signOut()
+    await supabase.auth.signOut({ scope: 'local' })
     throw new Error('Esta cuenta no tiene permisos de administrador.')
   }
 
@@ -56,7 +56,11 @@ export async function signIn(email: string, password: string) {
 }
 
 export async function signOut() {
-  const { error } = await supabase.auth.signOut()
-  if (error) throw error
-  session.value = null
+  try {
+    await supabase.auth.signOut({ scope: 'local' })
+  } catch (error) {
+    console.warn('No se pudo cerrar la sesión remota; se limpiará la sesión local.', error)
+  } finally {
+    session.value = null
+  }
 }
