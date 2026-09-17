@@ -210,13 +210,13 @@ watch(
                 <a
                   :href="img.url"
                   target="_blank"
-                  class="p-2.5 rounded-xl bg-zinc-900 text-zinc-400 hover:bg-yellow-500 hover:text-zinc-950 transition-all border border-zinc-800"
+                  class="cursor-pointer p-2.5 rounded-xl bg-zinc-900 text-zinc-400 hover:bg-yellow-500 hover:text-zinc-950 transition-all border border-zinc-800"
                 >
                   <ExternalLink class="w-4 h-4" />
                 </a>
                 <button
                   @click="openDeleteModal(img.path, img.name)"
-                  class="p-2.5 rounded-xl bg-zinc-900 text-zinc-400 hover:bg-red-600 hover:text-white transition-all border border-zinc-800"
+                  class="cursor-pointer p-2.5 rounded-xl bg-zinc-900 text-zinc-400 hover:bg-red-600 hover:text-white transition-all border border-zinc-800"
                 >
                   <Trash2 class="w-4 h-4" />
                 </button>
@@ -255,7 +255,7 @@ watch(
               </h3>
               <button
                 @click="closeDeleteModal"
-                class="p-2 rounded-xl bg-zinc-900 text-zinc-500 hover:text-white transition-all"
+                class="cursor-pointer p-2 rounded-xl bg-zinc-900 text-zinc-500 hover:text-white transition-all"
               >
                 <Plus class="w-5 h-5 rotate-45" />
               </button>
@@ -275,13 +275,13 @@ watch(
             <div class="flex gap-4 pt-2">
               <button
                 @click="closeDeleteModal"
-                class="flex-1 h-[44px] rounded-full bg-zinc-900 border border-zinc-800 text-zinc-500 font-black uppercase tracking-[0.15em] text-[10px] hover:text-white transition-all active:scale-95"
+                class="flex-1 cursor-pointer h-[44px] rounded-full bg-zinc-900 border border-zinc-800 text-zinc-500 font-black uppercase tracking-[0.15em] text-[10px] hover:text-white transition-all active:scale-95"
               >
                 Cancelar
               </button>
               <button
                 @click="confirmDelete"
-                class="flex-1 h-[44px] rounded-full bg-red-600 text-white font-black uppercase tracking-[0.15em] text-[10px] hover:bg-red-500 transition-all active:scale-95 shadow-xl shadow-red-600/20"
+                class="flex-1 cursor-pointer h-[44px] rounded-full bg-red-600 text-white font-black uppercase tracking-[0.15em] text-[10px] hover:bg-red-500 transition-all active:scale-95 shadow-xl shadow-red-600/20"
               >
                 Eliminar
               </button>

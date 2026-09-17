@@ -139,7 +139,7 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen], ([modal,
 
       <div class="flex flex-row items-center gap-2 sm:gap-4">
         <button @click="openFilterModal" 
-            class="flex items-center justify-center w-[44px] h-[44px] rounded-full transition-all active:scale-95 shadow-xl"
+            class="flex cursor-pointer items-center justify-center w-[44px] h-[44px] rounded-full transition-all active:scale-95 shadow-xl"
             :class="selectedLevel !== 'all' || selectedType !== 'all' 
                 ? 'bg-yellow-500 border-2 border-yellow-500 text-zinc-950 shadow-[0_0_20px_rgba(234,179,8,0.3)]' 
                 : 'bg-zinc-900 border-2 border-zinc-400 text-zinc-400 hover:text-yellow-500 hover:border-yellow-500'"
@@ -150,7 +150,7 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen], ([modal,
         <div class="ml-auto">
           <button
             @click="isModalOpen = true"
-            class="group flex items-center justify-center gap-3 w-[44px] sm:w-auto px-0 sm:px-4 h-[44px] rounded-full bg-zinc-950 border-2 border-yellow-500 text-yellow-500 font-black uppercase tracking-[0.15em] text-[10px] sm:text-[10px] hover:bg-yellow-500 hover:text-zinc-950 transition-all duration-300 shadow-xl shadow-yellow-500/10 active:scale-95"
+            class="group flex cursor-pointer items-center justify-center gap-3 w-[44px] sm:w-auto px-0 sm:px-4 h-[44px] rounded-full bg-zinc-950 border-2 border-yellow-500 text-yellow-500 font-black uppercase tracking-[0.15em] text-[10px] sm:text-[10px] hover:bg-yellow-500 hover:text-zinc-950 transition-all duration-300 shadow-xl shadow-yellow-500/10 active:scale-95"
           >
             <Plus class="w-4 h-4 stroke-[3px]" />
             <span class="hidden sm:inline text-[10px] sm:text-xs">Nueva Base</span>
@@ -194,7 +194,7 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen], ([modal,
                   v-if="base.link"
                   :href="base.link" 
                   target="_blank" 
-                  class="p-2.5 rounded-xl bg-zinc-900 text-zinc-400 hover:bg-yellow-500 hover:text-zinc-950 transition-all border border-zinc-800"
+                  class="cursor-pointer p-2.5 rounded-xl bg-zinc-900 text-zinc-400 hover:bg-yellow-500 hover:text-zinc-950 transition-all border border-zinc-800"
                 >
                   <ExternalLink class="w-4 h-4" />
                 </a>
@@ -205,7 +205,7 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen], ([modal,
                 >
                   <ExternalLink class="w-4 h-4" />
                 </div>
-                <button @click="openDeleteModal(base)" class="p-2.5 rounded-xl bg-zinc-900 text-zinc-400 hover:bg-red-600 hover:text-white transition-all border border-zinc-800">
+                <button @click="openDeleteModal(base)" class="cursor-pointer p-2.5 rounded-xl bg-zinc-900 text-zinc-400 hover:bg-red-600 hover:text-white transition-all border border-zinc-800">
                   <Trash2 class="w-4 h-4" />
                 </button>
               </div>
@@ -229,7 +229,7 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen], ([modal,
             <div class="p-4 space-y-4">
                 <div class="flex items-center justify-between">
                     <h3 class="text-xl font-black italic text-white uppercase tracking-tighter">Filtro</h3>
-                    <button @click="isFilterModalOpen = false" class="p-2 rounded-xl bg-zinc-900 text-zinc-500 hover:text-white transition-all">
+                    <button @click="isFilterModalOpen = false" class="cursor-pointer p-2 rounded-xl bg-zinc-900 text-zinc-500 hover:text-white transition-all">
                         <Plus class="w-5 h-5 rotate-45" />
                     </button>
                 </div>
@@ -265,10 +265,10 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen], ([modal,
                 </div>
 
                 <div class="flex gap-4 border-zinc-900">
-                    <button @click="clearFilters(); isFilterModalOpen = false" class="flex-1 h-[44px] rounded-full bg-zinc-900 border border-zinc-800 text-zinc-500 font-black uppercase tracking-[0.15em] text-[10px] hover:text-white transition-all active:scale-95">
+                    <button @click="clearFilters(); isFilterModalOpen = false" class="flex-1 cursor-pointer h-[44px] rounded-full bg-zinc-900 border border-zinc-800 text-zinc-500 font-black uppercase tracking-[0.15em] text-[10px] hover:text-white transition-all active:scale-95">
                         Limpiar
                     </button>
-                    <button @click="applyFilters" class="flex-1 h-[44px] rounded-full bg-yellow-500 text-zinc-950 font-black uppercase tracking-[0.15em] text-[10px] hover:bg-white transition-all duration-300 shadow-xl shadow-yellow-500/10 active:scale-95">
+                    <button @click="applyFilters" class="flex-1 cursor-pointer h-[44px] rounded-full bg-yellow-500 text-zinc-950 font-black uppercase tracking-[0.15em] text-[10px] hover:bg-white transition-all duration-300 shadow-xl shadow-yellow-500/10 active:scale-95">
                         Aplicar Filtros
                     </button>
                 </div>
@@ -284,7 +284,7 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen], ([modal,
         <div class="relative bg-zinc-950 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-yellow-500/20 animate-in zoom-in-95 duration-300 custom-scrollbar">
           <div class="px-4 pt-4 flex items-center justify-between">
             <h3 class="text-xl font-black italic text-white uppercase tracking-tighter">Nueva Base</h3>
-            <button @click="isModalOpen = false" class="p-2 rounded-xl bg-zinc-900 text-zinc-500 hover:text-white transition-all">
+            <button @click="isModalOpen = false" class="cursor-pointer p-2 rounded-xl bg-zinc-900 text-zinc-500 hover:text-white transition-all">
               <Plus class="w-5 h-5 rotate-45" />
             </button>
           </div>
@@ -303,7 +303,7 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen], ([modal,
             <div class="p-4 space-y-4">
                 <div class="flex items-center justify-between">
                     <h3 class="text-xl font-black italic text-white uppercase tracking-tighter">Eliminar</h3>
-                    <button @click="closeDeleteModal" class="p-2 rounded-xl bg-zinc-900 text-zinc-500 hover:text-white transition-all">
+                    <button @click="closeDeleteModal" class="cursor-pointer p-2 rounded-xl bg-zinc-900 text-zinc-500 hover:text-white transition-all">
                         <Plus class="w-5 h-5 rotate-45" />
                     </button>
                 </div>
@@ -314,10 +314,10 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen], ([modal,
                 </div>
 
                 <div class="flex gap-4 pt-2">
-                    <button @click="closeDeleteModal" class="flex-1 h-[44px] rounded-full bg-zinc-900 border border-zinc-800 text-zinc-500 font-black uppercase tracking-[0.15em] text-[10px] hover:text-white transition-all active:scale-95">
+                    <button @click="closeDeleteModal" class="flex-1 cursor-pointer h-[44px] rounded-full bg-zinc-900 border border-zinc-800 text-zinc-500 font-black uppercase tracking-[0.15em] text-[10px] hover:text-white transition-all active:scale-95">
                         Cancelar
                     </button>
-                    <button @click="confirmDelete" class="flex-1 h-[44px] rounded-full bg-red-600 text-white font-black uppercase tracking-[0.15em] text-[10px] hover:bg-red-500 transition-all active:scale-95 shadow-xl shadow-red-600/20">
+                    <button @click="confirmDelete" class="flex-1 cursor-pointer h-[44px] rounded-full bg-red-600 text-white font-black uppercase tracking-[0.15em] text-[10px] hover:bg-red-500 transition-all active:scale-95 shadow-xl shadow-red-600/20">
                         Confirmar
                     </button>
                 </div>

@@ -35,7 +35,7 @@ const isMobileMenuOpen = ref(false);
       <header class="md:hidden h-16 border-b flex items-center justify-between px-4 bg-card sticky top-0 z-30">
         <button
           @click="isMobileMenuOpen = true"
-          class="p-2 -ml-2 text-zinc-400 hover:text-white"
+          class="-ml-2 cursor-pointer p-2 text-zinc-400 hover:text-white"
         >
           <Menu class="w-6 h-6" />
         </button>

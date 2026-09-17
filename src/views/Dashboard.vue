@@ -2,7 +2,7 @@
 import { ref, onMounted } from "vue";
 import { supabase } from "@/lib/supabase";
 import { Card, CardContent } from "@/components/ui/card";
-import { Sword, Trophy, Hammer, Shield, ChevronRight } from "lucide-vue-next";
+import { Sword, Trophy, Hammer, Shield, Layers } from "lucide-vue-next";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 const totalBases = ref(0);
@@ -55,10 +55,10 @@ onMounted(() => fetchStats());
       </h2>
       <router-link
         to="/bases"
-        class="hidden sm:flex items-center gap-3 px-4 h-[36px] sm:h-[44px] rounded-full bg-zinc-950 border-2 border-yellow-500 text-yellow-500 font-black uppercase tracking-[0.15em] text-[8px] sm:text-[10px] hover:bg-yellow-500 hover:text-zinc-950 transition-all duration-300 shadow-xl shadow-yellow-500/10 active:scale-95"
+        class="hidden sm:flex cursor-pointer items-center gap-3 px-4 h-[36px] sm:h-[44px] rounded-full bg-zinc-950 border-2 border-yellow-500 text-yellow-500 font-black uppercase tracking-[0.15em] text-[8px] sm:text-[10px] hover:bg-yellow-500 hover:text-zinc-950 transition-all duration-300 shadow-xl shadow-yellow-500/10 active:scale-95"
       >
+        <Layers class="h-3 w-3 sm:h-4 sm:w-4 stroke-[3px]" />
         <span class="text-[10px] sm:text-xs">Ver Bases</span>
-        <ChevronRight class="h-3 w-3 sm:h-4 sm:w-4 stroke-[3px] group-hover:translate-x-1 transition-transform" />
       </router-link>
     </div>
 

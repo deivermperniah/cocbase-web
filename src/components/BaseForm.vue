@@ -371,7 +371,7 @@ async function handleSubmit() {
                         v-if="baseLink" 
                         @click="baseLink = ''"
                         type="button"
-                        class="p-1 rounded-lg text-zinc-500 hover:text-white transition-colors"
+                        class="cursor-pointer p-1 rounded-lg text-zinc-500 hover:text-white transition-colors"
                     >
                         <Plus class="w-4 h-4 rotate-45" />
                     </button>
@@ -430,7 +430,7 @@ async function handleSubmit() {
                     <button 
                         v-if="!loading"
                         @click.stop="removeImage"
-                        class="absolute -top-2 -right-2 h-8 w-8 rounded-full bg-zinc-950 text-zinc-400 flex items-center justify-center hover:bg-red-600 hover:text-white transition-all border border-zinc-800"
+                        class="absolute -top-2 -right-2 h-8 w-8 cursor-pointer rounded-full bg-zinc-950 text-zinc-400 flex items-center justify-center hover:bg-red-600 hover:text-white transition-all border border-zinc-800"
                     >
                         <PlusCircle class="w-3 h-3 rotate-45" />
                     </button>
@@ -445,13 +445,13 @@ async function handleSubmit() {
 
         <!-- Botón de Envío -->
         <button
-            class="w-full h-[44px] rounded-full bg-yellow-500 text-zinc-950 font-black uppercase tracking-[0.15em] text-[10px] hover:bg-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shadow-xl shadow-yellow-500/10"
+            class="w-full h-[44px] cursor-pointer rounded-full bg-yellow-500 text-zinc-950 font-black uppercase tracking-[0.15em] text-[10px] hover:bg-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shadow-xl shadow-yellow-500/10"
             :disabled="loading || !isFormValid" 
             @click="handleSubmit"
         >
             <div v-if="!loading" class="flex items-center justify-center gap-2">
-                <span>Guardar</span>
                 <PlusCircle class="w-4 h-4" />
+                <span>Guardar</span>
             </div>
             <div v-else class="flex items-center justify-center gap-2">
                 <Loader2 class="w-4 h-4 animate-spin" />
