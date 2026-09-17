@@ -82,7 +82,7 @@ Clash of Clans Base Manager es una aplicación táctica diseñada para jugadores
 ## 🚀 Instalación
 
 ### Prerrequisitos
-- Node.js 18+ 
+- Node.js 20.19+ (o 22.12+)
 - npm o yarn
 - Cuenta de Supabase
 
@@ -131,30 +131,49 @@ Crear archivo `.env` con las siguientes variables:
 # Supabase Configuration
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_ADMIN_EMAIL=admin@example.com
 ```
+
+`VITE_ADMIN_EMAIL` limita el acceso de la interfaz al correo del administrador. Esta variable es pública en el navegador y no sustituye las políticas RLS de Supabase.
 
 ### Configuración de Supabase
 
-1. **Crear bucket de storage**
+1. **Crear el usuario administrador**
+
+En Supabase Dashboard, crea el usuario con el correo definido en `VITE_ADMIN_EMAIL` y desactiva el registro público.
+
+2. **Crear bucket de storage**
 ```sql
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('bases-fotos', 'bases-fotos', true);
 ```
 
-2. **Políticas de acceso (RLS)**
+3. **Políticas de acceso (RLS)**
+
+Activa RLS en `bases` y utiliza el rol `admin` en `app_metadata` del usuario administrador. Ejecuta estas políticas reemplazando las políticas públicas existentes:
+
 ```sql
--- Política para leer imágenes
-CREATE POLICY "Public Access" ON storage.objects
-FOR SELECT USING (bucket_id = 'bases-fotos');
+ALTER TABLE public.bases ENABLE ROW LEVEL SECURITY;
 
--- Política para subir imágenes
-CREATE POLICY "Upload Images" ON storage.objects
-FOR INSERT WITH CHECK (bucket_id = 'bases-fotos');
+CREATE POLICY "Admin can manage bases" ON public.bases
+FOR ALL TO authenticated
+USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin')
+WITH CHECK ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 
--- Política para eliminar imágenes
+CREATE POLICY "Admin can read images" ON storage.objects
+FOR SELECT TO authenticated
+USING (bucket_id = 'bases-fotos' AND (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+
+CREATE POLICY "Admin can upload images" ON storage.objects
+FOR INSERT TO authenticated
+WITH CHECK (bucket_id = 'bases-fotos' AND (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+
 CREATE POLICY "Delete Images" ON storage.objects
-FOR DELETE USING (bucket_id = 'bases-fotos');
+FOR DELETE TO authenticated
+USING (bucket_id = 'bases-fotos' AND (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
 ```
+
+Configura `app_metadata.role = "admin"` para el usuario desde un entorno administrativo seguro. No uses `service_role` en la aplicación Vue. El bucket mostrado sigue siendo público porque la aplicación actual almacena URLs públicas; para ocultar las imágenes también hay que migrar a bucket privado y URLs firmadas.
 
 ## 📁 Estructura del Proyecto
 
