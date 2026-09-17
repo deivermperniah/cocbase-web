@@ -40,12 +40,7 @@ const isMobileMenuOpen = ref(false);
           <Menu class="w-6 h-6" />
         </button>
 
-        <div class="flex items-center gap-2">
-          <img :src="logo" class="w-10 h-10 object-contain" />
-          <span class="font-black text-lg tracking-tighter">cocbase-admin</span>
-        </div>
-
-        <div class="w-8"></div>
+        <img :src="logo" alt="CocBase" class="ml-auto w-10 h-10 object-contain" />
       </header>
 
       <main class="flex-1 md:overflow-y-auto overflow-x-hidden p-4 relative w-full">

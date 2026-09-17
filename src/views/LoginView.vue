@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { LogIn } from 'lucide-vue-next'
+import { Loader2, LogIn } from 'lucide-vue-next'
 import Alert from '@/components/ui/alert/Alert.vue'
 import AlertDescription from '@/components/ui/alert/AlertDescription.vue'
 import Button from '@/components/ui/button/Button.vue'
@@ -68,7 +68,8 @@ async function handleSubmit() {
           </div>
 
           <Button type="submit" class="w-full h-[44px] cursor-pointer rounded-full bg-yellow-500 text-zinc-950 font-black uppercase tracking-[0.15em] text-[10px] hover:bg-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shadow-xl shadow-yellow-500/10" :disabled="isSubmitting">
-            <LogIn class="mr-2 h-4 w-4" />
+            <Loader2 v-if="isSubmitting" class="mr-2 h-4 w-4 animate-spin" />
+            <LogIn v-else class="mr-2 h-4 w-4" />
             {{ isSubmitting ? 'Iniciando sesión...' : 'Iniciar sesión' }}
           </Button>
         </form>

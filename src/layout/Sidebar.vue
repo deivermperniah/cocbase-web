@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { LayoutDashboard, Layers, Image, LogOut } from "lucide-vue-next";
+import { LayoutDashboard, Layers, Image, Loader2, LogOut } from "lucide-vue-next";
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 import logo from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
 import { signOut } from "@/lib/auth";
 
 const router = useRouter();
+const isSigningOut = ref(false);
 
 const props = withDefaults(defineProps<{
   showLabels?: boolean;
@@ -32,8 +34,15 @@ function handleNavClick(e: MouseEvent, navigate: () => void) {
 }
 
 async function handleSignOut() {
-  await signOut()
-  await router.replace({ name: 'login' })
+  if (isSigningOut.value) return
+  isSigningOut.value = true
+
+  try {
+    await signOut()
+    await router.replace({ name: 'login' })
+  } finally {
+    isSigningOut.value = false
+  }
 }
 </script>
 
@@ -90,14 +99,16 @@ async function handleSignOut() {
     <div class="border-t p-4">
       <button
         type="button"
-        class="flex w-full cursor-pointer items-center rounded-lg py-3 text-red-500 transition-colors hover:bg-red-500/10 hover:text-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+        class="flex w-full cursor-pointer items-center rounded-lg py-3 text-red-500 transition-colors hover:bg-red-500/10 hover:text-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 disabled:cursor-not-allowed disabled:opacity-50"
         :class="showLabels ? 'justify-start px-4' : 'justify-center'"
+        :disabled="isSigningOut"
         title="Cerrar sesión"
         @click="handleSignOut"
       >
-        <LogOut class="h-5 w-5 shrink-0" />
+        <Loader2 v-if="isSigningOut" class="h-5 w-5 shrink-0 animate-spin" />
+        <LogOut v-else class="h-5 w-5 shrink-0" />
         <span v-if="showLabels" class="ml-3 text-sm font-medium uppercase tracking-wider">
-          Cerrar sesión
+          {{ isSigningOut ? 'Cerrando sesión...' : 'Cerrar sesión' }}
         </span>
       </button>
     </div>
