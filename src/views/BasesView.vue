@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from "vue";
+import { ref, onMounted, onBeforeUnmount, computed, watch } from "vue";
 import { supabase } from "@/lib/supabase";
-import { Plus, ExternalLink, Trash2, Filter } from "lucide-vue-next";
+import { Plus, ExternalLink, Trash2, Filter, X, ZoomIn, ZoomOut, Shield, Castle, CalendarDays, Sword, Trophy, Hammer } from "lucide-vue-next";
 import BaseForm from "@/components/BaseForm.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import {
@@ -23,12 +23,35 @@ const deleteModal = ref({
   baseTitle: "",
 });
 
+const imageViewer = ref({
+  isOpen: false,
+  url: "",
+  title: "",
+  level: "",
+  type: "",
+  date: "",
+  scale: 1,
+  x: 0,
+  y: 0,
+});
+
+const isDraggingImage = ref(false);
+const dragStart = ref({ x: 0, y: 0 });
+const imageViewport = ref<HTMLElement | null>(null);
+
 const selectedLevel = ref<string>("all");
 const selectedType = ref<string>("all");
 const types = ["Guerra", "Liga", "Mejora", "Recursos"];
 
 const tempLevel = ref<string>("all");
 const tempType = ref<string>("all");
+
+function getTypeIcon(type: string) {
+  if (type === "Guerra") return Sword;
+  if (type === "Liga") return Trophy;
+  if (type === "Mejora") return Hammer;
+  return Shield;
+}
 
 function openFilterModal() {
   tempLevel.value = selectedLevel.value;
@@ -90,6 +113,91 @@ function closeDeleteModal() {
   };
 }
 
+function openImageViewer(base: any) {
+  imageViewer.value = {
+    isOpen: true,
+    url: base.url_foto,
+    title: `Base #${base.id} - Nivel ${base.level_th} - ${base.type}`,
+    level: String(base.level_th),
+    type: base.type,
+    date: new Date(base.created_at).toLocaleDateString("es-ES"),
+    scale: 1,
+    x: 0,
+    y: 0,
+  };
+}
+
+function closeImageViewer() {
+  imageViewer.value = {
+    isOpen: false,
+    url: "",
+    title: "",
+    level: "",
+    type: "",
+    date: "",
+    scale: 1,
+    x: 0,
+    y: 0,
+  };
+  isDraggingImage.value = false;
+}
+
+function zoomImage(amount: number) {
+  const scale = Math.min(3, Math.max(0.5, imageViewer.value.scale + amount));
+  imageViewer.value.scale = scale;
+  if (scale <= 1) {
+    imageViewer.value.x = 0;
+    imageViewer.value.y = 0;
+  } else {
+    clampImagePosition();
+  }
+}
+
+function clampImagePosition() {
+  const viewport = imageViewport.value;
+  if (!viewport || imageViewer.value.scale <= 1) return;
+
+  const { width, height } = viewport.getBoundingClientRect();
+  const maxX = width * (imageViewer.value.scale - 1) / 2;
+  const maxY = height * (imageViewer.value.scale - 1) / 2;
+
+  imageViewer.value.x = Math.min(maxX, Math.max(-maxX, imageViewer.value.x));
+  imageViewer.value.y = Math.min(maxY, Math.max(-maxY, imageViewer.value.y));
+}
+
+function startImageDrag(event: PointerEvent) {
+  if (event.button !== 0 || imageViewer.value.scale <= 1) return;
+
+  isDraggingImage.value = true;
+  dragStart.value = {
+    x: event.clientX - imageViewer.value.x,
+    y: event.clientY - imageViewer.value.y,
+  };
+  (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+}
+
+function moveImage(event: PointerEvent) {
+  if (!isDraggingImage.value) return;
+
+  imageViewer.value.x = event.clientX - dragStart.value.x;
+  imageViewer.value.y = event.clientY - dragStart.value.y;
+  clampImagePosition();
+}
+
+function stopImageDrag(event: PointerEvent) {
+  isDraggingImage.value = false;
+  const target = event.currentTarget as HTMLElement;
+  if (target.hasPointerCapture(event.pointerId)) {
+    target.releasePointerCapture(event.pointerId);
+  }
+}
+
+function handleImageViewerKeydown(event: KeyboardEvent) {
+  if (event.key === "Escape" && imageViewer.value.isOpen) {
+    closeImageViewer();
+  }
+}
+
 async function confirmDelete() {
   if (!deleteModal.value.baseId) return;
 
@@ -113,10 +221,16 @@ function handleSuccess() {
 
 onMounted(() => {
   fetchBases();
+  window.addEventListener("keydown", handleImageViewerKeydown);
 });
 
-watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen], ([modal, filter, del]) => {
-  if (modal || filter || del) {
+onBeforeUnmount(() => {
+  window.removeEventListener("keydown", handleImageViewerKeydown);
+  document.body.style.overflow = "";
+});
+
+watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => imageViewer.value.isOpen], ([modal, filter, del, viewer]) => {
+  if (modal || filter || del || viewer) {
     document.body.style.overflow = 'hidden'
   } else {
     document.body.style.overflow = ''
@@ -167,17 +281,29 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen], ([modal,
           class="group relative overflow-hidden bg-zinc-950 shadow-2xl transition-all hover:ring-2 hover:ring-yellow-500/50 rounded-[2.5rem]"
         >
           <div class="aspect-video relative overflow-hidden bg-zinc-900">
-            <img :src="base.url_foto" class="block w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-            <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
+            <button
+              type="button"
+              class="absolute inset-0 z-10 block h-full w-full cursor-zoom-in text-left"
+              :aria-label="`Ver imagen de ${base.type}`"
+              @click="openImageViewer(base)"
+            >
+              <img :src="base.url_foto" class="block w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+            </button>
+            <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent opacity-60 transition-opacity group-hover:opacity-40"></div>
 
-            <div class="absolute bottom-4 left-4">
-              <span class="px-3 py-1.5 rounded-lg text-[10px] font-black bg-yellow-500 text-zinc-950 uppercase tracking-widest shadow-lg">
-                NIVEL {{ base.level_th }} <span class="text-white">➖</span> {{ base.type }}
+            <div class="pointer-events-none absolute bottom-4 left-4 z-20 flex items-center gap-2">
+              <span class="flex h-6 items-center gap-2 rounded-lg bg-yellow-500 px-3 text-[10px] font-black uppercase tracking-widest text-zinc-950 shadow-lg">
+                <Castle class="h-3.5 w-3.5" />
+                {{ base.level_th }}
+              </span>
+              <span class="flex h-6 items-center gap-2 rounded-lg bg-yellow-500 px-3 text-[10px] font-black uppercase tracking-widest text-zinc-950 shadow-lg">
+                <component :is="getTypeIcon(base.type)" class="h-3.5 w-3.5" />
+                {{ base.type }}
               </span>
             </div>
-
-            <div class="absolute bottom-4 right-4">
-              <span class="px-3 py-1.5 rounded-lg text-[10px] font-black bg-zinc-950 text-yellow-500 uppercase tracking-widest shadow-lg border border-yellow-500/20">
+            <div class="pointer-events-none absolute bottom-4 right-4 z-20">
+              <span class="flex h-6 items-center gap-2 rounded-lg border border-yellow-500/20 bg-zinc-950 px-3 text-[10px] font-black uppercase tracking-widest text-yellow-500 shadow-lg">
+                <CalendarDays class="h-3.5 w-3.5" />
                 {{ new Date(base.created_at).toLocaleDateString("es-ES") }}
               </span>
             </div>
@@ -322,6 +448,71 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen], ([modal,
                     </button>
                 </div>
             </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <Teleport to="body">
+      <div v-if="imageViewer.isOpen" class="fixed inset-0 z-[110] flex items-center justify-center bg-zinc-950/95 backdrop-blur-xl">
+        <button
+          type="button"
+          class="absolute inset-0 cursor-zoom-out"
+          aria-label="Cerrar visor de imagen"
+          @click="closeImageViewer"
+        ></button>
+
+        <div class="relative z-10 flex h-full w-full flex-col items-center">
+          <div class="relative z-20 flex h-16 w-full shrink-0 items-center justify-between gap-4 px-4 text-white sm:h-20 sm:px-6">
+            <div class="flex min-w-0 items-center gap-2">
+              <span class="flex h-6 items-center gap-2 rounded-lg bg-yellow-500 px-3 text-[10px] font-black uppercase tracking-widest text-zinc-950 shadow-lg">
+                <Castle class="h-3.5 w-3.5" />
+                {{ imageViewer.level }}
+              </span>
+              <span class="flex h-6 items-center gap-2 rounded-lg bg-yellow-500 px-3 text-[10px] font-black uppercase tracking-widest text-zinc-950 shadow-lg">
+                <component :is="getTypeIcon(imageViewer.type)" class="h-3.5 w-3.5" />
+                {{ imageViewer.type }}
+              </span>
+              <span class="flex h-6 shrink-0 items-center rounded-lg border border-yellow-500/20 bg-zinc-950 px-3 text-[10px] font-black uppercase tracking-widest text-yellow-500 shadow-lg">{{ imageViewer.date }}</span>
+            </div>
+            <button
+              type="button"
+              class="cursor-pointer rounded-xl bg-zinc-900 p-2 text-zinc-400 transition-all hover:bg-red-600 hover:text-white"
+              aria-label="Cerrar visor de imagen"
+              @click="closeImageViewer"
+            >
+              <X class="h-5 w-5" />
+            </button>
+          </div>
+
+          <div ref="imageViewport" class="flex min-h-0 w-full flex-1 items-center justify-center overflow-hidden">
+            <img
+              :src="imageViewer.url"
+              :alt="imageViewer.title"
+              draggable="false"
+              class="h-full w-full origin-center touch-none select-none object-contain"
+              :class="[
+                isDraggingImage ? 'cursor-grabbing' : imageViewer.scale > 1 ? 'cursor-grab' : 'cursor-default',
+                isDraggingImage ? 'transition-none' : 'transition-transform duration-200'
+              ]"
+              :style="{ transform: `translate(${imageViewer.x}px, ${imageViewer.y}px) scale(${imageViewer.scale})` }"
+              @pointerdown="startImageDrag"
+              @pointermove="moveImage"
+              @pointerup="stopImageDrag"
+              @pointercancel="stopImageDrag"
+              @dragstart.prevent
+              @wheel.prevent="zoomImage($event.deltaY > 0 ? -0.1 : 0.1)"
+            />
+          </div>
+
+          <div class="absolute bottom-4 flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-950 p-1 sm:bottom-6">
+            <button type="button" class="cursor-pointer rounded-full p-2 text-zinc-400 transition-colors hover:bg-yellow-500 hover:text-zinc-950" aria-label="Reducir zoom" @click="zoomImage(-0.25)">
+              <ZoomOut class="h-4 w-4" />
+            </button>
+            <span class="min-w-14 text-center text-[10px] font-black uppercase tracking-widest text-yellow-500">{{ Math.round(imageViewer.scale * 100) }}%</span>
+            <button type="button" class="cursor-pointer rounded-full p-2 text-zinc-400 transition-colors hover:bg-yellow-500 hover:text-zinc-950" aria-label="Aumentar zoom" @click="zoomImage(0.25)">
+              <ZoomIn class="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
     </Teleport>
