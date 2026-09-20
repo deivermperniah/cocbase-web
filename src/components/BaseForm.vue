@@ -116,17 +116,12 @@ async function checkExistingLink(): Promise<string | null> {
     }
 }
 
-// Verificar si la imagen ya existe (por nombre y características)
-async function checkDuplicateImage(): Promise<string | null> {
-    if (!baseImage.value) return null
-    
+// Verificar si ya existe el mismo archivo en Storage.
+async function checkDuplicateImage(fileName: string): Promise<string | null> {
     try {
-        // Verificar si ya existe una imagen con las mismas características
-        const { data: existingImages, error: imageError } = await supabase
-            .from('bases')
-            .select('id, url_foto')
-            .like('url_foto', `%${baseImage.value.name.split('.')[0]}%`)
-            .limit(1)
+        const { data: existingImages, error: imageError } = await supabase.storage
+            .from('bases-fotos')
+            .list('', { search: fileName, limit: 1 })
 
         if (imageError) {
             console.error('Error verificando imagen duplicada:', imageError)
@@ -144,11 +139,14 @@ async function checkDuplicateImage(): Promise<string | null> {
     }
 }
 
-// Generar nombre único para archivo (patrón timestamp simple)
-function generateUniqueFileName(file: File): string {
-    const timestamp = Date.now()
+async function generateFileName(file: File): Promise<string> {
+    const fileBuffer = await file.arrayBuffer()
+    const digest = await crypto.subtle.digest('SHA-256', fileBuffer)
+    const hash = Array.from(new Uint8Array(digest))
+        .map((byte) => byte.toString(16).padStart(2, '0'))
+        .join('')
     const fileExt = file.name.split('.').pop()
-    return `${timestamp}.${fileExt}`
+    return `${hash}.${fileExt}`
 }
 
 // Manejo de archivos
@@ -226,9 +224,11 @@ async function handleSubmit() {
             setTimeout(() => { if (errorMessage.value === duplicateLinkError) errorMessage.value = '' }, 2000)
             return
         }
+
+        const fileName = await generateFileName(baseImage.value!)
         
         // Validación 3: Imagen duplicada
-        const duplicateImageError = await checkDuplicateImage()
+        const duplicateImageError = await checkDuplicateImage(fileName)
         if (duplicateImageError) {
             errorMessage.value = duplicateImageError
             loading.value = false
@@ -236,22 +236,7 @@ async function handleSubmit() {
             return
         }
         
-        // Extraer ID del enlace (solo si existe)
-        let baseId = null
-        if (baseLink.value.trim()) {
-            const url = new URL(baseLink.value)
-            baseId = url.searchParams.get('id')
-            if (!baseId) {
-                errorMessage.value = 'No se pudo extraer el ID del enlace.'
-                loading.value = false
-                setTimeout(() => { if (errorMessage.value === 'No se pudo extraer el ID del enlace.') errorMessage.value = '' }, 2000)
-                return
-            }
-        }
-        
         // Subir imagen con nombre único directamente en la raíz del bucket
-        const fileName = generateUniqueFileName(baseImage.value!)
-        
         const { error: uploadError } = await supabase.storage
             .from('bases-fotos')
             .upload(fileName, baseImage.value, {
