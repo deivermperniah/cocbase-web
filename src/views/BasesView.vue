@@ -19,7 +19,7 @@ const isFilterModalOpen = ref(false);
 
 const deleteModal = ref({
   isOpen: false,
-  baseId: null as number | null,
+  baseId: null as string | null,
   baseTitle: "",
   imageUrl: "",
 });
@@ -102,7 +102,7 @@ function openDeleteModal(base: any) {
   deleteModal.value = {
     isOpen: true,
     baseId: base.id,
-    baseTitle: `#${base.id} - Nivel ${base.level_th} - ${base.type}`,
+    baseTitle: `${base.code}`,
     imageUrl: base.url_foto || "",
   };
 }
@@ -128,7 +128,7 @@ function openImageViewer(base: any) {
   imageViewer.value = {
     isOpen: true,
     url: base.url_foto,
-    title: `Base #${base.id} - Nivel ${base.level_th} - ${base.type}`,
+    title: `Base ${base.code} - Nivel ${base.level_th} - ${base.type}`,
     level: String(base.level_th),
     type: base.type,
     date: new Date(base.created_at).toLocaleDateString("es-ES"),
@@ -334,8 +334,8 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
 
           <div class="p-4">
             <div class="flex items-center justify-between">
-              <h3 class="text-lg font-black italic tracking-tighter text-white uppercase group-hover:text-yellow-500 transition-colors leading-none">
-                {{ base.id }}
+              <h3 class="text-sm font-black italic tracking-tighter text-white group-hover:text-yellow-500 transition-colors leading-none truncate flex-1">
+                {{ base.code }}
               </h3>
 
               <div class="flex gap-2">
