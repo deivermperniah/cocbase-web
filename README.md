@@ -27,7 +27,7 @@ Clash of Clans Base Manager es una aplicación táctica diseñada para jugadores
 - **Registro de bases**: Guarda enlaces de bases de Clash of Clans
 - **Capturas de pantalla**: Almacena imágenes de bases con validación de formato y tamaño
 - **Categorización**: Clasifica bases por tipo (Guerra, Liga, Mejora, Recursos)
-- **Niveles TH**: Soporte para todos los niveles Town Hall (1-18)
+- **Niveles TH**: Soporte para los niveles Town Hall 3-18
 
 ### 🖼️ Gestión de Imágenes
 - **Upload seguro**: Validación de archivos (JPG, PNG, WebP, max 5MB)
@@ -44,12 +44,11 @@ Clash of Clans Base Manager es una aplicación táctica diseñada para jugadores
 ### 📱 Interfaz de Usuario
 - **Diseño táctico**: UI inspirada en temas militares
 - **Responsive**: Compatible con desktop y móvil
-- **Modos de visualización**: Grid y list view para bases
+- **Visualización**: Grid responsive para bases
 - **Estados vacíos**: Mensajes informativos y llamadas a la acción
 
 ### ⚡ Rendimiento
-- **Lazy loading**: Carga optimizada de imágenes
-- **Skeleton loaders**: Estados de carga fluidos
+- **Carga progresiva**: Estados de carga con spinner
 - **Memory management**: Limpieza de object URLs
 - **Error handling**: Manejo robusto de errores
 
@@ -75,8 +74,6 @@ Clash of Clans Base Manager es una aplicación táctica diseñada para jugadores
   - Real-time subscriptions
 
 ### Development
-- **ESLint** - Linting de código
-- **Prettier** - Formateo de código
 - **TypeScript** - Tipado estático
 
 ## 🚀 Instalación
@@ -91,7 +88,7 @@ Clash of Clans Base Manager es una aplicación táctica diseñada para jugadores
 1. **Clonar el repositorio**
 ```bash
 git clone <repository-url>
-cd cocbase-admin
+cd cocbase-web-admin
 ```
 
 2. **Instalar dependencias**
@@ -178,26 +175,29 @@ Configura `app_metadata.role = "admin"` para el usuario desde un entorno adminis
 ## 📁 Estructura del Proyecto
 
 ```
-cocbase-admin/
+cocbase-web-admin/
 ├── public/                 # Assets estáticos
 ├── src/
 │   ├── components/         # Componentes Vue
 │   │   ├── ui/           # Componentes UI reutilizables
-│   │   └── BaseForm.vue  # Formulario de registro
+│   │   ├── BaseForm.vue  # Formulario de registro
+│   │   └── LoadingSpinner.vue
 │   ├── lib/              # Utilidades y configuración
 │   │   └── supabase.ts   # Cliente Supabase
 │   ├── layout/           # Layout components
-│   │   └── MainLayout.vue
+│   │   ├── MainLayout.vue
+│   │   ├── Sidebar.vue
 │   ├── views/            # Páginas principales
 │   │   ├── Dashboard.vue
 │   │   ├── BasesView.vue
-│   │   └── ImagesView.vue
+│   │   ├── ImagesView.vue
+│   │   └── LoginView.vue
 │   ├── router/           # Configuración de rutas
 │   ├── App.vue           # Componente raíz
 │   └── main.ts           # Punto de entrada
 ├── .env                  # Variables de entorno
 ├── package.json          # Dependencias y scripts
-├── tailwind.config.js    # Configuración Tailwind
+├── vite.config.ts        # Configuración de Vite y Tailwind
 ├── tsconfig.json         # Configuración TypeScript
 └── README.md            # Documentación
 ```
@@ -211,13 +211,13 @@ cocbase-admin/
 
 ### 2. Gestión de Bases (BasesView)
 - **Registro**: Modal con formulario completo
-- **Visualización**: Grid y list view
+- **Visualización**: Grid responsive
 - **Acciones**: Ver enlace, eliminar base
 - **Filtros**: Por tipo y nivel TH
 
 ### 3. Gestión de Imágenes (ImagesView)
 - **Galería**: Visualización en grid
-- **Información**: Tamaño de archivo, fecha
+- **Información**: Tamaño de archivo y espacio total usado
 - **Acciones**: Ver imagen, eliminar
 - **Estadísticas**: Total de imágenes y tamaño
 
@@ -235,7 +235,7 @@ cocbase-admin/
 -- Tabla de bases
 CREATE TABLE bases (
     id SERIAL PRIMARY KEY,
-    link TEXT NOT NULL UNIQUE,
+   link TEXT UNIQUE,
     type TEXT NOT NULL CHECK (type IN ('Guerra', 'Liga', 'Mejora', 'Recursos')),
     level_th INTEGER NOT NULL CHECK (level_th >= 1 AND level_th <= 18),
     url_foto TEXT,
@@ -267,7 +267,7 @@ CREATE TRIGGER update_bases_updated_at
 - **Bucket**: `bases-fotos`
 - **Formatos permitidos**: jpg, jpeg, png, webp
 - **Tamaño máximo**: 5MB por archivo
-- **Nomenclatura**: `{timestamp}_{random}.{ext}`
+- **Nomenclatura**: `{sha256}.{ext}`, basada en el contenido para detectar duplicados
 
 ## 🌐 API Endpoints
 
@@ -334,16 +334,10 @@ CMD ["npm", "run", "preview"]
 - Estilos con TailwindCSS
 - Commits descriptivos y semánticos
 
-### Testing
+### Verificación
 ```bash
-# Ejecutar tests
-npm run test
-
-# Linting
-npm run lint
-
-# Formatear código
-npm run format
+# Verificar tipos y construir para producción
+npm run build
 ```
 
 ## 🐛 Troubleshooting
