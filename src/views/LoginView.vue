@@ -45,7 +45,7 @@ async function handleSubmit() {
       <div class="relative rounded-[calc(2rem-1px)] bg-zinc-950 p-6 sm:p-8">
         <div class="mb-4 text-center">
           <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center">
-            <img :src="logo" alt="CocBase" class="h-full w-full object-contain" />
+            <img :src="logo" alt="logo" class="h-full w-full object-contain" />
           </div>
           <h2 class="text-xl font-black italic tracking-tighter uppercase text-white">
             Iniciar sesión
@@ -59,7 +59,7 @@ async function handleSubmit() {
 
           <div class="space-y-2">
             <label for="email" class="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">Correo electrónico *</label>
-            <Input id="email" v-model="email" type="email" autocomplete="email" placeholder="admin@cocbase.com" required class="!h-12 !rounded-lg !border-zinc-800 !bg-zinc-900 !text-white !placeholder:text-zinc-600 focus-visible:!border-yellow-500 focus-visible:!ring-yellow-500/20" />
+            <Input id="email" v-model="email" type="email" autocomplete="email" placeholder="jose20003@gmail.com" required class="!h-12 !rounded-lg !border-zinc-800 !bg-zinc-900 !text-white !placeholder:text-zinc-600 focus-visible:!border-yellow-500 focus-visible:!ring-yellow-500/20" />
           </div>
 
           <div class="space-y-2">

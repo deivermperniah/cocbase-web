@@ -61,14 +61,11 @@ async function handleSignOut() {
         <router-link
           to="/"
           class="flex items-center shrink-0"
-          aria-label="Ir a CocBase Admin"
+          aria-label="cocbase - Administrador"
         >
           <div class="flex items-center justify-center shrink-0 w-10 h-10 transition-all">
-            <img :src="logo" alt="Logo" class="w-full h-full object-contain" />
+            <img :src="logo" alt="logo" class="w-full h-full object-contain" />
           </div>
-          <span v-if="showLabels" class="ml-3 font-black text-lg tracking-tighter uppercase">
-            CocBase
-          </span>
         </router-link>
       </div>
       <div class="border-b mx-2"></div>
