@@ -139,6 +139,44 @@ async function checkDuplicateImage(fileName: string): Promise<string | null> {
     }
 }
 
+async function optimizeImage(file: File): Promise<File> {
+    try {
+        const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' })
+
+        const maxDimension = 1920
+        const scale = Math.min(1, maxDimension / Math.max(bitmap.width, bitmap.height))
+        const width = Math.round(bitmap.width * scale)
+        const height = Math.round(bitmap.height * scale)
+
+        const canvas = document.createElement('canvas')
+        canvas.width = width
+        canvas.height = height
+
+        const context = canvas.getContext('2d')
+        if (!context) {
+            bitmap.close()
+            return file
+        }
+
+        context.imageSmoothingEnabled = true
+        context.imageSmoothingQuality = 'high'
+        context.drawImage(bitmap, 0, 0, width, height)
+        bitmap.close()
+
+        const blob = await new Promise<Blob | null>((resolve) => {
+            canvas.toBlob(resolve, 'image/webp', 0.85)
+        })
+
+        if (!blob || blob.size >= file.size) return file
+
+        const baseName = file.name.replace(/\.[^.]+$/, '')
+        return new File([blob], `${baseName}.webp`, { type: 'image/webp' })
+    } catch (error) {
+        console.error('Error optimizando imagen:', error)
+        return file
+    }
+}
+
 async function generateFileName(file: File): Promise<string> {
     const fileBuffer = await file.arrayBuffer()
     const digest = await crypto.subtle.digest('SHA-256', fileBuffer)
@@ -146,7 +184,7 @@ async function generateFileName(file: File): Promise<string> {
         .map((byte) => byte.toString(16).padStart(2, '0'))
         .join('')
     const fileExt = file.name.split('.').pop()
-    return `${hash}.${fileExt}`
+    return `${hash.slice(0, 8)}.${fileExt}`
 }
 
 // Manejo de archivos
@@ -225,7 +263,8 @@ async function handleSubmit() {
             return
         }
 
-        const fileName = await generateFileName(baseImage.value!)
+        const optimizedFile = await optimizeImage(baseImage.value!)
+        const fileName = await generateFileName(optimizedFile)
         
         // Validación 3: Imagen duplicada
         const duplicateImageError = await checkDuplicateImage(fileName)
@@ -239,7 +278,7 @@ async function handleSubmit() {
         // Subir imagen con nombre único directamente en la raíz del bucket
         const { error: uploadError } = await supabase.storage
             .from('bases-fotos')
-            .upload(fileName, baseImage.value, {
+            .upload(fileName, optimizedFile, {
                 cacheControl: '3600', // 1 hora de caché
                 upsert: false // No sobreescribir
             })
