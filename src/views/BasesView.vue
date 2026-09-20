@@ -266,7 +266,7 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
     <LoadingSpinner size="lg" />
   </div>
 
-  <div v-else class="space-y-4 animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-500 ease-out">
+  <div v-else class="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out">
     <div class="flex flex-row items-center justify-between gap-4">
       <div class="space-y-1">
         <h2 class="text-xl font-black italic tracking-tighter uppercase text-zinc-950 dark:text-white">
@@ -499,7 +499,7 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
             </div>
             <button
               type="button"
-              class="cursor-pointer rounded-xl bg-zinc-900 p-2 text-zinc-400 transition-all hover:bg-red-600 hover:text-white"
+              class="cursor-pointer p-2 rounded-xl bg-zinc-900 text-zinc-500 hover:text-white transition-all"
               aria-label="Cerrar visor de imagen"
               @click="closeImageViewer"
             >

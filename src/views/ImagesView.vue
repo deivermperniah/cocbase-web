@@ -166,7 +166,7 @@ watch(
 
   <div
     v-else
-    class="space-y-4 animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-500 ease-out"
+    class="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out"
   >
     <div class="flex flex-row items-center justify-between gap-4">
       <div class="space-y-1">
