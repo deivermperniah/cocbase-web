@@ -21,6 +21,7 @@ const deleteModal = ref({
   isOpen: false,
   baseId: null as number | null,
   baseTitle: "",
+  imageUrl: "",
 });
 
 const imageViewer = ref({
@@ -102,6 +103,7 @@ function openDeleteModal(base: any) {
     isOpen: true,
     baseId: base.id,
     baseTitle: `#${base.id} - Nivel ${base.level_th} - ${base.type}`,
+    imageUrl: base.url_foto || "",
   };
 }
 
@@ -110,7 +112,16 @@ function closeDeleteModal() {
     isOpen: false,
     baseId: null,
     baseTitle: "",
+    imageUrl: "",
   };
+}
+
+function getStoragePath(publicUrl: string): string | null {
+  const marker = "/storage/v1/object/public/bases-fotos/";
+  const markerIndex = publicUrl.indexOf(marker);
+  if (markerIndex === -1) return null;
+
+  return decodeURIComponent(publicUrl.slice(markerIndex + marker.length));
 }
 
 function openImageViewer(base: any) {
@@ -199,15 +210,27 @@ function handleImageViewerKeydown(event: KeyboardEvent) {
 }
 
 async function confirmDelete() {
-  if (!deleteModal.value.baseId) return;
+  const baseId = deleteModal.value.baseId;
+  if (!baseId) return;
 
   try {
+    const imagePath = deleteModal.value.imageUrl
+      ? getStoragePath(deleteModal.value.imageUrl)
+      : null;
+
+    if (imagePath) {
+      const { error: storageError } = await supabase.storage
+        .from("bases-fotos")
+        .remove([imagePath]);
+      if (storageError) throw storageError;
+    }
+
     const { error } = await supabase
       .from("bases")
       .delete()
-      .eq("id", deleteModal.value.baseId);
+      .eq("id", baseId);
     if (error) throw error;
-    allBases.value = allBases.value.filter((b) => b.id !== deleteModal.value.baseId);
+    allBases.value = allBases.value.filter((b) => b.id !== baseId);
     closeDeleteModal();
   } catch (error) {
     console.error("Error deleting base:", error);

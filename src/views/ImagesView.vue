@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, onBeforeUnmount, onMounted, watch } from "vue";
 import { supabase } from "@/lib/supabase";
 import {
   Trash2,
@@ -100,11 +100,25 @@ function closeDeleteModal() {
 }
 
 async function confirmDelete() {
-  if (!deleteModal.value.imagePath) return;
+  const imagePath = deleteModal.value.imagePath;
+  if (!imagePath) return;
+
+  const { data: publicUrl } = supabase.storage
+    .from("bases-fotos")
+    .getPublicUrl(imagePath);
+  const { error: referencesError } = await supabase
+    .from("bases")
+    .update({ url_foto: null })
+    .eq("url_foto", publicUrl.publicUrl);
+
+  if (referencesError) {
+    console.error("❌ ERROR LIMPIANDO REFERENCIAS:", referencesError);
+    return;
+  }
 
   const { error } = await supabase.storage
     .from("bases-fotos")
-    .remove([deleteModal.value.imagePath]);
+    .remove([imagePath]);
 
   if (error) {
     console.error("❌ ERROR ELIMINANDO:", error);
@@ -112,19 +126,23 @@ async function confirmDelete() {
   }
 
   const deletedImage = images.value.find(
-    (img) => img.path === deleteModal.value.imagePath
+    (img) => img.path === imagePath
   );
   if (deletedImage?.size) {
     totalSize.value -= deletedImage.size;
   }
 
   images.value = images.value.filter(
-    (img) => img.path !== deleteModal.value.imagePath
+    (img) => img.path !== imagePath
   );
   closeDeleteModal();
 }
 
 onMounted(loadImages);
+
+onBeforeUnmount(() => {
+  document.body.style.overflow = "";
+});
 
 watch(
   () => deleteModal.value.isOpen,
