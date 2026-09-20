@@ -301,7 +301,7 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
         <div
           v-for="base in filteredBases"
           :key="base.id"
-          class="group relative overflow-hidden bg-zinc-950 shadow-2xl transition-all hover:ring-2 hover:ring-yellow-500/50 rounded-[2.5rem]"
+          class="group relative overflow-hidden bg-zinc-950 shadow-2xl transition-all rounded-[2.5rem]"
         >
           <div class="aspect-video relative overflow-hidden bg-zinc-900">
             <button

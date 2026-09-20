@@ -120,6 +120,29 @@
 }
 
 /* Global Styles */
+body::before,
+.app-background-fixed::before {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)), url('./assets/fondo.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+body::before {
+  inset: 0;
+}
+
+.app-background-fixed::before {
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100dvh;
+}
+
 .custom-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;

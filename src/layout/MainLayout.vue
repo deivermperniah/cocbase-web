@@ -8,7 +8,7 @@ const isMobileMenuOpen = ref(false);
 </script>
 
 <template>
-  <div class="flex min-h-dvh md:h-dvh bg-background md:overflow-hidden relative">
+  <div class="flex min-h-dvh md:h-dvh md:overflow-hidden relative">
     <div class="hidden md:block shrink-0 h-full">
       <Sidebar :showLabels="false" />
     </div>
@@ -20,7 +20,7 @@ const isMobileMenuOpen = ref(false);
     ></div>
 
     <div
-      class="fixed inset-y-0 left-0 z-50 w-64 bg-card shadow-2xl transform transition-transform duration-300 md:hidden"
+      class="fixed inset-y-0 left-0 z-50 w-64 app-background-fixed overflow-hidden shadow-2xl transform transition-transform duration-300 md:hidden"
       :class="isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'"
     >
       <Sidebar
@@ -32,10 +32,10 @@ const isMobileMenuOpen = ref(false);
     </div>
 
     <div class="flex-1 flex flex-col min-w-0 w-full relative">
-      <header class="md:hidden h-16 border-b flex items-center justify-between px-4 bg-card sticky top-0 z-30">
+      <header class="md:hidden h-16 border-b border-black flex items-center justify-between px-4 app-background-fixed overflow-hidden [transform:translateZ(0)] sticky top-0 z-30">
         <button
           @click="isMobileMenuOpen = true"
-          class="-ml-2 cursor-pointer p-2 text-zinc-400 hover:text-white"
+          class="-ml-2 cursor-pointer p-2 text-black hover:text-zinc-600"
         >
           <Menu class="w-6 h-6" />
         </button>

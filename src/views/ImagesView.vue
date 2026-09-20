@@ -179,16 +179,16 @@ watch(
 
       <div class="flex gap-4">
         <div class="flex items-center gap-2">
-          <ImageIcon class="w-4 h-4 text-zinc-500" />
+          <ImageIcon class="w-4 h-4 text-yellow-500" />
           <span
-            class="text-yellow-500 text-sm font-black italic tracking-tighter"
+            class="text-zinc-950 dark:text-white text-sm font-black italic tracking-tighter"
             >{{ images.length }}</span
           >
         </div>
         <div class="flex items-center gap-2">
-          <HardDrive class="w-4 h-4 text-zinc-500" />
+          <HardDrive class="w-4 h-4 text-yellow-500" />
           <span
-            class="text-yellow-500 text-sm font-black italic tracking-tighter"
+            class="text-zinc-950 dark:text-white text-sm font-black italic tracking-tighter"
             >{{ formatBytes(totalSize) }} MB</span
           >
         </div>
@@ -203,7 +203,7 @@ watch(
         <div
           v-for="img in images"
           :key="img.path"
-          class="group relative overflow-hidden bg-zinc-950 shadow-2xl transition-all hover:ring-2 hover:ring-yellow-500/50 rounded-[2.5rem]"
+          class="group relative overflow-hidden bg-zinc-950 shadow-2xl transition-all rounded-[2.5rem]"
         >
           <div class="aspect-video relative overflow-hidden bg-zinc-900">
             <img
