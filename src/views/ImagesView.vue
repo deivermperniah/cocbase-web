@@ -218,7 +218,7 @@ watch(
           <div class="p-4">
             <div class="flex items-center justify-between gap-3">
               <h3
-                class="text-sm font-black italic tracking-tighter text-white uppercase group-hover:text-yellow-500 transition-colors leading-none truncate flex-1"
+                class="text-sm font-black italic tracking-tighter text-white group-hover:text-yellow-500 transition-colors leading-none truncate flex-1"
                 :title="img.name"
               >
                 {{ img.name }}
