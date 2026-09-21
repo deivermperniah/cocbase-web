@@ -41,35 +41,35 @@ async function handleSubmit() {
 
 <template>
   <main class="relative flex min-h-dvh items-center justify-center overflow-hidden px-5 py-12 sm:px-10">
-    <section class="relative w-full max-w-md overflow-hidden rounded-[2.5rem] p-px shadow-2xl shadow-yellow-500/10">
-      <div class="absolute inset-[-100%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_58%,#eab308_72%,#facc15_80%,transparent_92%)]" />
-      <div class="relative rounded-[calc(2.5rem-1px)] bg-zinc-950 p-6 sm:p-8">
-        <div class="mb-4 text-center">
-          <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center">
+    <section class="relative w-full max-w-md overflow-hidden rounded-[1.25rem] p-px shadow-2xl shadow-yellow-400/10">
+      <div class="absolute inset-[-100%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_58%,#facc15_72%,#fde047_80%,transparent_92%)]" />
+      <div class="relative rounded-[calc(1.25rem-1px)] bg-card p-6 sm:p-8">
+        <div class="mb-[15px] text-center">
+          <div class="mx-auto mb-[15px] flex h-16 w-16 items-center justify-center">
             <img :src="logo" alt="logo" class="h-full w-full object-contain" />
           </div>
-          <h2 class="text-xl font-black italic tracking-tighter uppercase text-white">
+          <h2 class="text-[28px] text-yellow-400">
             Iniciar sesión
           </h2>
         </div>
 
-        <form class="space-y-4" @submit.prevent="handleSubmit">
+        <form class="space-y-[15px]" @submit.prevent="handleSubmit">
           <Alert v-if="errorMessage" variant="destructive" class="rounded-lg border-red-500/40 bg-red-500/10 text-red-300">
             <AlertDescription class="text-red-300">{{ errorMessage }}</AlertDescription>
           </Alert>
 
           <div class="space-y-2">
-            <label for="email" class="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">Correo electrónico *</label>
-            <Input id="email" v-model="email" type="email" autocomplete="email" placeholder="jose20003@gmail.com" required class="!h-12 !rounded-lg !border-zinc-800 !bg-zinc-900 !text-white !placeholder:text-zinc-600 focus-visible:!border-yellow-500 focus-visible:!ring-yellow-500/20" />
+            <label for="email" class="text-xs text-muted-foreground">Correo electrónico *</label>
+            <Input id="email" v-model="email" type="email" autocomplete="email" placeholder="jose20003@gmail.com" required class="!h-12 !rounded-lg !border-border !bg-secondary !text-white !placeholder:text-muted-foreground focus-visible:!border-yellow-400 focus-visible:!ring-yellow-400/20" />
           </div>
 
           <div class="space-y-2">
-            <label for="password" class="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-500">Contraseña *</label>
+            <label for="password" class="text-xs text-muted-foreground">Contraseña *</label>
             <div class="relative">
-              <Input id="password" v-model="password" :type="showPassword ? 'text' : 'password'" :placeholder="showPassword ? '12345678' : '••••••••'" autocomplete="current-password" required class="!h-12 !rounded-lg !border-zinc-800 !bg-zinc-900 !text-white !placeholder:text-zinc-600 focus-visible:!border-yellow-500 focus-visible:!ring-yellow-500/20 !pr-12" />
+              <Input id="password" v-model="password" :type="showPassword ? 'text' : 'password'" :placeholder="showPassword ? '12345678' : '••••••••'" autocomplete="current-password" required class="!h-12 !rounded-lg !border-border !bg-secondary !text-white !placeholder:text-muted-foreground focus-visible:!border-yellow-400 focus-visible:!ring-yellow-400/20 !pr-12" />
               <button
                 type="button"
-                class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-zinc-500 transition-colors hover:text-white"
+                class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-white"
                 :aria-label="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
                 @click="showPassword = !showPassword"
               >
@@ -79,7 +79,7 @@ async function handleSubmit() {
             </div>
           </div>
 
-          <Button type="submit" class="w-full h-[44px] cursor-pointer rounded-full bg-yellow-500 text-zinc-950 font-black uppercase tracking-[0.15em] text-[10px] hover:bg-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shadow-xl shadow-yellow-500/10" :disabled="isSubmitting">
+          <Button type="submit" class="w-full h-[44px] cursor-pointer rounded-full bg-yellow-400 text-black text-xs hover:bg-yellow-300 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shadow-xl shadow-yellow-400/10" :disabled="isSubmitting">
             <Loader2 v-if="isSubmitting" class="mr-2 h-4 w-4 animate-spin" />
             <LogIn v-else class="mr-2 h-4 w-4" />
             {{ isSubmitting ? 'Iniciando sesión...' : 'Iniciar sesión' }}

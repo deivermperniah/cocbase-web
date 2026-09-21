@@ -266,20 +266,20 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
     <LoadingSpinner size="lg" />
   </div>
 
-  <div v-else class="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out">
-    <div class="flex flex-row items-center justify-between gap-4">
+  <div v-else class="space-y-[15px] animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out">
+    <div class="flex flex-row items-center justify-between gap-[15px]">
       <div class="space-y-1">
-        <h2 class="text-xl font-black italic tracking-tighter uppercase text-zinc-950 dark:text-white">
+        <h2 class="text-[28px] text-yellow-400">
           Bases
         </h2>
       </div>
 
-      <div class="flex flex-row items-center gap-2 sm:gap-4">
+      <div class="flex flex-row items-center gap-2 sm:gap-[15px]">
         <button @click="openFilterModal" 
             class="flex cursor-pointer items-center justify-center w-[44px] h-[44px] rounded-full transition-all active:scale-95 shadow-xl"
             :class="selectedLevel !== 'all' || selectedType !== 'all' 
-                ? 'bg-yellow-500 border-2 border-yellow-500 text-zinc-950 shadow-[0_0_20px_rgba(234,179,8,0.3)]' 
-                : 'bg-zinc-900 border-2 border-zinc-400 text-zinc-400 hover:text-yellow-500 hover:border-yellow-500'"
+                ? 'bg-yellow-400 border-2 border-yellow-400 text-black shadow-[0_0_20px_rgba(250,204,21,0.3)]' 
+                : 'bg-secondary border-2 border-border text-muted-foreground hover:text-yellow-400 hover:border-yellow-400'"
         >
           <Filter class="w-4 h-4 stroke-[2.5px]" />
         </button>
@@ -287,23 +287,23 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
         <div class="ml-auto">
           <button
             @click="isModalOpen = true"
-            class="group flex cursor-pointer items-center justify-center gap-3 w-[44px] sm:w-auto px-0 sm:px-4 h-[44px] rounded-full bg-zinc-950 border-2 border-yellow-500 text-yellow-500 font-black uppercase tracking-[0.15em] text-[10px] sm:text-[10px] hover:bg-yellow-500 hover:text-zinc-950 transition-all duration-300 shadow-xl shadow-yellow-500/10 active:scale-95"
+            class="group flex cursor-pointer items-center justify-center gap-3 w-[44px] sm:w-auto px-0 sm:px-[15px] h-[44px] rounded-full bg-card border-2 border-yellow-400 text-yellow-400 text-xs sm:text-xs hover:bg-yellow-400 hover:text-black transition-all duration-300 shadow-xl shadow-yellow-400/10 active:scale-95"
           >
             <Plus class="w-4 h-4 stroke-[3px]" />
-            <span class="hidden sm:inline text-[10px] sm:text-xs">Nueva Base</span>
+            <span class="hidden sm:inline text-xs sm:text-xs">Nueva Base</span>
           </button>
         </div>
       </div>
     </div>
 
     <div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[15px]">
         <div
           v-for="base in filteredBases"
           :key="base.id"
-          class="group relative overflow-hidden bg-zinc-950 shadow-2xl transition-all rounded-[2.5rem]"
+          class="group relative overflow-hidden bg-card shadow-2xl transition-all rounded-xl"
         >
-          <div class="aspect-video relative overflow-hidden bg-zinc-900">
+          <div class="aspect-video relative overflow-hidden bg-secondary">
             <button
               type="button"
               class="absolute inset-0 z-10 block h-full w-full cursor-zoom-in text-left"
@@ -312,29 +312,29 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
             >
               <img :src="base.url_foto" class="block w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
             </button>
-            <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent opacity-60 transition-opacity group-hover:opacity-40"></div>
+            <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-60 transition-opacity group-hover:opacity-40"></div>
 
             <div class="pointer-events-none absolute bottom-4 left-4 z-20 flex items-center gap-2">
-              <span class="flex h-6 items-center gap-2 rounded-lg bg-yellow-500 px-3 text-[10px] font-black uppercase tracking-widest text-zinc-950 shadow-lg">
+              <span class="flex h-6 items-center gap-2 rounded-md bg-yellow-400 px-3 text-xs text-black shadow-lg">
                 <Castle class="h-3.5 w-3.5" />
                 {{ base.level_th }}
               </span>
-              <span class="flex h-6 items-center gap-2 rounded-lg bg-yellow-500 px-3 text-[10px] font-black uppercase tracking-widest text-zinc-950 shadow-lg">
+              <span class="flex h-6 items-center gap-2 rounded-md bg-yellow-400 px-3 text-xs text-black shadow-lg">
                 <component :is="getTypeIcon(base.type)" class="h-3.5 w-3.5" />
                 {{ base.type }}
               </span>
             </div>
             <div class="pointer-events-none absolute bottom-4 right-4 z-20">
-              <span class="flex h-6 items-center gap-2 rounded-lg border border-yellow-500/20 bg-zinc-950 px-3 text-[10px] font-black uppercase tracking-widest text-yellow-500 shadow-lg">
+              <span class="flex h-6 items-center gap-2 rounded-md border border-yellow-400/20 bg-card px-3 text-xs text-yellow-400 shadow-lg">
                 <CalendarDays class="h-3.5 w-3.5" />
                 {{ new Date(base.created_at).toLocaleDateString("es-ES") }}
               </span>
             </div>
           </div>
 
-          <div class="p-4">
+          <div class="p-[15px]">
             <div class="flex items-center justify-between">
-              <h3 class="text-sm font-black italic tracking-tighter text-white group-hover:text-yellow-500 transition-colors leading-none truncate flex-1">
+              <h3 class="text-sm text-white group-hover:text-yellow-400 transition-colors leading-none truncate flex-1">
                 {{ base.code }}
               </h3>
 
@@ -343,18 +343,18 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
                   v-if="base.link"
                   :href="base.link" 
                   target="_blank" 
-                  class="cursor-pointer p-2.5 rounded-xl bg-zinc-900 text-zinc-400 hover:bg-yellow-500 hover:text-zinc-950 transition-all border border-zinc-800"
+                  class="cursor-pointer p-2.5 rounded-lg bg-secondary text-muted-foreground hover:bg-yellow-400 hover:text-black transition-all border border-border"
                 >
                   <ExternalLink class="w-4 h-4" />
                 </a>
                 <div 
                   v-else
-                  class="p-2.5 rounded-xl bg-zinc-900 text-zinc-700 border border-zinc-800 cursor-not-allowed"
+                  class="p-2.5 rounded-lg bg-secondary text-muted-foreground/50 border border-border cursor-not-allowed"
                   title="Esta base no tiene enlace (Nivel 3)"
                 >
                   <ExternalLink class="w-4 h-4" />
                 </div>
-                <button @click="openDeleteModal(base)" class="cursor-pointer p-2.5 rounded-xl bg-zinc-900 text-zinc-400 hover:bg-red-600 hover:text-white transition-all border border-zinc-800">
+                <button @click="openDeleteModal(base)" class="cursor-pointer p-2.5 rounded-lg bg-secondary text-muted-foreground hover:bg-red-600 hover:text-white transition-all border border-border">
                   <Trash2 class="w-4 h-4" />
                 </button>
               </div>
@@ -364,33 +364,33 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
       </div>
 
       <div v-if="filteredBases.length === 0" class="text-center">
-        <p class="text-zinc-500 text-sm font-bold uppercase tracking-widest">
+        <p class="text-muted-foreground text-sm ">
           {{ allBases.length === 0 ? 'Sin bases registradas' : 'Sin bases para el filtro' }}
         </p>
       </div>
     </div>
 
     <Teleport to="body">
-      <div v-if="isFilterModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-zinc-950/90 backdrop-blur-xl" @click="isFilterModalOpen = false"></div>
+      <div v-if="isFilterModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-[15px]">
+        <div class="absolute inset-0 bg-card/90 backdrop-blur-xl" @click="isFilterModalOpen = false"></div>
 
-        <div class="relative bg-zinc-950 w-full max-w-lg rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-yellow-500/20 animate-in zoom-in-95 duration-300 overflow-hidden">
-            <div class="p-4 space-y-4">
+        <div class="relative bg-card w-full max-w-lg rounded-[1.25rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-yellow-400/20 animate-in zoom-in-95 duration-300 overflow-hidden">
+            <div class="p-[15px] space-y-[15px]">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-xl font-black italic text-white uppercase tracking-tighter">Filtro</h3>
-                    <button @click="isFilterModalOpen = false" class="cursor-pointer p-2 rounded-xl bg-zinc-900 text-zinc-500 hover:text-white transition-all">
+                    <h3 class="text-lg text-yellow-400 ">Filtro</h3>
+                    <button @click="isFilterModalOpen = false" class="cursor-pointer p-2 rounded-lg bg-secondary text-muted-foreground hover:text-white transition-all">
                         <Plus class="w-5 h-5 rotate-45" />
                     </button>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-[15px]">
                     <div class="flex flex-col">
-                        <label class="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-2">Nivel</label>
+                        <label class="text-xs text-muted-foreground mb-2">Nivel</label>
                         <Select v-model="tempLevel">
-                            <SelectTrigger class="h-[44px] rounded-xl bg-zinc-900 border border-zinc-800 text-white">
+                            <SelectTrigger class="h-[44px] rounded-lg bg-secondary border border-border text-white">
                                 <SelectValue placeholder="Seleccionar" />
                             </SelectTrigger>
-                            <SelectContent side="bottom" :side-offset="4" :avoid-collisions="false" class="z-[9999] bg-zinc-950 border border-zinc-800 text-white mt-1" data-select-content>
+                            <SelectContent side="bottom" :side-offset="4" :avoid-collisions="false" class="z-[9999] bg-card border border-border text-white mt-1" data-select-content>
                                 <SelectItem value="all">Todos</SelectItem>
                                 <SelectItem v-for="n in 16" :key="n + 2" :value="String(n + 2)">
                                     Nivel {{ n + 2 }}
@@ -400,12 +400,12 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
                     </div>
 
                     <div class="flex flex-col">
-                        <label class="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-2">Categoría</label>
+                        <label class="text-xs text-muted-foreground mb-2">Categoría</label>
                         <Select v-model="tempType">
-                            <SelectTrigger class="h-[44px] rounded-xl bg-zinc-900 border border-zinc-800 text-white">
+                            <SelectTrigger class="h-[44px] rounded-lg bg-secondary border border-border text-white">
                                 <SelectValue placeholder="Seleccionar" />
                             </SelectTrigger>
-                            <SelectContent side="bottom" :side-offset="4" :avoid-collisions="false" class="z-[9999] bg-zinc-950 border border-zinc-800 text-white mt-1" data-select-content>
+                            <SelectContent side="bottom" :side-offset="4" :avoid-collisions="false" class="z-[9999] bg-card border border-border text-white mt-1" data-select-content>
                                 <SelectItem value="all">Todos</SelectItem>
                                 <SelectItem v-for="t in types" :key="t" :value="t">{{ t }}</SelectItem>
                             </SelectContent>
@@ -413,11 +413,11 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
                     </div>
                 </div>
 
-                <div class="flex gap-4 border-zinc-900">
-                    <button @click="clearFilters(); isFilterModalOpen = false" class="flex-1 cursor-pointer h-[44px] rounded-full bg-zinc-900 border border-zinc-800 text-zinc-500 font-black uppercase tracking-[0.15em] text-[10px] hover:text-white transition-all active:scale-95">
+                <div class="flex gap-[15px] border-border">
+                    <button @click="clearFilters(); isFilterModalOpen = false" class="flex-1 cursor-pointer h-[44px] rounded-full bg-secondary border border-border text-muted-foreground text-xs hover:text-white transition-all active:scale-95">
                         Limpiar
                     </button>
-                    <button @click="applyFilters" class="flex-1 cursor-pointer h-[44px] rounded-full bg-yellow-500 text-zinc-950 font-black uppercase tracking-[0.15em] text-[10px] hover:bg-white transition-all duration-300 shadow-xl shadow-yellow-500/10 active:scale-95">
+                    <button @click="applyFilters" class="flex-1 cursor-pointer h-[44px] rounded-full bg-yellow-400 text-black text-xs hover:bg-yellow-300 transition-all duration-300 shadow-xl shadow-yellow-400/10 active:scale-95">
                         Aplicar Filtros
                     </button>
                 </div>
@@ -427,17 +427,17 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
     </Teleport>
 
     <Teleport to="body">
-      <div v-if="isModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-zinc-950/90 backdrop-blur-xl" @click="isModalOpen = false"></div>
+      <div v-if="isModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-[15px]">
+        <div class="absolute inset-0 bg-card/90 backdrop-blur-xl" @click="isModalOpen = false"></div>
 
-        <div class="relative bg-zinc-950 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-yellow-500/20 animate-in zoom-in-95 duration-300 custom-scrollbar">
-          <div class="px-4 pt-4 flex items-center justify-between">
-            <h3 class="text-xl font-black italic text-white uppercase tracking-tighter">Nueva Base</h3>
-            <button @click="isModalOpen = false" class="cursor-pointer p-2 rounded-xl bg-zinc-900 text-zinc-500 hover:text-white transition-all">
+        <div class="relative bg-card w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[1.25rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-yellow-400/20 animate-in zoom-in-95 duration-300 custom-scrollbar">
+          <div class="px-[15px] pt-4 flex items-center justify-between">
+            <h3 class="text-lg text-yellow-400 ">Nueva Base</h3>
+            <button @click="isModalOpen = false" class="cursor-pointer p-2 rounded-lg bg-secondary text-muted-foreground hover:text-white transition-all">
               <Plus class="w-5 h-5 rotate-45" />
             </button>
           </div>
-          <div class="p-4">
+          <div class="p-[15px]">
             <BaseForm @success="handleSuccess" />
           </div>
         </div>
@@ -445,28 +445,28 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
     </Teleport>
 
     <Teleport to="body">
-      <div v-if="deleteModal.isOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-zinc-950/90 backdrop-blur-xl" @click="closeDeleteModal"></div>
+      <div v-if="deleteModal.isOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-[15px]">
+        <div class="absolute inset-0 bg-card/90 backdrop-blur-xl" @click="closeDeleteModal"></div>
 
-        <div class="relative bg-zinc-950 w-full max-w-md rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-red-500/20 animate-in zoom-in-95 duration-300 overflow-hidden">
-            <div class="p-4 space-y-4">
+        <div class="relative bg-card w-full max-w-md rounded-[1.25rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-red-500/20 animate-in zoom-in-95 duration-300 overflow-hidden">
+            <div class="p-[15px] space-y-[15px]">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-xl font-black italic text-white uppercase tracking-tighter">Eliminar</h3>
-                    <button @click="closeDeleteModal" class="cursor-pointer p-2 rounded-xl bg-zinc-900 text-zinc-500 hover:text-white transition-all">
+                    <h3 class="text-lg text-yellow-400 ">Eliminar</h3>
+                    <button @click="closeDeleteModal" class="cursor-pointer p-2 rounded-lg bg-secondary text-muted-foreground hover:text-white transition-all">
                         <Plus class="w-5 h-5 rotate-45" />
                     </button>
                 </div>
 
-                <div class="bg-zinc-900 rounded-2xl p-4 border border-zinc-800">
-                    <p class="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">Base seleccionada:</p>
-                    <p class="text-white font-medium truncate text-sm">{{ deleteModal.baseTitle }}</p>
+                <div class="bg-secondary rounded-xl p-[15px] border border-border">
+                    <p class="text-muted-foreground text-xs mb-1">Base seleccionada:</p>
+                    <p class="text-white truncate text-sm">{{ deleteModal.baseTitle }}</p>
                 </div>
 
-                <div class="flex gap-4 pt-2">
-                    <button @click="closeDeleteModal" class="flex-1 cursor-pointer h-[44px] rounded-full bg-zinc-900 border border-zinc-800 text-zinc-500 font-black uppercase tracking-[0.15em] text-[10px] hover:text-white transition-all active:scale-95">
+                <div class="flex gap-[15px] pt-2">
+                    <button @click="closeDeleteModal" class="flex-1 cursor-pointer h-[44px] rounded-full bg-secondary border border-border text-muted-foreground text-xs hover:text-white transition-all active:scale-95">
                         Cancelar
                     </button>
-                    <button @click="confirmDelete" class="flex-1 cursor-pointer h-[44px] rounded-full bg-red-600 text-white font-black uppercase tracking-[0.15em] text-[10px] hover:bg-red-500 transition-all active:scale-95 shadow-xl shadow-red-600/20">
+                    <button @click="confirmDelete" class="flex-1 cursor-pointer h-[44px] rounded-full bg-red-600 text-white text-xs hover:bg-red-500 transition-all active:scale-95 shadow-xl shadow-red-600/20">
                         Confirmar
                     </button>
                 </div>
@@ -476,7 +476,7 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
     </Teleport>
 
     <Teleport to="body">
-      <div v-if="imageViewer.isOpen" class="fixed inset-0 z-[110] flex items-center justify-center bg-zinc-950/95 backdrop-blur-xl">
+      <div v-if="imageViewer.isOpen" class="fixed inset-0 z-[110] flex items-center justify-center bg-card/95 backdrop-blur-xl">
         <button
           type="button"
           class="absolute inset-0 cursor-zoom-out"
@@ -485,21 +485,21 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
         ></button>
 
         <div class="relative z-10 flex h-full w-full flex-col items-center">
-          <div class="relative z-20 flex h-16 w-full shrink-0 items-center justify-between gap-4 px-4 text-white sm:h-20 sm:px-6">
+          <div class="relative z-20 flex h-16 w-full shrink-0 items-center justify-between gap-[15px] px-[15px] text-white sm:h-20 sm:px-6">
             <div class="flex min-w-0 items-center gap-2">
-              <span class="flex h-6 items-center gap-2 rounded-lg bg-yellow-500 px-3 text-[10px] font-black uppercase tracking-widest text-zinc-950 shadow-lg">
+              <span class="flex h-6 items-center gap-2 rounded-md bg-yellow-400 px-3 text-xs text-black shadow-lg">
                 <Castle class="h-3.5 w-3.5" />
                 {{ imageViewer.level }}
               </span>
-              <span class="flex h-6 items-center gap-2 rounded-lg bg-yellow-500 px-3 text-[10px] font-black uppercase tracking-widest text-zinc-950 shadow-lg">
+              <span class="flex h-6 items-center gap-2 rounded-md bg-yellow-400 px-3 text-xs text-black shadow-lg">
                 <component :is="getTypeIcon(imageViewer.type)" class="h-3.5 w-3.5" />
                 {{ imageViewer.type }}
               </span>
-              <span class="flex h-6 shrink-0 items-center rounded-lg border border-yellow-500/20 bg-zinc-950 px-3 text-[10px] font-black uppercase tracking-widest text-yellow-500 shadow-lg">{{ imageViewer.date }}</span>
+              <span class="flex h-6 shrink-0 items-center rounded-md border border-yellow-400/20 bg-card px-3 text-xs text-yellow-400 shadow-lg">{{ imageViewer.date }}</span>
             </div>
             <button
               type="button"
-              class="cursor-pointer p-2 rounded-xl bg-zinc-900 text-zinc-500 hover:text-white transition-all"
+              class="cursor-pointer p-2 rounded-lg bg-secondary text-muted-foreground hover:text-white transition-all"
               aria-label="Cerrar visor de imagen"
               @click="closeImageViewer"
             >
@@ -527,12 +527,12 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
             />
           </div>
 
-          <div class="absolute bottom-4 flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-950 p-1 sm:bottom-6">
-            <button type="button" class="cursor-pointer rounded-full p-2 text-zinc-400 transition-colors hover:bg-yellow-500 hover:text-zinc-950" aria-label="Reducir zoom" @click="zoomImage(-0.25)">
+          <div class="absolute bottom-4 flex items-center gap-2 rounded-full border border-border bg-card p-1 sm:bottom-6">
+            <button type="button" class="cursor-pointer rounded-full p-2 text-muted-foreground transition-colors hover:bg-yellow-400 hover:text-black" aria-label="Reducir zoom" @click="zoomImage(-0.25)">
               <ZoomOut class="h-4 w-4" />
             </button>
-            <span class="min-w-14 text-center text-[10px] font-black uppercase tracking-widest text-yellow-500">{{ Math.round(imageViewer.scale * 100) }}%</span>
-            <button type="button" class="cursor-pointer rounded-full p-2 text-zinc-400 transition-colors hover:bg-yellow-500 hover:text-zinc-950" aria-label="Aumentar zoom" @click="zoomImage(0.25)">
+            <span class="min-w-14 text-center text-xs text-yellow-400">{{ Math.round(imageViewer.scale * 100) }}%</span>
+            <button type="button" class="cursor-pointer rounded-full p-2 text-muted-foreground transition-colors hover:bg-yellow-400 hover:text-black" aria-label="Aumentar zoom" @click="zoomImage(0.25)">
               <ZoomIn class="h-4 w-4" />
             </button>
           </div>

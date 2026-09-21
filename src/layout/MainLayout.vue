@@ -15,12 +15,12 @@ const isMobileMenuOpen = ref(false);
 
     <div
       v-if="isMobileMenuOpen"
-      class="fixed inset-0 z-40 bg-zinc-950/80 backdrop-blur-sm md:hidden animate-in fade-in duration-200"
+      class="fixed inset-0 z-40 bg-card/80 backdrop-blur-sm md:hidden animate-in fade-in duration-200"
       @click="isMobileMenuOpen = false"
     ></div>
 
     <div
-      class="fixed inset-y-0 left-0 z-50 w-64 app-background-fixed overflow-hidden shadow-2xl transform transition-transform duration-300 md:hidden"
+      class="fixed inset-y-0 left-0 z-50 w-64 bg-card shadow-2xl transform transition-transform duration-300 md:hidden"
       :class="isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'"
     >
       <Sidebar
@@ -32,10 +32,10 @@ const isMobileMenuOpen = ref(false);
     </div>
 
     <div class="flex-1 flex flex-col min-w-0 w-full relative">
-      <header class="md:hidden h-16 border-b border-black flex items-center justify-between px-4 app-background-fixed overflow-hidden [transform:translateZ(0)] sticky top-0 z-30">
+      <header class="md:hidden h-16 border-b border-border flex items-center justify-between px-[15px] bg-background sticky top-0 z-30">
         <button
           @click="isMobileMenuOpen = true"
-          class="-ml-2 cursor-pointer p-2 text-black hover:text-zinc-600"
+          class="-ml-2 cursor-pointer p-2 text-white hover:text-yellow-400"
         >
           <Menu class="w-6 h-6" />
         </button>
@@ -45,7 +45,7 @@ const isMobileMenuOpen = ref(false);
         </router-link>
       </header>
 
-      <main class="flex-1 md:overflow-y-auto overflow-x-hidden p-4 relative w-full">
+      <main class="flex-1 md:overflow-y-auto overflow-x-hidden p-[15px] relative w-full">
         <div class="max-w-7xl mx-auto">
           <slot />
         </div>

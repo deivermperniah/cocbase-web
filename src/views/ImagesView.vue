@@ -166,59 +166,59 @@ watch(
 
   <div
     v-else
-    class="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out"
+    class="space-y-[15px] animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out"
   >
-    <div class="flex flex-row items-center justify-between gap-4">
+    <div class="flex flex-row items-center justify-between gap-[15px]">
       <div class="space-y-1">
         <h2
-          class="text-xl font-black italic tracking-tighter uppercase text-zinc-950 dark:text-white"
+          class="text-[28px] text-yellow-400"
         >
           Imágenes
         </h2>
       </div>
 
-      <div class="flex gap-4">
+      <div class="flex gap-[15px]">
         <div class="flex items-center gap-2">
-          <ImageIcon class="w-4 h-4 text-yellow-500" />
+          <ImageIcon class="w-4 h-4 text-yellow-400" />
           <span
-            class="text-zinc-950 dark:text-white text-sm font-black italic tracking-tighter"
+            class="text-white text-sm"
             >{{ images.length }}</span
           >
         </div>
         <div class="flex items-center gap-2">
-          <HardDrive class="w-4 h-4 text-yellow-500" />
+          <HardDrive class="w-4 h-4 text-yellow-400" />
           <span
-            class="text-zinc-950 dark:text-white text-sm font-black italic tracking-tighter"
+            class="text-white text-sm"
             >{{ formatBytes(totalSize) }} MB</span
           >
         </div>
       </div>
     </div>
 
-    <div class="space-y-4">
+    <div class="space-y-[15px]">
       <div
         v-if="images.length > 0"
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[15px]"
       >
         <div
           v-for="img in images"
           :key="img.path"
-          class="group relative overflow-hidden bg-zinc-950 shadow-2xl transition-all rounded-[2.5rem]"
+          class="group relative overflow-hidden bg-card shadow-2xl transition-all rounded-xl"
         >
-          <div class="aspect-video relative overflow-hidden bg-zinc-900">
+          <div class="aspect-video relative overflow-hidden bg-secondary">
             <img
               :src="img.url"
               class="block w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             />
             <div
-              class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"
+              class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"
             ></div>
           </div>
 
-          <div class="p-4">
+          <div class="p-[15px]">
             <div class="flex items-center justify-between gap-3">
               <h3
-                class="text-sm font-black italic tracking-tighter text-white group-hover:text-yellow-500 transition-colors leading-none truncate flex-1"
+                class="text-sm text-white group-hover:text-yellow-400 transition-colors leading-none truncate flex-1"
                 :title="img.name"
               >
                 {{ img.name }}
@@ -228,13 +228,13 @@ watch(
                 <a
                   :href="img.url"
                   target="_blank"
-                  class="cursor-pointer p-2.5 rounded-xl bg-zinc-900 text-zinc-400 hover:bg-yellow-500 hover:text-zinc-950 transition-all border border-zinc-800"
+                  class="cursor-pointer p-2.5 rounded-lg bg-secondary text-muted-foreground hover:bg-yellow-400 hover:text-black transition-all border border-border"
                 >
                   <ExternalLink class="w-4 h-4" />
                 </a>
                 <button
                   @click="openDeleteModal(img.path, img.name)"
-                  class="cursor-pointer p-2.5 rounded-xl bg-zinc-900 text-zinc-400 hover:bg-red-600 hover:text-white transition-all border border-zinc-800"
+                  class="cursor-pointer p-2.5 rounded-lg bg-secondary text-muted-foreground hover:bg-red-600 hover:text-white transition-all border border-border"
                 >
                   <Trash2 class="w-4 h-4" />
                 </button>
@@ -245,7 +245,7 @@ watch(
       </div>
 
       <div v-else class="text-center">
-        <p class="text-zinc-500 text-sm font-bold uppercase tracking-widest">
+        <p class="text-muted-foreground text-sm ">
           Sin imágenes en el storage
         </p>
       </div>
@@ -254,52 +254,52 @@ watch(
     <Teleport to="body">
       <div
         v-if="deleteModal.isOpen"
-        class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+        class="fixed inset-0 z-[100] flex items-center justify-center p-[15px]"
       >
         <div
-          class="absolute inset-0 bg-zinc-950/90 backdrop-blur-xl"
+          class="absolute inset-0 bg-card/90 backdrop-blur-xl"
           @click="closeDeleteModal"
         ></div>
 
         <div
-          class="relative bg-zinc-950 w-full max-w-md rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-red-500/20 animate-in zoom-in-95 duration-300"
+          class="relative bg-card w-full max-w-md rounded-[1.25rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-red-500/20 animate-in zoom-in-95 duration-300"
         >
-          <div class="p-4 space-y-4">
+          <div class="p-[15px] space-y-[15px]">
             <div class="flex items-center justify-between">
               <h3
-                class="text-xl font-black italic text-white uppercase tracking-tighter"
+                class="text-lg text-yellow-400 "
               >
                 Eliminar
               </h3>
               <button
                 @click="closeDeleteModal"
-                class="cursor-pointer p-2 rounded-xl bg-zinc-900 text-zinc-500 hover:text-white transition-all"
+                class="cursor-pointer p-2 rounded-lg bg-secondary text-muted-foreground hover:text-white transition-all"
               >
                 <Plus class="w-5 h-5 rotate-45" />
               </button>
             </div>
 
-            <div class="bg-zinc-900 rounded-2xl p-4 border border-zinc-800">
+            <div class="bg-secondary rounded-xl p-[15px] border border-border">
               <p
-                class="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1"
+                class="text-muted-foreground text-xs mb-1"
               >
                 Imágen seleccionada:
               </p>
-              <p class="text-white font-medium truncate text-sm">
+              <p class="text-white truncate text-sm">
                 {{ deleteModal.imageName }}
               </p>
             </div>
 
-            <div class="flex gap-4 pt-2">
+            <div class="flex gap-[15px] pt-2">
               <button
                 @click="closeDeleteModal"
-                class="flex-1 cursor-pointer h-[44px] rounded-full bg-zinc-900 border border-zinc-800 text-zinc-500 font-black uppercase tracking-[0.15em] text-[10px] hover:text-white transition-all active:scale-95"
+                class="flex-1 cursor-pointer h-[44px] rounded-full bg-secondary border border-border text-muted-foreground text-xs hover:text-white transition-all active:scale-95"
               >
                 Cancelar
               </button>
               <button
                 @click="confirmDelete"
-                class="flex-1 cursor-pointer h-[44px] rounded-full bg-red-600 text-white font-black uppercase tracking-[0.15em] text-[10px] hover:bg-red-500 transition-all active:scale-95 shadow-xl shadow-red-600/20"
+                class="flex-1 cursor-pointer h-[44px] rounded-full bg-red-600 text-white text-xs hover:bg-red-500 transition-all active:scale-95 shadow-xl shadow-red-600/20"
               >
                 Eliminar
               </button>

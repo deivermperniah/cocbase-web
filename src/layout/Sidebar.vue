@@ -50,7 +50,7 @@ async function handleSignOut() {
   <aside
     :class="
       cn(
-        'border-r border-black flex flex-col h-full transition-all duration-300',
+        'border-r border-border bg-[#121212] flex flex-col h-full transition-all duration-300',
         showLabels ? 'w-64' : 'w-20',
         className
       )
@@ -68,24 +68,24 @@ async function handleSignOut() {
           </div>
         </router-link>
       </div>
-      <div class="border-b border-black mx-2"></div>
+      <div class="border-b border-border mx-2"></div>
     </div>
 
-    <nav class="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar">
+    <nav class="flex-1 p-[15px] space-y-2 overflow-y-auto custom-scrollbar">
       <router-link v-for="item in navItems" :key="item.name" :to="item.path" custom v-slot="{ navigate, href, isActive, isExactActive }">
         <a :href="href" @click="(e) => handleNavClick(e, navigate)" 
            :class="cn(
-               'flex cursor-pointer items-center rounded-lg hover:bg-zinc-950 group relative py-3 transition-all',
-               showLabels ? 'justify-start px-4' : 'justify-center',
-               (item.path === '/' ? isExactActive : isActive) && 'bg-zinc-950 text-yellow-500 shadow-lg shadow-yellow-500/10 border border-yellow-500/20 hover:bg-zinc-950'
+               'flex cursor-pointer items-center rounded-lg hover:bg-card group relative py-3 transition-all',
+               showLabels ? 'justify-start px-[15px]' : 'justify-center',
+               (item.path === '/' ? isExactActive : isActive) && 'bg-card text-yellow-400 shadow-lg shadow-yellow-400/10 border border-yellow-400/20 hover:bg-card'
            )">
           <component :is="item.icon" :class="cn(
               'w-5 h-5 shrink-0 transition-colors',
-              (item.path === '/' ? isExactActive : isActive) ? 'text-yellow-500' : 'text-muted-foreground group-hover:text-yellow-500'
+              (item.path === '/' ? isExactActive : isActive) ? 'text-yellow-400' : 'text-muted-foreground group-hover:text-yellow-400'
           )" />
           <span v-if="showLabels" :class="cn(
-              'ml-3 font-medium transition-colors text-sm uppercase tracking-wider',
-              (item.path === '/' ? isExactActive : isActive) ? 'text-yellow-500' : 'text-muted-foreground group-hover:text-yellow-500'
+              'ml-3 transition-colors text-sm ',
+              (item.path === '/' ? isExactActive : isActive) ? 'text-yellow-400' : 'text-muted-foreground group-hover:text-yellow-400'
           )">
             {{ item.name }}
           </span>
@@ -93,19 +93,19 @@ async function handleSignOut() {
       </router-link>
     </nav>
 
-    <div class="border-b border-black mx-2"></div>
-    <div class="p-4">
+    <div class="border-b border-border mx-2"></div>
+    <div class="p-[15px]">
       <button
         type="button"
         class="flex w-full cursor-pointer items-center rounded-lg py-3 text-red-500 transition-colors hover:bg-red-500/10 hover:text-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 disabled:cursor-not-allowed disabled:opacity-50"
-        :class="showLabels ? 'justify-start px-4' : 'justify-center'"
+        :class="showLabels ? 'justify-start px-[15px]' : 'justify-center'"
         :disabled="isSigningOut"
         title="Cerrar sesión"
         @click="handleSignOut"
       >
         <Loader2 v-if="isSigningOut" class="h-5 w-5 shrink-0 animate-spin" />
         <LogOut v-else class="h-5 w-5 shrink-0" />
-        <span v-if="showLabels" class="ml-3 text-sm font-medium uppercase tracking-wider">
+        <span v-if="showLabels" class="ml-3 text-sm ">
           {{ isSigningOut ? 'Cerrando sesión...' : 'Cerrar sesión' }}
         </span>
       </button>
