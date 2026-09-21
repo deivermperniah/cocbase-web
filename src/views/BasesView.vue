@@ -49,6 +49,10 @@ const imageViewer = ref({
 });
 
 const isDraggingImage = ref(false);
+const isPinchingImage = ref(false);
+const activePointers = new Map<number, { x: number; y: number }>();
+const pinchStartDistance = ref(0);
+const pinchStartScale = ref(1);
 const dragStart = ref({ x: 0, y: 0 });
 const imageViewport = ref<HTMLElement | null>(null);
 
@@ -163,6 +167,8 @@ function closeImageViewer() {
     y: 0,
   };
   isDraggingImage.value = false;
+  isPinchingImage.value = false;
+  activePointers.clear();
 }
 
 function zoomImage(amount: number) {
@@ -189,6 +195,19 @@ function clampImagePosition() {
 }
 
 function startImageDrag(event: PointerEvent) {
+  activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+  (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+
+  if (activePointers.size === 2) {
+    isDraggingImage.value = false;
+    isPinchingImage.value = true;
+    const [a, b] = Array.from(activePointers.values());
+    if (!a || !b) return;
+    pinchStartDistance.value = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+    pinchStartScale.value = imageViewer.value.scale;
+    return;
+  }
+
   if (event.button !== 0 || imageViewer.value.scale <= 1) return;
 
   isDraggingImage.value = true;
@@ -196,10 +215,27 @@ function startImageDrag(event: PointerEvent) {
     x: event.clientX - imageViewer.value.x,
     y: event.clientY - imageViewer.value.y,
   };
-  (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
 }
 
 function moveImage(event: PointerEvent) {
+  if (!activePointers.has(event.pointerId)) return;
+  activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
+  if (isPinchingImage.value && activePointers.size >= 2) {
+    const [a, b] = Array.from(activePointers.values());
+    if (!a || !b) return;
+    const distance = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+    const scale = Math.min(3, Math.max(0.5, pinchStartScale.value * (distance / pinchStartDistance.value)));
+    imageViewer.value.scale = scale;
+    if (scale <= 1) {
+      imageViewer.value.x = 0;
+      imageViewer.value.y = 0;
+    } else {
+      clampImagePosition();
+    }
+    return;
+  }
+
   if (!isDraggingImage.value) return;
 
   imageViewer.value.x = event.clientX - dragStart.value.x;
@@ -208,10 +244,26 @@ function moveImage(event: PointerEvent) {
 }
 
 function stopImageDrag(event: PointerEvent) {
-  isDraggingImage.value = false;
+  activePointers.delete(event.pointerId);
   const target = event.currentTarget as HTMLElement;
   if (target.hasPointerCapture(event.pointerId)) {
     target.releasePointerCapture(event.pointerId);
+  }
+
+  if (activePointers.size < 2) {
+    isPinchingImage.value = false;
+  }
+
+  if (activePointers.size === 0) {
+    isDraggingImage.value = false;
+  } else if (!isPinchingImage.value && imageViewer.value.scale > 1) {
+    const [remaining] = Array.from(activePointers.values());
+    if (!remaining) return;
+    isDraggingImage.value = true;
+    dragStart.value = {
+      x: remaining.x - imageViewer.value.x,
+      y: remaining.y - imageViewer.value.y,
+    };
   }
 }
 
@@ -519,7 +571,7 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
             </button>
           </div>
 
-          <div ref="imageViewport" class="flex min-h-0 w-full flex-1 items-center justify-center overflow-hidden">
+          <div ref="imageViewport" class="flex min-h-0 w-full flex-1 touch-none items-center justify-center overflow-hidden">
             <img
               :src="imageViewer.url"
               :alt="imageViewer.title"
@@ -527,7 +579,7 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
               class="h-full w-full origin-center touch-none select-none object-contain"
               :class="[
                 isDraggingImage ? 'cursor-grabbing' : imageViewer.scale > 1 ? 'cursor-grab' : 'cursor-default',
-                isDraggingImage ? 'transition-none' : 'transition-transform duration-200'
+                isDraggingImage || isPinchingImage ? 'transition-none' : 'transition-transform duration-200'
               ]"
               :style="{ transform: `translate(${imageViewer.x}px, ${imageViewer.y}px) scale(${imageViewer.scale})` }"
               @pointerdown="startImageDrag"
