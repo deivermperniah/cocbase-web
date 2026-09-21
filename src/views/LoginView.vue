@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Loader2, LogIn, Eye, EyeOff } from 'lucide-vue-next'
+import IconSync from '~icons/ph/arrows-clockwise'
+import IconLogIn from '~icons/ph/sign-in'
+import IconEye from '~icons/ph/eye'
+import IconEyeOff from '~icons/ph/eye-slash'
 import Alert from '@/components/ui/alert/Alert.vue'
 import AlertDescription from '@/components/ui/alert/AlertDescription.vue'
 import Button from '@/components/ui/button/Button.vue'
@@ -73,15 +76,15 @@ async function handleSubmit() {
                 :aria-label="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
                 @click="showPassword = !showPassword"
               >
-                <Eye v-if="showPassword" class="h-4 w-4" />
-                <EyeOff v-else class="h-4 w-4" />
+                <IconEye v-if="showPassword" class="h-4 w-4" />
+                <IconEyeOff v-else class="h-4 w-4" />
               </button>
             </div>
           </div>
 
           <Button type="submit" class="w-full h-[44px] cursor-pointer rounded-full bg-yellow-400 text-black text-xs hover:bg-yellow-300 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shadow-xl shadow-yellow-400/10" :disabled="isSubmitting">
-            <Loader2 v-if="isSubmitting" class="mr-2 h-4 w-4 animate-spin" />
-            <LogIn v-else class="mr-2 h-4 w-4" />
+            <IconSync v-if="isSubmitting" class="mr-2 h-4 w-4 animate-spin" />
+            <IconLogIn v-else class="mr-2 h-4 w-4" />
             {{ isSubmitting ? 'Iniciando sesión...' : 'Iniciar sesión' }}
           </Button>
         </form>

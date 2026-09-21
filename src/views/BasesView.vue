@@ -1,7 +1,19 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed, watch } from "vue";
 import { supabase } from "@/lib/supabase";
-import { Plus, ExternalLink, Trash2, Filter, X, ZoomIn, ZoomOut, Shield, Castle, CalendarDays, Sword, Trophy, Hammer } from "lucide-vue-next";
+import IconAdd from "~icons/ph/plus";
+import IconOpen from "~icons/ph/arrow-square-out";
+import IconTrash from "~icons/ph/trash";
+import IconFunnel from "~icons/ph/funnel";
+import IconClose from "~icons/ph/x";
+import IconZoomIn from "~icons/ph/plus-circle";
+import IconZoomOut from "~icons/ph/minus-circle";
+import IconShield from "~icons/ph/shield";
+import IconBusiness from "~icons/ph/buildings";
+import IconCalendar from "~icons/ph/calendar";
+import IconSword from "~icons/ph/sword";
+import IconTrophy from "~icons/ph/trophy";
+import IconHammer from "~icons/ph/hammer";
 import BaseForm from "@/components/BaseForm.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import {
@@ -48,10 +60,10 @@ const tempLevel = ref<string>("all");
 const tempType = ref<string>("all");
 
 function getTypeIcon(type: string) {
-  if (type === "Guerra") return Sword;
-  if (type === "Liga") return Trophy;
-  if (type === "Mejora") return Hammer;
-  return Shield;
+  if (type === "Guerra") return IconSword;
+  if (type === "Liga") return IconTrophy;
+  if (type === "Mejora") return IconHammer;
+  return IconShield;
 }
 
 function openFilterModal() {
@@ -281,7 +293,7 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
                 ? 'bg-yellow-400 border-2 border-yellow-400 text-black shadow-[0_0_20px_rgba(250,204,21,0.3)]' 
                 : 'bg-secondary border-2 border-border text-muted-foreground hover:text-yellow-400 hover:border-yellow-400'"
         >
-          <Filter class="w-4 h-4 stroke-[2.5px]" />
+          <IconFunnel class="w-4 h-4" />
         </button>
 
         <div class="ml-auto">
@@ -289,7 +301,7 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
             @click="isModalOpen = true"
             class="group flex cursor-pointer items-center justify-center gap-3 w-[44px] sm:w-auto px-0 sm:px-[15px] h-[44px] rounded-full bg-card border-2 border-yellow-400 text-yellow-400 text-xs sm:text-xs hover:bg-yellow-400 hover:text-black transition-all duration-300 shadow-xl shadow-yellow-400/10 active:scale-95"
           >
-            <Plus class="w-4 h-4 stroke-[3px]" />
+            <IconAdd class="w-4 h-4" />
             <span class="hidden sm:inline text-xs sm:text-xs">Nueva Base</span>
           </button>
         </div>
@@ -316,7 +328,7 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
 
             <div class="pointer-events-none absolute bottom-4 left-4 z-20 flex items-center gap-2">
               <span class="flex h-6 items-center gap-2 rounded-md bg-yellow-400 px-3 text-xs text-black shadow-lg">
-                <Castle class="h-3.5 w-3.5" />
+                <IconBusiness class="h-3.5 w-3.5" />
                 {{ base.level_th }}
               </span>
               <span class="flex h-6 items-center gap-2 rounded-md bg-yellow-400 px-3 text-xs text-black shadow-lg">
@@ -326,7 +338,7 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
             </div>
             <div class="pointer-events-none absolute bottom-4 right-4 z-20">
               <span class="flex h-6 items-center gap-2 rounded-md border border-yellow-400/20 bg-card px-3 text-xs text-yellow-400 shadow-lg">
-                <CalendarDays class="h-3.5 w-3.5" />
+                <IconCalendar class="h-3.5 w-3.5" />
                 {{ new Date(base.created_at).toLocaleDateString("es-ES") }}
               </span>
             </div>
@@ -345,17 +357,17 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
                   target="_blank" 
                   class="cursor-pointer p-2.5 rounded-lg bg-secondary text-muted-foreground hover:bg-yellow-400 hover:text-black transition-all border border-border"
                 >
-                  <ExternalLink class="w-4 h-4" />
+                  <IconOpen class="w-4 h-4" />
                 </a>
                 <div 
                   v-else
                   class="p-2.5 rounded-lg bg-secondary text-muted-foreground/50 border border-border cursor-not-allowed"
                   title="Esta base no tiene enlace (Nivel 3)"
                 >
-                  <ExternalLink class="w-4 h-4" />
+                  <IconOpen class="w-4 h-4" />
                 </div>
                 <button @click="openDeleteModal(base)" class="cursor-pointer p-2.5 rounded-lg bg-secondary text-muted-foreground hover:bg-red-600 hover:text-white transition-all border border-border">
-                  <Trash2 class="w-4 h-4" />
+                  <IconTrash class="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -379,7 +391,7 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
                 <div class="flex items-center justify-between">
                     <h3 class="text-lg text-yellow-400 ">Filtro</h3>
                     <button @click="isFilterModalOpen = false" class="cursor-pointer p-2 rounded-lg bg-secondary text-muted-foreground hover:text-white transition-all">
-                        <Plus class="w-5 h-5 rotate-45" />
+                        <IconAdd class="w-5 h-5 rotate-45" />
                     </button>
                 </div>
 
@@ -434,7 +446,7 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
           <div class="px-[15px] pt-4 flex items-center justify-between">
             <h3 class="text-lg text-yellow-400 ">Nueva Base</h3>
             <button @click="isModalOpen = false" class="cursor-pointer p-2 rounded-lg bg-secondary text-muted-foreground hover:text-white transition-all">
-              <Plus class="w-5 h-5 rotate-45" />
+              <IconAdd class="w-5 h-5 rotate-45" />
             </button>
           </div>
           <div class="p-[15px]">
@@ -453,7 +465,7 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
                 <div class="flex items-center justify-between">
                     <h3 class="text-lg text-yellow-400 ">Eliminar</h3>
                     <button @click="closeDeleteModal" class="cursor-pointer p-2 rounded-lg bg-secondary text-muted-foreground hover:text-white transition-all">
-                        <Plus class="w-5 h-5 rotate-45" />
+                        <IconAdd class="w-5 h-5 rotate-45" />
                     </button>
                 </div>
 
@@ -488,7 +500,7 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
           <div class="relative z-20 flex h-16 w-full shrink-0 items-center justify-between gap-[15px] px-[15px] text-white sm:h-20 sm:px-6">
             <div class="flex min-w-0 items-center gap-2">
               <span class="flex h-6 items-center gap-2 rounded-md bg-yellow-400 px-3 text-xs text-black shadow-lg">
-                <Castle class="h-3.5 w-3.5" />
+                <IconBusiness class="h-3.5 w-3.5" />
                 {{ imageViewer.level }}
               </span>
               <span class="flex h-6 items-center gap-2 rounded-md bg-yellow-400 px-3 text-xs text-black shadow-lg">
@@ -503,7 +515,7 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
               aria-label="Cerrar visor de imagen"
               @click="closeImageViewer"
             >
-              <X class="h-5 w-5" />
+              <IconClose class="h-5 w-5" />
             </button>
           </div>
 
@@ -529,11 +541,11 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
 
           <div class="absolute bottom-4 flex items-center gap-2 rounded-full border border-border bg-card p-1 sm:bottom-6">
             <button type="button" class="cursor-pointer rounded-full p-2 text-muted-foreground transition-colors hover:bg-yellow-400 hover:text-black" aria-label="Reducir zoom" @click="zoomImage(-0.25)">
-              <ZoomOut class="h-4 w-4" />
+              <IconZoomOut class="h-4 w-4" />
             </button>
             <span class="min-w-14 text-center text-xs text-yellow-400">{{ Math.round(imageViewer.scale * 100) }}%</span>
             <button type="button" class="cursor-pointer rounded-full p-2 text-muted-foreground transition-colors hover:bg-yellow-400 hover:text-black" aria-label="Aumentar zoom" @click="zoomImage(0.25)">
-              <ZoomIn class="h-4 w-4" />
+              <IconZoomIn class="h-4 w-4" />
             </button>
           </div>
         </div>

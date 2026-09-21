@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import Sidebar from "./Sidebar.vue";
-import { Menu } from "lucide-vue-next";
+import IconMenu from "~icons/ph/list";
 import logo from "@/assets/logo.png";
 
 const isMobileMenuOpen = ref(false);
@@ -37,7 +37,7 @@ const isMobileMenuOpen = ref(false);
           @click="isMobileMenuOpen = true"
           class="-ml-2 cursor-pointer p-2 text-white hover:text-yellow-400"
         >
-          <Menu class="w-6 h-6" />
+          <IconMenu class="w-6 h-6" />
         </button>
 
         <router-link to="/" aria-label="cocbase - Administrador" class="ml-auto">

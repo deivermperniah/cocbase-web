@@ -2,7 +2,11 @@
 import { ref, onMounted } from "vue";
 import { supabase } from "@/lib/supabase";
 import { Card, CardContent } from "@/components/ui/card";
-import { Sword, Trophy, Hammer, Shield, Layers } from "lucide-vue-next";
+import IconSword from "~icons/ph/sword";
+import IconTrophy from "~icons/ph/trophy";
+import IconHammer from "~icons/ph/hammer";
+import IconShield from "~icons/ph/shield";
+import IconLayers from "~icons/ph/stack";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 const totalBases = ref(0);
@@ -57,7 +61,7 @@ onMounted(() => fetchStats());
         to="/bases"
         class="hidden sm:flex cursor-pointer items-center gap-3 px-[15px] h-[36px] sm:h-[44px] rounded-full bg-card border-2 border-yellow-400 text-yellow-400 text-xs sm:text-xs hover:bg-yellow-400 hover:text-black transition-all duration-300 shadow-xl shadow-yellow-400/10 active:scale-95"
       >
-        <Layers class="h-3 w-3 sm:h-4 sm:w-4 stroke-[3px]" />
+        <IconLayers class="h-3 w-3 sm:h-4 sm:w-4" />
         <span class="text-xs sm:text-xs">Ver Bases</span>
       </router-link>
     </div>
@@ -70,7 +74,7 @@ onMounted(() => fetchStats());
           <div class="absolute -right-10 -top-10 sm:-right-20 sm:-top-20 h-32 w-32 sm:h-64 sm:w-64 rounded-full bg-white/20 blur-2xl sm:blur-3xl"></div>
           <div class="absolute -left-10 -bottom-10 sm:-left-20 sm:-bottom-20 h-32 w-32 sm:h-64 sm:w-64 rounded-full bg-black/5 blur-2xl sm:blur-3xl"></div>
           <div class="relative z-10 space-y-0">
-            <h1 class="text-5xl text-black leading-none">
+            <h1 class="text-[28px] text-black leading-none">
               {{ totalBases }}
             </h1>
             <p class="text-black/60 text-xs">
@@ -85,7 +89,7 @@ onMounted(() => fetchStats());
           <div class="absolute right-0 top-0 h-24 w-24 sm:h-32 sm:w-32 bg-yellow-400/5 rounded-bl-[3rem] sm:rounded-bl-[4rem] translate-x-8 sm:translate-x-12 -translate-y-8 sm:-translate-y-12 transition-transform group-hover:scale-110"></div>
           <CardContent class="h-full p-3 relative flex flex-col justify-center gap-[15px]">
             <div class="h-12 w-12 rounded-xl bg-yellow-400/10 flex items-center justify-center group-hover:bg-yellow-400 transition-all duration-500 shadow-lg shadow-yellow-400/10">
-              <Sword class="h-5 w-5 text-yellow-400 group-hover:text-black transition-colors" />
+              <IconSword class="h-5 w-5 text-yellow-400 group-hover:text-black transition-colors" />
             </div>
             <div class="space-y-0">
               <h3 class="text-base text-white">Guerra</h3>
@@ -104,7 +108,7 @@ onMounted(() => fetchStats());
         <div class="absolute right-0 top-0 h-24 w-24 sm:h-32 sm:w-32 bg-yellow-400/5 rounded-bl-[3rem] sm:rounded-bl-[4rem] translate-x-8 sm:translate-x-12 -translate-y-8 sm:-translate-y-12 transition-transform group-hover:scale-110"></div>
         <CardContent class="h-full p-3 relative flex flex-col justify-center gap-[15px]">
           <div class="h-12 w-12 rounded-xl bg-yellow-400/10 flex items-center justify-center group-hover:bg-yellow-400 transition-all duration-500 shadow-lg shadow-yellow-400/10">
-            <Sword class="h-5 w-5 text-yellow-400 group-hover:text-black transition-colors" />
+            <IconSword class="h-5 w-5 text-yellow-400 group-hover:text-black transition-colors" />
           </div>
           <div class="space-y-0 text-white">
             <h3 class="text-base ">Guerra</h3>
@@ -119,7 +123,7 @@ onMounted(() => fetchStats());
         <div class="absolute right-0 top-0 h-24 w-24 sm:h-32 sm:w-32 bg-yellow-400/5 rounded-bl-[3rem] sm:rounded-bl-[4rem] translate-x-8 sm:translate-x-12 -translate-y-8 sm:-translate-y-12 transition-transform group-hover:scale-110"></div>
         <CardContent class="h-full p-3 relative flex flex-col justify-center gap-[15px]">
           <div class="h-12 w-12 rounded-xl bg-yellow-400/10 flex items-center justify-center group-hover:bg-yellow-400 transition-all duration-500 shadow-lg shadow-yellow-400/10">
-            <Trophy class="h-5 w-5 text-yellow-400 group-hover:text-black transition-colors" />
+            <IconTrophy class="h-5 w-5 text-yellow-400 group-hover:text-black transition-colors" />
           </div>
           <div class="space-y-0 text-white">
             <h3 class="text-base ">Liga</h3>
@@ -134,7 +138,7 @@ onMounted(() => fetchStats());
         <div class="absolute right-0 top-0 h-24 w-24 sm:h-32 sm:w-32 bg-yellow-400/5 rounded-bl-[3rem] sm:rounded-bl-[4rem] translate-x-8 sm:translate-x-12 -translate-y-8 sm:-translate-y-12 transition-transform group-hover:scale-110"></div>
         <CardContent class="h-full p-3 relative flex flex-col justify-center gap-[15px]">
           <div class="h-12 w-12 rounded-xl bg-yellow-400/10 flex items-center justify-center group-hover:bg-yellow-400 transition-all duration-500 shadow-lg shadow-yellow-400/10">
-            <Hammer class="h-5 w-5 text-yellow-400 group-hover:text-black transition-colors" />
+            <IconHammer class="h-5 w-5 text-yellow-400 group-hover:text-black transition-colors" />
           </div>
           <div class="space-y-0 text-white">
             <h3 class="text-base ">Mejora</h3>
@@ -149,7 +153,7 @@ onMounted(() => fetchStats());
         <div class="absolute right-0 top-0 h-24 w-24 sm:h-32 sm:w-32 bg-yellow-400/5 rounded-bl-[3rem] sm:rounded-bl-[4rem] translate-x-8 sm:translate-x-12 -translate-y-8 sm:-translate-y-12 transition-transform group-hover:scale-110"></div>
         <CardContent class="h-full p-3 relative flex flex-col justify-center gap-[15px]">
           <div class="h-12 w-12 rounded-xl bg-yellow-400/10 flex items-center justify-center group-hover:bg-yellow-400 transition-all duration-500 shadow-lg shadow-yellow-400/10">
-            <Shield class="h-5 w-5 text-yellow-400 group-hover:text-black transition-colors" />
+            <IconShield class="h-5 w-5 text-yellow-400 group-hover:text-black transition-colors" />
           </div>
           <div class="space-y-0 text-white">
             <h3 class="text-base ">Recursos</h3>

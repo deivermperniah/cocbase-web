@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { ref, onBeforeUnmount, onMounted, watch } from "vue";
 import { supabase } from "@/lib/supabase";
-import {
-  Trash2,
-  ExternalLink,
-  Image as ImageIcon,
-  HardDrive,
-  Plus,
-} from "lucide-vue-next";
+import IconTrash from "~icons/ph/trash";
+import IconOpen from "~icons/ph/arrow-square-out";
+import IconImage from "~icons/ph/image";
+import IconServer from "~icons/ph/hard-drives";
+import IconAdd from "~icons/ph/plus";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 interface Img {
@@ -179,14 +177,14 @@ watch(
 
       <div class="flex gap-[15px]">
         <div class="flex items-center gap-2">
-          <ImageIcon class="w-4 h-4 text-yellow-400" />
+          <IconImage class="w-4 h-4 text-yellow-400" />
           <span
             class="text-white text-sm"
             >{{ images.length }}</span
           >
         </div>
         <div class="flex items-center gap-2">
-          <HardDrive class="w-4 h-4 text-yellow-400" />
+          <IconServer class="w-4 h-4 text-yellow-400" />
           <span
             class="text-white text-sm"
             >{{ formatBytes(totalSize) }} MB</span
@@ -230,13 +228,13 @@ watch(
                   target="_blank"
                   class="cursor-pointer p-2.5 rounded-lg bg-secondary text-muted-foreground hover:bg-yellow-400 hover:text-black transition-all border border-border"
                 >
-                  <ExternalLink class="w-4 h-4" />
+                  <IconOpen class="w-4 h-4" />
                 </a>
                 <button
                   @click="openDeleteModal(img.path, img.name)"
                   class="cursor-pointer p-2.5 rounded-lg bg-secondary text-muted-foreground hover:bg-red-600 hover:text-white transition-all border border-border"
                 >
-                  <Trash2 class="w-4 h-4" />
+                  <IconTrash class="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -275,7 +273,7 @@ watch(
                 @click="closeDeleteModal"
                 class="cursor-pointer p-2 rounded-lg bg-secondary text-muted-foreground hover:text-white transition-all"
               >
-                <Plus class="w-5 h-5 rotate-45" />
+                <IconAdd class="w-5 h-5 rotate-45" />
               </button>
             </div>
 

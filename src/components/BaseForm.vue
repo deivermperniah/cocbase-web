@@ -4,7 +4,12 @@ import { supabase } from '@/lib/supabase'
 
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { PlusCircle, Image as ImageIcon, CheckCircle2, AlertTriangle, Loader2, Plus } from 'lucide-vue-next'
+import IconAddCircle from '~icons/ph/plus-circle'
+import IconImage from '~icons/ph/image'
+import IconCheck from '~icons/ph/check-circle'
+import IconWarning from '~icons/ph/warning'
+import IconSync from '~icons/ph/arrows-clockwise'
+import IconAdd from '~icons/ph/plus'
 
 const emit = defineEmits(['success'])
 
@@ -397,7 +402,7 @@ async function handleSubmit() {
                         type="button"
                         class="cursor-pointer p-1 rounded-lg text-muted-foreground hover:text-white transition-colors"
                     >
-                        <Plus class="w-4 h-4 rotate-45" />
+                        <IconAdd class="w-4 h-4 rotate-45" />
                     </button>
                 </div>
             </div>
@@ -423,7 +428,7 @@ async function handleSubmit() {
                     class="flex flex-col items-center justify-center border-2 border-dashed border-border rounded-xl p-[15px] text-center cursor-pointer bg-secondary/40 hover:bg-secondary/60 hover:border-yellow-400/40 transition-all"
                     :class="loading ? 'opacity-50 cursor-not-allowed' : ''"
                 >
-                    <ImageIcon class="w-6 h-6 text-muted-foreground mb-2" />
+                    <IconImage class="w-6 h-6 text-muted-foreground mb-2" />
                     <p class="text-xs text-white">Subir Captura</p>
                     <p class="text-xs text-muted-foreground mt-1">
                         JPG, PNG, WebP • Max 5MB
@@ -456,7 +461,7 @@ async function handleSubmit() {
                         @click.stop="removeImage"
                         class="absolute -top-2 -right-2 h-8 w-8 cursor-pointer rounded-full bg-card text-muted-foreground flex items-center justify-center hover:bg-red-600 hover:text-white transition-all border border-border"
                     >
-                        <PlusCircle class="w-3 h-3 rotate-45" />
+                        <IconAddCircle class="w-3 h-3 rotate-45" />
                     </button>
                     
                     <!-- Información del archivo -->
@@ -474,11 +479,11 @@ async function handleSubmit() {
             @click="handleSubmit"
         >
             <div v-if="!loading" class="flex items-center justify-center gap-2">
-                <PlusCircle class="w-4 h-4" />
+                <IconAddCircle class="w-4 h-4" />
                 <span>Guardar</span>
             </div>
             <div v-else class="flex items-center justify-center gap-2">
-                <Loader2 class="w-4 h-4 animate-spin" />
+                <IconSync class="w-4 h-4 animate-spin" />
                 <span>Procesando...</span>
             </div>
         </button>
@@ -488,7 +493,7 @@ async function handleSubmit() {
             <!-- Estado de éxito -->
             <div v-if="successMessage"
                 class="flex items-center gap-3 p-3 rounded-lg bg-secondary border border-yellow-400/20 text-white">
-                <CheckCircle2 class="w-4 h-4 shrink-0 text-yellow-400" />
+                <IconCheck class="w-4 h-4 shrink-0 text-yellow-400" />
                 <p class="text-xs ">
                     {{ successMessage }}
                 </p>
@@ -497,7 +502,7 @@ async function handleSubmit() {
             <!-- Estado de error -->
             <div v-if="errorMessage"
                 class="flex items-center gap-3 p-3 rounded-lg bg-secondary border border-red-500/30 text-white">
-                <AlertTriangle class="w-4 h-4 shrink-0 text-red-500" />
+                <IconWarning class="w-4 h-4 shrink-0 text-red-500" />
                 <p class="text-xs ">
                     {{ errorMessage }}
                 </p>

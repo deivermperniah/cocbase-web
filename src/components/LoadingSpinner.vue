@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Loader2 } from 'lucide-vue-next'
+import IconSync from '~icons/ph/arrows-clockwise'
 
 interface Props {
   size?: 'sm' | 'md' | 'lg'
@@ -18,7 +18,7 @@ const sizeClasses = {
 
 <template>
   <div class="flex flex-col items-center justify-center">
-    <Loader2 :class="[sizeClasses[size], 'animate-spin text-yellow-400 mb-[15px]']" />
+    <IconSync :class="[sizeClasses[size], 'animate-spin text-yellow-400 mb-[15px]']" />
     <span class="text-foreground text-sm ">
       Cargando...
     </span>

@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { LayoutDashboard, Layers, Image, Loader2, LogOut } from "lucide-vue-next";
+import IconDashboard from "~icons/ph/squares-four";
+import IconLayers from "~icons/ph/stack";
+import IconImage from "~icons/ph/image";
+import IconSync from "~icons/ph/arrows-clockwise";
+import IconLogOut from "~icons/ph/sign-out";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import logo from "@/assets/logo.png";
@@ -22,9 +26,9 @@ const emit = defineEmits<{
 }>()
 
 const navItems = [
-  { name: "Dashboard", icon: LayoutDashboard, path: "/" },
-  { name: "Bases", icon: Layers, path: "/bases" },
-  { name: "Imagenes", icon: Image, path: "/imagenes" },
+  { name: "Dashboard", icon: IconDashboard, path: "/" },
+  { name: "Bases", icon: IconLayers, path: "/bases" },
+  { name: "Imagenes", icon: IconImage, path: "/imagenes" },
 ];
 
 function handleNavClick(e: MouseEvent, navigate: () => void) {
@@ -103,8 +107,8 @@ async function handleSignOut() {
         title="Cerrar sesión"
         @click="handleSignOut"
       >
-        <Loader2 v-if="isSigningOut" class="h-5 w-5 shrink-0 animate-spin" />
-        <LogOut v-else class="h-5 w-5 shrink-0" />
+        <IconSync v-if="isSigningOut" class="h-5 w-5 shrink-0 animate-spin" />
+        <IconLogOut v-else class="h-5 w-5 shrink-0" />
         <span v-if="showLabels" class="ml-3 text-sm ">
           {{ isSigningOut ? 'Cerrando sesión...' : 'Cerrar sesión' }}
         </span>
