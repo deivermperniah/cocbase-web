@@ -13,9 +13,8 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'cocbase - Administrador',
+        name: 'cocbase',
         short_name: 'cocbase',
-        description: 'Panel de administración de cocbase',
         lang: 'es',
         theme_color: '#0a0a0a',
         background_color: '#0a0a0a',

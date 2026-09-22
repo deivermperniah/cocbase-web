@@ -65,7 +65,7 @@ async function handleSignOut() {
         <router-link
           to="/"
           class="flex items-center shrink-0"
-          aria-label="cocbase - Administrador"
+          aria-label="cocbase"
         >
           <div class="flex items-center justify-center shrink-0 w-10 h-10 transition-all">
             <img :src="logo" alt="logo" class="w-full h-full object-contain" />

@@ -40,7 +40,7 @@ const isMobileMenuOpen = ref(false);
           <IconMenu class="w-6 h-6" />
         </button>
 
-        <router-link to="/" aria-label="cocbase - Administrador" class="ml-auto">
+        <router-link to="/" aria-label="cocbase" class="ml-auto">
           <img :src="logo" alt="logo" class="w-10 h-10 object-contain" />
         </router-link>
       </header>
