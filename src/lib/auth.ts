@@ -1,18 +1,37 @@
-import { ref } from 'vue'
-import type { Session } from '@supabase/supabase-js'
+import { ref, computed } from 'vue'
+import type { Session, User } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 
-const adminEmail = import.meta.env.VITE_ADMIN_EMAIL?.trim().toLowerCase() ?? ''
-
 export const session = ref<Session | null>(null)
+export const user = ref<User | null>(null)
 export const isAuthInitialized = ref(false)
+
+export interface Profile {
+  id: string
+  full_name: string | null
+  role: 'user' | 'admin'
+}
+
+export const profile = ref<Profile | null>(null)
+
+export const isAdmin = computed(() => profile.value?.role === 'admin')
 
 let authSubscription: { unsubscribe: () => void } | null = null
 let initializationPromise: Promise<void> | null = null
 
-export function isAuthorizedUser(currentSession: Session | null) {
-  if (!currentSession?.user) return false
-  return Boolean(adminEmail) && currentSession.user.email?.toLowerCase() === adminEmail
+async function loadProfile(userId: string) {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, full_name, role')
+    .eq('id', userId)
+    .maybeSingle()
+
+  if (error) {
+    console.error('Error loading profile:', error)
+    return
+  }
+
+  profile.value = data as Profile | null
 }
 
 export function initializeAuth() {
@@ -21,14 +40,23 @@ export function initializeAuth() {
   initializationPromise = supabase.auth.getSession().then(async ({ data, error }) => {
     if (error) throw error
 
-    session.value = isAuthorizedUser(data.session) ? data.session : null
-    if (data.session && !session.value) {
-      await supabase.auth.signOut()
+    session.value = data.session
+    user.value = data.session?.user ?? null
+
+    if (data.session?.user) {
+      await loadProfile(data.session.user.id)
     }
 
     if (!authSubscription) {
-      const { data: subscription } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-        session.value = isAuthorizedUser(nextSession) ? nextSession : null
+      const { data: subscription } = supabase.auth.onAuthStateChange(async (_event, nextSession) => {
+        session.value = nextSession
+        user.value = nextSession?.user ?? null
+
+        if (nextSession?.user) {
+          await loadProfile(nextSession.user.id)
+        } else {
+          profile.value = null
+        }
       })
       authSubscription = subscription.subscription
     }
@@ -47,12 +75,25 @@ export async function signIn(email: string, password: string) {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password })
   if (error) throw error
 
-  if (!isAuthorizedUser(data.session)) {
-    await supabase.auth.signOut({ scope: 'local' })
-    throw new Error('Esta cuenta no tiene permisos de administrador.')
-  }
-
   session.value = data.session
+  user.value = data.session.user
+
+  if (data.session?.user) {
+    await loadProfile(data.session.user.id)
+  }
+}
+
+export async function signUp(fullName: string, email: string, password: string) {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { full_name: fullName },
+      emailRedirectTo: `${window.location.origin}/login`,
+    },
+  })
+  if (error) throw error
+  return data
 }
 
 export async function signOut() {
@@ -62,5 +103,7 @@ export async function signOut() {
     console.warn('No se pudo cerrar la sesión remota; se limpiará la sesión local.', error)
   } finally {
     session.value = null
+    user.value = null
+    profile.value = null
   }
 }

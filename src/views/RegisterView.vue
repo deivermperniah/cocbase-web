@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import IconSync from '~icons/ph/arrows-clockwise'
-import IconLogIn from '~icons/ph/sign-in'
+import IconUserPlus from '~icons/ph/user-plus'
 import IconEye from '~icons/ph/eye'
 import IconEyeOff from '~icons/ph/eye-slash'
 import Alert from '@/components/ui/alert/Alert.vue'
@@ -10,32 +9,28 @@ import AlertDescription from '@/components/ui/alert/AlertDescription.vue'
 import Button from '@/components/ui/button/Button.vue'
 import Input from '@/components/ui/input/Input.vue'
 import logo from '@/assets/logo.png'
-import { signIn } from '@/lib/auth'
+import { signUp } from '@/lib/auth'
 
-const route = useRoute()
-const router = useRouter()
+const fullName = ref('')
 const email = ref('')
 const password = ref('')
 const showPassword = ref(false)
 const errorMessage = ref('')
+const successMessage = ref('')
 const isSubmitting = ref(false)
 
 async function handleSubmit() {
   errorMessage.value = ''
+  successMessage.value = ''
   isSubmitting.value = true
 
   try {
-    await signIn(email.value.trim(), password.value)
-    const redirect = typeof route.query.redirect === 'string'
-      && route.query.redirect.startsWith('/')
-      && !route.query.redirect.startsWith('//')
-      ? route.query.redirect
-      : '/'
-    await router.replace(redirect)
+    await signUp(fullName.value.trim(), email.value.trim(), password.value)
+    successMessage.value = 'Revisa tu correo para confirmar la cuenta y entrar.'
   } catch (error) {
     errorMessage.value = error instanceof Error
       ? error.message
-      : 'No se pudo iniciar sesión.'
+      : 'No se pudo crear la cuenta.'
   } finally {
     isSubmitting.value = false
   }
@@ -51,15 +46,22 @@ async function handleSubmit() {
           <div class="mx-auto mb-[15px] flex h-16 w-16 items-center justify-center">
             <img :src="logo" alt="logo" class="h-full w-full object-contain" />
           </div>
-          <h2 class="text-[28px] text-yellow-400">
-            Iniciar sesión
-          </h2>
+          <h2 class="text-[28px] text-yellow-400">Crear cuenta</h2>
         </div>
 
         <form class="space-y-[15px]" @submit.prevent="handleSubmit">
           <Alert v-if="errorMessage" variant="destructive" class="rounded-lg border-red-500/40 bg-red-500/10 text-red-300">
             <AlertDescription class="text-red-300">{{ errorMessage }}</AlertDescription>
           </Alert>
+
+          <Alert v-if="successMessage" class="rounded-lg border-yellow-400/40 bg-yellow-400/10">
+            <AlertDescription class="text-yellow-300">{{ successMessage }}</AlertDescription>
+          </Alert>
+
+          <div class="space-y-2">
+            <label for="fullName" class="text-xs text-muted-foreground">Nombre completo *</label>
+            <Input id="fullName" v-model="fullName" type="text" autocomplete="name" placeholder="Deiver Pernia" required class="!h-12 !rounded-lg !border-border !bg-secondary !text-white !placeholder:text-muted-foreground focus-visible:!border-yellow-400 focus-visible:!ring-yellow-400/20" />
+          </div>
 
           <div class="space-y-2">
             <label for="email" class="text-xs text-muted-foreground">Correo electrónico *</label>
@@ -69,7 +71,7 @@ async function handleSubmit() {
           <div class="space-y-2">
             <label for="password" class="text-xs text-muted-foreground">Contraseña *</label>
             <div class="relative">
-              <Input id="password" v-model="password" :type="showPassword ? 'text' : 'password'" :placeholder="showPassword ? '12345678' : '••••••••'" autocomplete="current-password" required class="!h-12 !rounded-lg !border-border !bg-secondary !text-white !placeholder:text-muted-foreground focus-visible:!border-yellow-400 focus-visible:!ring-yellow-400/20 !pr-12" />
+              <Input id="password" v-model="password" :type="showPassword ? 'text' : 'password'" :placeholder="showPassword ? '12345678' : '••••••••'" autocomplete="new-password" required class="!h-12 !rounded-lg !border-border !bg-secondary !text-white !placeholder:text-muted-foreground focus-visible:!border-yellow-400 focus-visible:!ring-yellow-400/20 !pr-12" />
               <button
                 type="button"
                 class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-white"
@@ -84,16 +86,15 @@ async function handleSubmit() {
 
           <Button type="submit" class="w-full h-[44px] cursor-pointer rounded-full bg-yellow-400 text-black text-xs hover:bg-yellow-300 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shadow-xl shadow-yellow-400/10" :disabled="isSubmitting">
             <IconSync v-if="isSubmitting" class="mr-2 h-4 w-4 animate-spin" />
-            <IconLogIn v-else class="mr-2 h-4 w-4" />
-            {{ isSubmitting ? 'Iniciando sesión...' : 'Iniciar sesión' }}
+            <IconUserPlus v-else class="mr-2 h-4 w-4" />
+            {{ isSubmitting ? 'Creando cuenta...' : 'Crear cuenta' }}
           </Button>
         </form>
 
         <p class="mt-6 text-center text-xs text-muted-foreground">
-          ¿No tienes cuenta?
-          <router-link to="/register" class="text-yellow-400 hover:text-yellow-300 transition-colors">Crea una</router-link>
+          ¿Ya tienes cuenta?
+          <router-link to="/login" class="text-yellow-400 hover:text-yellow-300 transition-colors">Inicia sesión</router-link>
         </p>
-
       </div>
     </section>
   </main>
