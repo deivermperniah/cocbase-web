@@ -2,16 +2,18 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import MainLayout from '@/layout/MainLayout.vue'
+import ToastContainer from '@/components/ToastContainer.vue'
 import { isAuthInitialized } from '@/lib/auth'
 
 const route = useRoute()
-const requiresAuth = computed(() => route.meta.requiresAuth === true)
+const isAuthScreen = computed(() => route.name === 'login' || route.name === 'register')
 </script>
 
 <template>
   <div v-if="!isAuthInitialized" class="min-h-dvh bg-background" />
-  <MainLayout v-else-if="requiresAuth">
+  <RouterView v-else-if="isAuthScreen" />
+  <MainLayout v-else>
     <RouterView />
   </MainLayout>
-  <RouterView v-else />
+  <ToastContainer />
 </template>
