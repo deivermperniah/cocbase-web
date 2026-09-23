@@ -1,6 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, computed, watch } from "vue";
+import { ref, onMounted, onBeforeUnmount, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { supabase } from "@/lib/supabase";
+import { session, user, isAdmin } from "@/lib/auth";
+import { toast } from "@/lib/toast";
+import { BASE_TYPES, BASE_LEVELS } from "@/lib/constants";
 import IconAdd from "~icons/ph/plus";
 import IconOpen from "~icons/ph/arrow-square-out";
 import IconTrash from "~icons/ph/trash";
@@ -8,6 +12,8 @@ import IconFunnel from "~icons/ph/funnel";
 import IconClose from "~icons/ph/x";
 import IconZoomIn from "~icons/ph/plus-circle";
 import IconZoomOut from "~icons/ph/minus-circle";
+import IconHeart from "~icons/ph/heart";
+import IconHeartFill from "~icons/ph/heart-fill";
 import IconShield from "~icons/ph/shield";
 import IconBusiness from "~icons/ph/buildings";
 import IconCalendar from "~icons/ph/calendar";
@@ -24,10 +30,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+const route = useRoute();
+const router = useRouter();
+
 const allBases = ref<any[]>([]);
+const totalCount = ref(0);
 const loading = ref(true);
+const loadingMore = ref(false);
+const hasMore = ref(false);
+const pageSize = 12;
+
 const isModalOpen = ref(false);
 const isFilterModalOpen = ref(false);
+
+const favoriteIds = ref<Set<string>>(new Set());
+const loadedImages = ref<Set<string>>(new Set());
 
 const deleteModal = ref({
   isOpen: false,
@@ -58,7 +75,6 @@ const imageViewport = ref<HTMLElement | null>(null);
 
 const selectedLevel = ref<string>("all");
 const selectedType = ref<string>("all");
-const types = ["Guerra", "Liga", "Mejora", "Recursos"];
 
 const tempLevel = ref<string>("all");
 const tempType = ref<string>("all");
@@ -80,6 +96,7 @@ function applyFilters() {
   selectedLevel.value = tempLevel.value;
   selectedType.value = tempType.value;
   isFilterModalOpen.value = false;
+  fetchBases(true);
 }
 
 function clearFilters() {
@@ -89,28 +106,109 @@ function clearFilters() {
   tempType.value = "all";
 }
 
-const filteredBases = computed(() => {
-  if (!allBases.value) return [];
-  return allBases.value.filter((base) => {
-    const matchesLevel = selectedLevel.value === "all" || String(base.level_th) === selectedLevel.value;
-    const matchesType = selectedType.value === "all" || base.type === selectedType.value;
-    return matchesLevel && matchesType;
-  });
-});
+async function fetchBases(reset = false) {
+  if (reset) {
+    allBases.value = [];
+    totalCount.value = 0;
+    hasMore.value = false;
+    loading.value = true;
+  } else {
+    loadingMore.value = true;
+  }
 
-async function fetchBases() {
-  try {
-    const { data, error } = await supabase
-      .from("bases")
-      .select("*")
-      .order("created_at", { ascending: false });
+  const from = reset ? 0 : allBases.value.length;
+  const to = from + pageSize - 1;
 
-    if (error) throw error;
-    allBases.value = data || [];
-  } catch (error) {
+  let query = supabase
+    .from("bases")
+    .select("*", { count: "exact" })
+    .order("created_at", { ascending: false })
+    .range(from, to);
+
+  if (selectedLevel.value !== "all") {
+    query = query.eq("level_th", Number(selectedLevel.value));
+  }
+  if (selectedType.value !== "all") {
+    query = query.eq("type", selectedType.value);
+  }
+
+  const { data, count, error } = await query;
+
+  if (error) {
     console.error("Error fetching bases:", error);
-  } finally {
-    loading.value = false;
+  } else {
+    if (reset) {
+      allBases.value = data || [];
+    } else {
+      allBases.value = allBases.value.concat(data || []);
+    }
+    totalCount.value = count ?? allBases.value.length;
+    hasMore.value = allBases.value.length < (count ?? allBases.value.length);
+  }
+
+  loading.value = false;
+  loadingMore.value = false;
+}
+
+function loadMore() {
+  fetchBases(false);
+}
+
+async function fetchFavorites() {
+  if (!user.value) {
+    favoriteIds.value = new Set();
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from("favorites")
+    .select("base_id")
+    .eq("user_id", user.value.id);
+
+  if (error) {
+    console.error("Error fetching favorites:", error);
+    return;
+  }
+
+  favoriteIds.value = new Set((data || []).map((r: any) => r.base_id));
+}
+
+function isFavorite(baseId: string) {
+  return favoriteIds.value.has(baseId);
+}
+
+async function toggleFavorite(base: any) {
+  if (!user.value) {
+    router.push({ name: "login", query: { redirect: "/bases" } });
+    return;
+  }
+
+  const baseId = base.id;
+
+  if (isFavorite(baseId)) {
+    const { error } = await supabase
+      .from("favorites")
+      .delete()
+      .eq("user_id", user.value.id)
+      .eq("base_id", baseId);
+
+    if (error) {
+      toast.error("No se pudo quitar de favoritos.");
+      return;
+    }
+    favoriteIds.value.delete(baseId);
+    toast.success("Eliminada de favoritos.");
+  } else {
+    const { error } = await supabase
+      .from("favorites")
+      .insert({ user_id: user.value.id, base_id: baseId });
+
+    if (error) {
+      toast.error("No se pudo guardar en favoritos.");
+      return;
+    }
+    favoriteIds.value.add(baseId);
+    toast.success("Guardada en favoritos.");
   }
 }
 
@@ -295,21 +393,51 @@ async function confirmDelete() {
       .eq("id", baseId);
     if (error) throw error;
     allBases.value = allBases.value.filter((b) => b.id !== baseId);
+    totalCount.value = Math.max(0, totalCount.value - 1);
+    toast.success("Base eliminada.");
     closeDeleteModal();
   } catch (error) {
     console.error("Error deleting base:", error);
+    toast.error("No se pudo eliminar la base.");
   }
 }
 
 function handleSuccess() {
   isModalOpen.value = false;
-  fetchBases();
+  fetchBases(true);
+}
+
+function markLoaded(url: string) {
+  loadedImages.value.add(url);
 }
 
 onMounted(() => {
-  fetchBases();
+  const levelParam = route.query.level;
+  if (typeof levelParam === "string" && levelParam !== "") {
+    selectedLevel.value = levelParam;
+  }
+
+  fetchBases(true);
+  fetchFavorites();
   window.addEventListener("keydown", handleImageViewerKeydown);
 });
+
+watch(
+  () => route.query.level,
+  (level) => {
+    if (typeof level === "string" && level !== "") {
+      selectedLevel.value = level;
+      fetchBases(true);
+    }
+  }
+);
+
+watch(
+  () => session.value,
+  () => {
+    fetchFavorites();
+  }
+);
 
 onBeforeUnmount(() => {
   window.removeEventListener("keydown", handleImageViewerKeydown);
@@ -339,19 +467,19 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
       </div>
 
       <div class="flex flex-row items-center gap-2 sm:gap-[15px]">
-        <button @click="openFilterModal" 
+        <button @click="openFilterModal"
             class="flex cursor-pointer items-center justify-center w-[44px] h-[44px] rounded-full transition-all active:scale-95 shadow-xl"
-            :class="selectedLevel !== 'all' || selectedType !== 'all' 
-                ? 'bg-yellow-400 border-2 border-yellow-400 text-black shadow-[0_0_20px_rgba(250,204,21,0.3)]' 
+            :class="selectedLevel !== 'all' || selectedType !== 'all'
+                ? 'bg-yellow-400 border-2 border-yellow-400 text-black shadow-[0_0_20px_rgba(250,204,21,0.3)]'
                 : 'bg-secondary border-2 border-border text-muted-foreground hover:text-yellow-400 hover:border-yellow-400'"
         >
           <IconFunnel class="w-4 h-4" />
         </button>
 
-        <div class="ml-auto">
+        <div v-if="isAdmin" class="ml-auto">
           <button
             @click="isModalOpen = true"
-            class="group flex cursor-pointer items-center justify-center gap-3 w-[44px] sm:w-auto px-0 sm:px-[15px] h-[44px] rounded-full bg-card border-2 border-yellow-400 text-yellow-400 text-xs sm:text-xs hover:bg-yellow-400 hover:text-black transition-all duration-300 shadow-xl shadow-yellow-400/10 active:scale-95"
+            class="group flex cursor-pointer items-center justify-center gap-3 w-[44px] sm:w-auto px-0 sm:px-[15px] h-[44px] rounded-full bg-card border-2 border-yellow-400 text-yellow-400 text-xs sm:text-xs hover:bg-yellow-400/10 transition-all duration-300 shadow-xl shadow-yellow-400/10 active:scale-95"
           >
             <IconAdd class="w-4 h-4" />
             <span class="hidden sm:inline text-xs sm:text-xs">Nueva Base</span>
@@ -363,18 +491,25 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
     <div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[15px]">
         <div
-          v-for="base in filteredBases"
+          v-for="base in allBases"
           :key="base.id"
           class="group relative overflow-hidden bg-card shadow-2xl transition-all rounded-xl"
         >
           <div class="aspect-video relative overflow-hidden bg-secondary">
+            <div v-if="!loadedImages.has(base.url_foto)" class="absolute inset-0 z-0 animate-pulse bg-secondary"></div>
             <button
               type="button"
               class="absolute inset-0 z-10 block h-full w-full cursor-zoom-in text-left"
               :aria-label="`Ver imagen de ${base.type}`"
               @click="openImageViewer(base)"
             >
-              <img :src="base.url_foto" class="block w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+              <img
+                :src="base.url_foto"
+                loading="lazy"
+                decoding="async"
+                class="block w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                @load="markLoaded(base.url_foto)"
+              />
             </button>
             <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-60 transition-opacity group-hover:opacity-40"></div>
 
@@ -403,22 +538,31 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
               </h3>
 
               <div class="flex gap-2">
-                <a 
+                <button
+                  v-if="!isAdmin"
+                  @click="toggleFavorite(base)"
+                  class="cursor-pointer p-2.5 rounded-lg bg-secondary transition-all border border-border"
+                  :class="isFavorite(base.id) ? 'text-yellow-400' : 'text-muted-foreground hover:text-yellow-400'"
+                  :title="isFavorite(base.id) ? 'Quitar de favoritos' : 'Guardar en favoritos'"
+                >
+                  <component :is="isFavorite(base.id) ? IconHeartFill : IconHeart" class="w-4 h-4" />
+                </button>
+                <a
                   v-if="base.link"
-                  :href="base.link" 
-                  target="_blank" 
-                  class="cursor-pointer p-2.5 rounded-lg bg-secondary text-muted-foreground hover:bg-yellow-400 hover:text-black transition-all border border-border"
+                  :href="base.link"
+                  target="_blank"
+                  class="cursor-pointer p-2.5 rounded-lg bg-secondary text-muted-foreground hover:bg-yellow-400/10 hover:text-yellow-400 transition-all border border-border"
                 >
                   <IconOpen class="w-4 h-4" />
                 </a>
-                <div 
+                <div
                   v-else
                   class="p-2.5 rounded-lg bg-secondary text-muted-foreground/50 border border-border cursor-not-allowed"
                   title="Esta base no tiene enlace (Nivel 3)"
                 >
                   <IconOpen class="w-4 h-4" />
                 </div>
-                <button @click="openDeleteModal(base)" class="cursor-pointer p-2.5 rounded-lg bg-secondary text-muted-foreground hover:bg-red-600 hover:text-white transition-all border border-border">
+                <button v-if="isAdmin" @click="openDeleteModal(base)" class="cursor-pointer p-2.5 rounded-lg bg-secondary text-muted-foreground hover:bg-red-600 hover:text-white transition-all border border-border">
                   <IconTrash class="w-4 h-4" />
                 </button>
               </div>
@@ -427,10 +571,21 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
         </div>
       </div>
 
-      <div v-if="filteredBases.length === 0" class="text-center">
-        <p class="text-muted-foreground text-sm ">
-          {{ allBases.length === 0 ? 'Sin bases registradas' : 'Sin bases para el filtro' }}
+      <div v-if="allBases.length === 0" class="text-center">
+        <p class="text-muted-foreground text-sm">
+          {{ selectedLevel !== 'all' || selectedType !== 'all' ? 'Sin bases para este filtro' : 'Sin bases' }}
         </p>
+      </div>
+
+      <div v-if="hasMore" class="flex justify-center pt-6">
+        <button
+          @click="loadMore"
+          :disabled="loadingMore"
+          class="flex cursor-pointer items-center justify-center gap-2 px-6 h-11 rounded-full bg-card border-2 border-yellow-400 text-yellow-400 text-xs hover:bg-yellow-400/10 transition-all active:scale-95 disabled:opacity-50"
+        >
+          <span v-if="loadingMore" class="animate-pulse">Cargando...</span>
+          <span v-else>Mostrar más</span>
+        </button>
       </div>
     </div>
 
@@ -456,8 +611,8 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
                             </SelectTrigger>
                             <SelectContent side="bottom" :side-offset="4" :avoid-collisions="false" class="z-[9999] bg-card border border-border text-white mt-1" data-select-content>
                                 <SelectItem value="all">Todos</SelectItem>
-                                <SelectItem v-for="n in 16" :key="n + 2" :value="String(n + 2)">
-                                    Nivel {{ n + 2 }}
+                                <SelectItem v-for="n in BASE_LEVELS" :key="n" :value="String(n)">
+                                    Nivel {{ n }}
                                 </SelectItem>
                             </SelectContent>
                         </Select>
@@ -471,14 +626,14 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
                             </SelectTrigger>
                             <SelectContent side="bottom" :side-offset="4" :avoid-collisions="false" class="z-[9999] bg-card border border-border text-white mt-1" data-select-content>
                                 <SelectItem value="all">Todos</SelectItem>
-                                <SelectItem v-for="t in types" :key="t" :value="t">{{ t }}</SelectItem>
+                                <SelectItem v-for="t in BASE_TYPES" :key="t" :value="t">{{ t }}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
                 </div>
 
                 <div class="flex gap-[15px] border-border">
-                    <button @click="clearFilters(); isFilterModalOpen = false" class="flex-1 cursor-pointer h-[44px] rounded-full bg-secondary border border-border text-muted-foreground text-xs hover:text-white transition-all active:scale-95">
+                    <button @click="clearFilters(); isFilterModalOpen = false; fetchBases(true)" class="flex-1 cursor-pointer h-[44px] rounded-full bg-secondary border border-border text-muted-foreground text-xs hover:text-white transition-all active:scale-95">
                         Limpiar
                     </button>
                     <button @click="applyFilters" class="flex-1 cursor-pointer h-[44px] rounded-full bg-yellow-400 text-black text-xs hover:bg-yellow-300 transition-all duration-300 shadow-xl shadow-yellow-400/10 active:scale-95">
@@ -592,11 +747,11 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
           </div>
 
           <div class="absolute bottom-4 flex items-center gap-2 rounded-full border border-border bg-card p-1 sm:bottom-6">
-            <button type="button" class="cursor-pointer rounded-full p-2 text-muted-foreground transition-colors hover:bg-yellow-400 hover:text-black" aria-label="Reducir zoom" @click="zoomImage(-0.25)">
+            <button type="button" class="cursor-pointer rounded-full p-2 text-muted-foreground transition-colors hover:bg-yellow-400/10 hover:text-yellow-400" aria-label="Reducir zoom" @click="zoomImage(-0.25)">
               <IconZoomOut class="h-4 w-4" />
             </button>
             <span class="min-w-14 text-center text-xs text-yellow-400">{{ Math.round(imageViewer.scale * 100) }}%</span>
-            <button type="button" class="cursor-pointer rounded-full p-2 text-muted-foreground transition-colors hover:bg-yellow-400 hover:text-black" aria-label="Aumentar zoom" @click="zoomImage(0.25)">
+            <button type="button" class="cursor-pointer rounded-full p-2 text-muted-foreground transition-colors hover:bg-yellow-400/10 hover:text-yellow-400" aria-label="Aumentar zoom" @click="zoomImage(0.25)">
               <IconZoomIn class="h-4 w-4" />
             </button>
           </div>
@@ -605,4 +760,3 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
     </Teleport>
   </div>
 </template>
-
