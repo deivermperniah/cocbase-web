@@ -13,11 +13,17 @@ interface Img {
   path: string;
   url: string;
   size?: number;
+  inUse: boolean;
 }
 
 const images = ref<Img[]>([]);
 const loading = ref(true);
+const loadingMore = ref(false);
+const hasMore = ref(false);
+const pageSize = 24;
 const totalSize = ref(0);
+const usedUrls = ref<Set<string>>(new Set());
+
 const deleteModal = ref<{
   isOpen: boolean;
   imagePath: string | null;
@@ -30,29 +36,45 @@ const deleteModal = ref<{
 
 const FOLDER = "";
 
-async function loadImages() {
-  images.value = [];
-  totalSize.value = 0;
+async function loadUsedUrls() {
+  const { data, error } = await supabase.from("bases").select("url_foto");
+  if (error) {
+    console.error("Error loading used urls:", error);
+    return;
+  }
+  usedUrls.value = new Set((data || []).map((r: any) => r.url_foto).filter(Boolean));
+}
+
+async function loadImages(reset = false) {
+  if (reset) {
+    images.value = [];
+    totalSize.value = 0;
+    hasMore.value = false;
+    loading.value = true;
+  } else {
+    loadingMore.value = true;
+  }
+
+  const offset = reset ? 0 : images.value.length;
 
   const { data, error } = await supabase.storage
     .from("bases-fotos")
     .list(FOLDER, {
-      limit: 100,
+      limit: pageSize,
+      offset,
       sortBy: { column: "created_at", order: "desc" },
     });
 
   if (error) {
     console.error("❌ ERROR LISTANDO STORAGE:", error);
     loading.value = false;
+    loadingMore.value = false;
     return;
   }
 
-  if (!data) {
-    loading.value = false;
-    return;
-  }
+  const batch: Img[] = [];
 
-  for (const file of data) {
+  for (const file of data || []) {
     if (!file.name.match(/\.(jpg|jpeg|png|webp)$/i)) continue;
 
     const fullPath = file.name;
@@ -60,23 +82,36 @@ async function loadImages() {
       .from("bases-fotos")
       .getPublicUrl(fullPath);
 
-    images.value.push({
+    const size = file.metadata?.size || 0;
+
+    batch.push({
       name: file.name,
       path: fullPath,
       url: publicUrl.publicUrl,
-      size: file.metadata?.size,
+      size,
+      inUse: usedUrls.value.has(publicUrl.publicUrl),
     });
 
-    if (file.metadata?.size) {
-      totalSize.value += file.metadata.size;
-    }
+    totalSize.value += size;
   }
 
+  if (reset) {
+    images.value = batch;
+  } else {
+    images.value = images.value.concat(batch);
+  }
+
+  hasMore.value = (data || []).length === pageSize;
   loading.value = false;
+  loadingMore.value = false;
+}
+
+function loadMore() {
+  loadImages(false);
 }
 
 function formatBytes(bytes: number): string {
-  if (bytes === 0) return "0 MB";
+  if (bytes === 0) return "0.00";
   const mb = bytes / (1024 * 1024);
   return mb.toFixed(2);
 }
@@ -136,7 +171,10 @@ async function confirmDelete() {
   closeDeleteModal();
 }
 
-onMounted(loadImages);
+onMounted(async () => {
+  await loadUsedUrls();
+  await loadImages(true);
+});
 
 onBeforeUnmount(() => {
   document.body.style.overflow = "";
@@ -206,11 +244,20 @@ watch(
           <div class="aspect-video relative overflow-hidden bg-secondary">
             <img
               :src="img.url"
+              loading="lazy"
+              decoding="async"
               class="block w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             />
             <div
               class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"
             ></div>
+
+            <span
+              class="absolute top-3 left-3 z-10 flex h-6 items-center rounded-md px-3 text-xs shadow-lg"
+              :class="img.inUse ? 'bg-yellow-400 text-black' : 'bg-red-500/90 text-white'"
+            >
+              {{ img.inUse ? "En uso" : "Huérfana" }}
+            </span>
           </div>
 
           <div class="p-[15px]">
@@ -226,7 +273,7 @@ watch(
                 <a
                   :href="img.url"
                   target="_blank"
-                  class="cursor-pointer p-2.5 rounded-lg bg-secondary text-muted-foreground hover:bg-yellow-400 hover:text-black transition-all border border-border"
+                  class="cursor-pointer p-2.5 rounded-lg bg-secondary text-muted-foreground hover:bg-yellow-400/10 hover:text-yellow-400 transition-all border border-border"
                 >
                   <IconOpen class="w-4 h-4" />
                 </a>
@@ -244,8 +291,19 @@ watch(
 
       <div v-else class="text-center">
         <p class="text-muted-foreground text-sm ">
-          Sin imágenes en el storage
+          Sin imágenes
         </p>
+      </div>
+
+      <div v-if="hasMore" class="flex justify-center pt-6">
+        <button
+          @click="loadMore"
+          :disabled="loadingMore"
+          class="flex cursor-pointer items-center justify-center gap-2 px-6 h-11 rounded-full bg-card border-2 border-yellow-400 text-yellow-400 text-xs hover:bg-yellow-400/10 transition-all active:scale-95 disabled:opacity-50"
+        >
+          <span v-if="loadingMore" class="animate-pulse">Cargando...</span>
+          <span v-else>Mostrar más</span>
+        </button>
       </div>
     </div>
 

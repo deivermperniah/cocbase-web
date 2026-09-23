@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { supabase } from "@/lib/supabase";
+import { BASE_TYPES } from "@/lib/constants";
 import { Card, CardContent } from "@/components/ui/card";
 import IconSword from "~icons/ph/sword";
 import IconTrophy from "~icons/ph/trophy";
@@ -23,9 +24,8 @@ async function fetchStats() {
       .select("*", { count: "exact", head: true });
     totalBases.value = basesCount || 0;
 
-    const types = ["Guerra", "Liga", "Mejora", "Recursos"];
     const counts = await Promise.all(
-      types.map((type) =>
+      BASE_TYPES.map((type) =>
         supabase
           .from("bases")
           .select("*", { count: "exact", head: true })
@@ -59,7 +59,7 @@ onMounted(() => fetchStats());
       </h2>
       <router-link
         to="/bases"
-        class="hidden sm:flex cursor-pointer items-center gap-3 px-[15px] h-[36px] sm:h-[44px] rounded-full bg-card border-2 border-yellow-400 text-yellow-400 text-xs sm:text-xs hover:bg-yellow-400 hover:text-black transition-all duration-300 shadow-xl shadow-yellow-400/10 active:scale-95"
+        class="hidden sm:flex cursor-pointer items-center gap-3 px-[15px] h-[36px] sm:h-[44px] rounded-full bg-card border-2 border-yellow-400 text-yellow-400 text-xs sm:text-xs hover:bg-yellow-400/10 transition-all duration-300 shadow-xl shadow-yellow-400/10 active:scale-95"
       >
         <IconLayers class="h-3 w-3 sm:h-4 sm:w-4" />
         <span class="text-xs sm:text-xs">Ver Bases</span>
