@@ -1,38 +1,34 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { supabase } from '@/lib/supabase'
+import { user, isAdmin } from '@/lib/auth'
+import { toast } from '@/lib/toast'
+import { BASE_TYPES, BASE_LEVELS } from '@/lib/constants'
 
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import IconAddCircle from '~icons/ph/plus-circle'
 import IconImage from '~icons/ph/image'
-import IconCheck from '~icons/ph/check-circle'
-import IconWarning from '~icons/ph/warning'
 import IconSync from '~icons/ph/arrows-clockwise'
 import IconAdd from '~icons/ph/plus'
 
 const emit = defineEmits(['success'])
 
-// Estado del formulario
 const baseLink = ref('')
 const baseType = ref('')
 const baseLevel = ref('')
 const baseImage = ref<File | null>(null)
 const previewUrl = ref<string | null>(null)
 
-// Estados de UI
 const loading = ref(false)
-const successMessage = ref('')
-const errorMessage = ref('')
 
-// Validaciones reactivas
 const isFormValid = computed(() => {
     const isLevel3 = baseLevel.value === '3'
     const linkValid = isLevel3 ? true : (baseLink.value.trim() && !hasSpacesInLink.value && isValidLink.value)
-    
-    return linkValid && 
-           baseType.value && 
-           baseLevel.value && 
+
+    return linkValid &&
+           baseType.value &&
+           baseLevel.value &&
            baseImage.value
 })
 
@@ -41,79 +37,85 @@ const hasSpacesInLink = computed(() => /\s/.test(baseLink.value))
 const isValidLink = computed(() => {
     try {
         const url = new URL(baseLink.value)
-        return url.hostname.includes('link.clashofclans.com') && 
+        return url.hostname.includes('link.clashofclans.com') &&
                url.searchParams.has('id')
     } catch {
         return false
     }
 })
 
-// Validadores específicos
 function validateImage(): string | null {
     if (!baseImage.value) {
         return 'La imagen es requerida.'
     }
-    
-    // Validar tipo de archivo
+
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
     if (!allowedTypes.includes(baseImage.value.type)) {
         return 'Solo se permiten imágenes JPG, PNG o WebP.'
     }
-    
-    // Validar tamaño (5MB máximo)
-    const maxSize = 5 * 1024 * 1024 // 5MB
+
+    const maxSize = 5 * 1024 * 1024
     if (baseImage.value.size > maxSize) {
         return 'La imagen no puede superar los 5MB.'
     }
-    
+
     return null
 }
 
-// Verificar si el link ya existe
+function escapeLike(value: string): string {
+    return value.replace(/[\\%_]/g, (c) => '\\' + c)
+}
+
 async function checkExistingLink(): Promise<string | null> {
     if (baseLevel.value === '3' && !baseLink.value.trim()) return null
-    
+
     try {
         const url = new URL(baseLink.value)
         const baseId = url.searchParams.get('id')
-        
+
         if (!baseId) {
             return 'No se pudo extraer el ID del enlace.'
         }
-        
-        const normalizedLink = baseLink.value.trim()
-        const idToken = baseId.split(':').pop() || baseId
 
-        const { data: existingBases, error: selectError } = await supabase
+        const normalizedLink = baseLink.value.trim()
+
+        const { data: exactMatches } = await supabase
             .from('bases')
-            .select('id, link')
-            .or(`link.eq.${normalizedLink},link.ilike.%${idToken}%`)
+            .select('id')
+            .eq('link', normalizedLink)
+            .limit(1)
+
+        if (exactMatches && exactMatches.length > 0) {
+            return 'Esta base ya fue guardada anteriormente.'
+        }
+
+        const idToken = baseId.split(':').pop() || baseId
+        const { data: fuzzyMatches, error: fuzzyError } = await supabase
+            .from('bases')
+            .select('link')
+            .ilike('link', `%${escapeLike(idToken)}%`)
             .limit(50)
 
-        if (selectError) {
-            console.error('Error verificando link existente:', selectError)
+        if (fuzzyError) {
+            console.error('Error verificando link existente:', fuzzyError)
             return 'Error al verificar el enlace.'
         }
-        
-        if (existingBases && existingBases.length > 0) {
-            const hasDuplicate = existingBases.some((b) => {
-                if (!b?.link) return false
-                if (b.link === normalizedLink) return true
 
-                try {
-                    const existingUrl = new URL(b.link)
-                    const existingId = existingUrl.searchParams.get('id')
-                    return existingId === baseId
-                } catch {
-                    return false
-                }
-            })
-
-            if (hasDuplicate) {
-                return 'Esta base ya fue guardada anteriormente.'
+        const hasDuplicate = (fuzzyMatches || []).some((b) => {
+            if (!b?.link) return false
+            try {
+                const existingUrl = new URL(b.link)
+                const existingId = existingUrl.searchParams.get('id')
+                return existingId === baseId
+            } catch {
+                return false
             }
+        })
+
+        if (hasDuplicate) {
+            return 'Esta base ya fue guardada anteriormente.'
         }
-        
+
         return null
     } catch (error) {
         console.error('Error en checkExistingLink:', error)
@@ -121,7 +123,6 @@ async function checkExistingLink(): Promise<string | null> {
     }
 }
 
-// Verificar si ya existe el mismo archivo en Storage.
 async function checkDuplicateImage(fileName: string): Promise<string | null> {
     try {
         const { data: existingImages, error: imageError } = await supabase.storage
@@ -130,17 +131,17 @@ async function checkDuplicateImage(fileName: string): Promise<string | null> {
 
         if (imageError) {
             console.error('Error verificando imagen duplicada:', imageError)
-            return null // No bloquear por error en verificación
+            return null
         }
-        
+
         if (existingImages && existingImages.length > 0) {
             return 'Esta imagen ya fue subida anteriormente.'
         }
-        
+
         return null
     } catch (error) {
         console.error('Error en checkDuplicateImage:', error)
-        return null // No bloquear por error en verificación
+        return null
     }
 }
 
@@ -192,131 +193,106 @@ async function generateFileName(file: File): Promise<string> {
     return `${hash.slice(0, 8)}.${fileExt}`
 }
 
-// Manejo de archivos
 function handleFileChange(event: Event) {
     const target = event.target as HTMLInputElement
     const file = target.files?.[0]
-    
+
     if (file) {
-        // Primero asignar el archivo
         baseImage.value = file
-        
-        // Luego validar
+
         const imageError = validateImage()
         if (imageError) {
-            errorMessage.value = imageError
-            baseImage.value = null // Limpiar si hay error
+            toast.error(imageError)
+            baseImage.value = null
             return
         }
-        
-        // Si es válido, crear preview
+
         previewUrl.value = URL.createObjectURL(file)
-        errorMessage.value = '' // Limpiar error de imagen si era válido
     }
 }
 
 function removeImage() {
-    // Limpiar el object URL para evitar memory leaks
     if (previewUrl.value) {
         URL.revokeObjectURL(previewUrl.value)
     }
-    
+
     baseImage.value = null
     previewUrl.value = null
-    errorMessage.value = '' // Limpiar errores relacionados con imagen
 }
 
-// Reset del formulario
 function resetForm() {
-    // Limpiar el object URL si existe
     if (previewUrl.value) {
         URL.revokeObjectURL(previewUrl.value)
     }
-    
+
     baseLink.value = ''
     baseType.value = ''
     baseLevel.value = ''
     baseImage.value = null
     previewUrl.value = null
-    errorMessage.value = ''
-    successMessage.value = ''
 }
 
-
-// Limpiar link si se selecciona nivel 3
 watch(() => baseLevel.value, (newLevel) => {
     if (newLevel === '3') {
         baseLink.value = ''
     }
 })
 
-// Submit principal con todas las validaciones
 async function handleSubmit() {
-    // Limpiar mensajes previos
-    errorMessage.value = ''
-    successMessage.value = ''
-    
     loading.value = true
-    
+
     try {
-        // Validación 2: Link duplicado (Verificación en servidor)
         const duplicateLinkError = await checkExistingLink()
         if (duplicateLinkError) {
-            errorMessage.value = duplicateLinkError
-            loading.value = false
-            setTimeout(() => { if (errorMessage.value === duplicateLinkError) errorMessage.value = '' }, 2000)
+            toast.error(duplicateLinkError)
             return
         }
 
         const optimizedFile = await optimizeImage(baseImage.value!)
         const fileName = await generateFileName(optimizedFile)
-        
-        // Validación 3: Imagen duplicada
+
         const duplicateImageError = await checkDuplicateImage(fileName)
         if (duplicateImageError) {
-            errorMessage.value = duplicateImageError
-            loading.value = false
-            setTimeout(() => { if (errorMessage.value === duplicateImageError) errorMessage.value = '' }, 2000)
+            toast.error(duplicateImageError)
             return
         }
-        
-        // Subir imagen con nombre único directamente en la raíz del bucket
+
         const { error: uploadError } = await supabase.storage
             .from('bases-fotos')
             .upload(fileName, optimizedFile, {
-                cacheControl: '3600', // 1 hora de caché
-                upsert: false // No sobreescribir
+                cacheControl: '3600',
+                upsert: false
             })
 
         if (uploadError) {
             console.error('Error subiendo imagen:', uploadError)
-            errorMessage.value = 'Error al subir la imagen. Intenta con otra.'
-            loading.value = false
-            setTimeout(() => { if (errorMessage.value === 'Error al subir la imagen. Intenta con otra.') errorMessage.value = '' }, 2000)
+            toast.error('Error al subir la imagen. Intenta con otra.')
             return
         }
 
-        // Obtener URL pública
         const { data: urlData } = supabase.storage
             .from('bases-fotos')
             .getPublicUrl(fileName)
 
-        // Guardar en base de datos
-        const { error: insertError } = await supabase.from('bases').insert({
+        const insertPayload: Record<string, unknown> = {
             link: baseLink.value.trim() || null,
             type: baseType.value,
             level_th: Number(baseLevel.value),
             url_foto: urlData.publicUrl,
-            created_at: new Date().toISOString()
-        })
+            created_at: new Date().toISOString(),
+            status: isAdmin.value ? 'approved' : 'pending',
+        }
+
+        if (user.value) {
+            insertPayload.author_id = user.value.id
+        }
+
+        const { error: insertError } = await supabase.from('bases').insert(insertPayload)
 
         if (insertError) {
             console.error('Error guardando en BD:', insertError)
-            errorMessage.value = 'Error al guardar la base. Intenta nuevamente.'
-            loading.value = false
-            setTimeout(() => { if (errorMessage.value === 'Error al guardar la base. Intenta nuevamente.') errorMessage.value = '' }, 2000)
-            
-            // Intentar eliminar la imagen subida si falló la BD
+            toast.error('Error al guardar la base. Intenta nuevamente.')
+
             try {
                 await supabase.storage.from('bases-fotos').remove([fileName])
             } catch (cleanupError) {
@@ -325,19 +301,12 @@ async function handleSubmit() {
             return
         }
 
-        // Éxito
-        successMessage.value = '¡Base registrada exitosamente!'
-        
-        // Reset después de éxito
-        setTimeout(() => {
-            emit('success')
-            resetForm()
-        }, 2000)
-
+        toast.success('¡Base registrada!', isAdmin.value ? 'La base quedó publicada.' : 'Tu base quedó en revisión.')
+        emit('success')
+        resetForm()
     } catch (error: any) {
         console.error('Error general en handleSubmit:', error)
-        errorMessage.value = error.message || 'Error inesperado. Intenta nuevamente.'
-        setTimeout(() => { errorMessage.value = '' }, 2000)
+        toast.error(error.message || 'Error inesperado. Intenta nuevamente.')
     } finally {
         loading.value = false
     }
@@ -346,9 +315,7 @@ async function handleSubmit() {
 
 <template>
     <div class="space-y-[15px]">
-        <!-- Selects -->
         <div class="grid grid-cols-2 gap-[15px]">
-            <!-- Select de Nivel -->
             <div class="flex flex-col">
                 <label for="level" class="text-xs text-muted-foreground mb-2">Nivel *</label>
                 <Select v-model="baseLevel">
@@ -356,14 +323,13 @@ async function handleSubmit() {
                         <SelectValue placeholder="Selecciona" />
                     </SelectTrigger>
                     <SelectContent side="bottom" :side-offset="4" :avoid-collisions="false" class="z-[9999] bg-card border border-border text-white mt-1" data-select-content>
-                        <SelectItem v-for="n in 16" :key="n + 2" :value="String(n + 2)">
-                            Nivel {{ n + 2 }}
+                        <SelectItem v-for="n in BASE_LEVELS" :key="n" :value="String(n)">
+                            Nivel {{ n }}
                         </SelectItem>
                     </SelectContent>
                 </Select>
             </div>
 
-            <!-- Select de Tipo -->
             <div class="flex flex-col">
                 <label for="type" class="text-xs text-muted-foreground mb-2">Categoría *</label>
                 <Select v-model="baseType">
@@ -371,24 +337,20 @@ async function handleSubmit() {
                         <SelectValue placeholder="Selecciona" />
                     </SelectTrigger>
                     <SelectContent side="bottom" :side-offset="4" :avoid-collisions="false" class="z-[9999] bg-card border border-border text-white mt-1" data-select-content>
-                        <SelectItem value="Guerra">Guerra</SelectItem>
-                        <SelectItem value="Liga">Liga</SelectItem>
-                        <SelectItem value="Mejora">Mejora</SelectItem>
-                        <SelectItem value="Recursos">Recursos</SelectItem>
+                        <SelectItem v-for="t in BASE_TYPES" :key="t" :value="t">{{ t }}</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
         </div>
 
-        <!-- Link Input -->
         <div v-if="baseLevel !== '3'" class="flex flex-col">
             <label for="link" class="text-xs text-muted-foreground mb-2">
                 Link *
             </label>
             <div class="relative">
-                <Input 
+                <Input
                     id="link"
-                    placeholder="https://link.clashofclans.com/..." 
+                    placeholder="https://link.clashofclans.com/..."
                     v-model="baseLink"
                     :class="[
                         'h-[44px] rounded-lg bg-secondary border-border text-white placeholder:text-muted-foreground focus-visible:ring-yellow-400/40 pr-10',
@@ -396,8 +358,8 @@ async function handleSubmit() {
                     ]"
                 />
                 <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center pr-1">
-                    <button 
-                        v-if="baseLink" 
+                    <button
+                        v-if="baseLink"
                         @click="baseLink = ''"
                         type="button"
                         class="cursor-pointer p-1 rounded-lg text-muted-foreground hover:text-white transition-colors"
@@ -408,22 +370,20 @@ async function handleSubmit() {
             </div>
         </div>
 
-        <!-- Upload Imagen -->
         <div class="flex flex-col">
             <label class="text-xs text-muted-foreground mb-2">Fotografía *</label>
             <div class="relative">
-                <input 
-                    type="file" 
-                    accept="image/*" 
-                    class="hidden" 
-                    id="fileInModal" 
+                <input
+                    type="file"
+                    accept="image/*"
+                    class="hidden"
+                    id="fileInModal"
                     @change="handleFileChange"
                     :disabled="loading"
                 />
-                
-                <!-- Estado sin imagen -->
-                <label 
-                    v-if="!previewUrl" 
+
+                <label
+                    v-if="!previewUrl"
                     for="fileInModal"
                     class="flex flex-col items-center justify-center border-2 border-dashed border-border rounded-xl p-[15px] text-center cursor-pointer bg-secondary/40 hover:bg-secondary/60 hover:border-yellow-400/40 transition-all"
                     :class="loading ? 'opacity-50 cursor-not-allowed' : ''"
@@ -434,17 +394,15 @@ async function handleSubmit() {
                         JPG, PNG, WebP • Max 5MB
                     </p>
                 </label>
-                
-                <!-- Estado con imagen preview -->
+
                 <div v-else class="relative">
                     <div class="relative w-full overflow-hidden rounded-xl border border-border bg-secondary">
-                        <img 
-                            :src="previewUrl" 
-                            class="w-full h-40 object-cover" 
+                        <img
+                            :src="previewUrl"
+                            class="w-full h-40 object-cover"
                             alt="Preview de la captura"
                         />
-                        <!-- Overlay para cambiar imagen -->
-                        <label 
+                        <label
                             for="fileInModal"
                             class="absolute inset-0 bg-card/70 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
                             :class="loading ? 'pointer-events-none' : ''"
@@ -454,17 +412,15 @@ async function handleSubmit() {
                             </div>
                         </label>
                     </div>
-                    
-                    <!-- Botón eliminar -->
-                    <button 
+
+                    <button
                         v-if="!loading"
                         @click.stop="removeImage"
                         class="absolute -top-2 -right-2 h-8 w-8 cursor-pointer rounded-full bg-card text-muted-foreground flex items-center justify-center hover:bg-red-600 hover:text-white transition-all border border-border"
                     >
                         <IconAddCircle class="w-3 h-3 rotate-45" />
                     </button>
-                    
-                    <!-- Información del archivo -->
+
                     <div class="mt-3 text-xs text-muted-foreground">
                         {{ baseImage?.name }}
                     </div>
@@ -472,42 +428,19 @@ async function handleSubmit() {
             </div>
         </div>
 
-        <!-- Botón de Envío -->
         <button
             class="w-full h-[44px] cursor-pointer rounded-full bg-yellow-400 text-black text-xs hover:bg-yellow-300 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shadow-xl shadow-yellow-400/10"
-            :disabled="loading || !isFormValid" 
+            :disabled="loading || !isFormValid"
             @click="handleSubmit"
         >
             <div v-if="!loading" class="flex items-center justify-center gap-2">
                 <IconAddCircle class="w-4 h-4" />
-                <span>Guardar</span>
+                <span>{{ isAdmin ? 'Guardar' : 'Enviar a revisión' }}</span>
             </div>
             <div v-else class="flex items-center justify-center gap-2">
                 <IconSync class="w-4 h-4 animate-spin" />
                 <span>Procesando...</span>
             </div>
         </button>
-
-        <!-- Feedback States -->
-        <div v-if="successMessage || errorMessage" class="space-y-2">
-            <!-- Estado de éxito -->
-            <div v-if="successMessage"
-                class="flex items-center gap-3 p-3 rounded-lg bg-secondary border border-yellow-400/20 text-white">
-                <IconCheck class="w-4 h-4 shrink-0 text-yellow-400" />
-                <p class="text-xs ">
-                    {{ successMessage }}
-                </p>
-            </div>
-
-            <!-- Estado de error -->
-            <div v-if="errorMessage"
-                class="flex items-center gap-3 p-3 rounded-lg bg-secondary border border-red-500/30 text-white">
-                <IconWarning class="w-4 h-4 shrink-0 text-red-500" />
-                <p class="text-xs ">
-                    {{ errorMessage }}
-                </p>
-            </div>
-        </div>
     </div>
 </template>
-
