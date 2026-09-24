@@ -17,11 +17,11 @@ const socials = [
 </script>
 
 <template>
-  <footer class="mt-10 border-t border-border bg-[#121212]">
-    <div class="max-w-7xl mx-auto px-[15px] py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+  <footer class="mt-10 border-t border-border bg-chrome">
+    <div class="max-w-7xl mx-auto px-page py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
       <div class="space-y-4 lg:pr-16">
         <router-link to="/" class="flex items-center gap-2">
-          <img src="@/assets/logo.png" alt="cocbase" class="h-8 w-8 object-contain" />
+          <img src="@/assets/logo.png" alt="cocbase" class="h-9 w-9 object-contain" />
           <span class="text-lg text-white">cocbase</span>
         </router-link>
         <p class="font-body text-xs text-muted-foreground leading-relaxed">
@@ -67,7 +67,7 @@ const socials = [
     </div>
 
     <div class="border-t border-border">
-      <div class="max-w-7xl mx-auto px-[15px] py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="max-w-7xl mx-auto px-page py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
         <p class="text-xs text-muted-foreground">© 2026 cocbase. Todos los derechos reservados.</p>
         <div class="flex gap-4">
           <router-link to="/aviso-legal" class="text-xs text-muted-foreground hover:text-yellow-400 transition-colors">Aviso legal</router-link>

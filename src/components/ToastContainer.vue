@@ -22,7 +22,7 @@ function accentFor(variant: string) {
 
 <template>
   <Teleport to="body">
-    <div class="fixed top-3 right-4 z-[200] flex w-full max-w-sm flex-col gap-3 px-[15px]">
+    <div class="fixed top-3 right-4 z-[200] flex w-full max-w-sm flex-col gap-3 px-page">
       <TransitionGroup
         name="toast"
         tag="div"

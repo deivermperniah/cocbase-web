@@ -14,6 +14,8 @@
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-chrome: var(--chrome);
+  --spacing-page: 15px;
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
@@ -49,6 +51,7 @@
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
+  --chrome: oklch(0.985 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklch(0.205 0 0);
@@ -83,6 +86,7 @@
   --foreground: #ffffff;
   --card: #1a1a1a;
   --card-foreground: #ffffff;
+  --chrome: #121212;
   --popover: #1a1a1a;
   --popover-foreground: #ffffff;
   --primary: #facc15;

@@ -18,8 +18,8 @@ const sizeClasses = {
 
 <template>
   <div class="flex flex-col items-center justify-center">
-    <IconSync :class="[sizeClasses[size], 'animate-spin text-yellow-400 mb-[15px]']" />
-    <span class="text-foreground text-sm ">
+    <IconSync :class="[sizeClasses[size], 'animate-spin text-yellow-400 mb-page']" />
+    <span class="text-foreground text-sm">
       Cargando...
     </span>
   </div>
