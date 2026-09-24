@@ -279,7 +279,6 @@ async function handleSubmit() {
             type: baseType.value,
             level_th: Number(baseLevel.value),
             url_foto: urlData.publicUrl,
-            created_at: new Date().toISOString(),
             status: isAdmin.value ? 'approved' : 'pending',
         }
 
@@ -314,8 +313,8 @@ async function handleSubmit() {
 </script>
 
 <template>
-    <div class="space-y-[15px]">
-        <div class="grid grid-cols-2 gap-[15px]">
+    <div class="space-y-page">
+        <div class="grid grid-cols-2 gap-page">
             <div class="flex flex-col">
                 <label for="level" class="text-xs text-muted-foreground mb-2">Nivel *</label>
                 <Select v-model="baseLevel">
@@ -362,7 +361,7 @@ async function handleSubmit() {
                         v-if="baseLink"
                         @click="baseLink = ''"
                         type="button"
-                        class="cursor-pointer p-1 rounded-lg text-muted-foreground hover:text-white transition-colors"
+                        class="cursor-pointer p-1 rounded-full text-muted-foreground hover:text-white transition-colors"
                     >
                         <IconAdd class="w-4 h-4 rotate-45" />
                     </button>
@@ -385,7 +384,7 @@ async function handleSubmit() {
                 <label
                     v-if="!previewUrl"
                     for="fileInModal"
-                    class="flex flex-col items-center justify-center border-2 border-dashed border-border rounded-xl p-[15px] text-center cursor-pointer bg-secondary/40 hover:bg-secondary/60 hover:border-yellow-400/40 transition-all"
+                    class="flex flex-col items-center justify-center border-2 border-dashed border-border rounded-xl p-page text-center cursor-pointer bg-secondary/40 hover:bg-secondary/60 hover:border-yellow-400/40 transition-all"
                     :class="loading ? 'opacity-50 cursor-not-allowed' : ''"
                 >
                     <IconImage class="w-6 h-6 text-muted-foreground mb-2" />
@@ -408,7 +407,7 @@ async function handleSubmit() {
                             :class="loading ? 'pointer-events-none' : ''"
                         >
                             <div class="text-center text-white">
-                                <p class="text-xs ">Cambiar Fotografía</p>
+                                <p class="text-xs">Cambiar Fotografía</p>
                             </div>
                         </label>
                     </div>

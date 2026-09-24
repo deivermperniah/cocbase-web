@@ -5,23 +5,23 @@ import { supabase } from "@/lib/supabase";
 import { session, user, isAdmin } from "@/lib/auth";
 import { toast } from "@/lib/toast";
 import { BASE_TYPES, BASE_LEVELS } from "@/lib/constants";
-import IconAdd from "~icons/ph/plus";
-import IconOpen from "~icons/ph/arrow-square-out";
-import IconTrash from "~icons/ph/trash";
+import IconCopy from "~icons/ph/copy";
+import IconMore from "~icons/ph/dots-three-bold";
 import IconFunnel from "~icons/ph/funnel";
 import IconClose from "~icons/ph/x";
 import IconZoomIn from "~icons/ph/plus-circle";
 import IconZoomOut from "~icons/ph/minus-circle";
 import IconHeart from "~icons/ph/heart";
 import IconHeartFill from "~icons/ph/heart-fill";
-import IconShield from "~icons/ph/shield";
 import IconBusiness from "~icons/ph/buildings";
-import IconCalendar from "~icons/ph/calendar";
-import IconSword from "~icons/ph/sword";
-import IconTrophy from "~icons/ph/trophy";
-import IconHammer from "~icons/ph/hammer";
-import BaseForm from "@/components/BaseForm.vue";
-import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import BaseActionsModal, { type ActionsBase } from "@/components/BaseActionsModal.vue";
+import { getBaseTypeIcon } from "@/lib/base";
+import { deleteBase } from "@/lib/admin";
+import LoadingState from "@/components/ui/LoadingState.vue";
+import PageHeader from "@/components/ui/PageHeader.vue";
+import BaseBadge from "@/components/ui/BaseBadge.vue";
+import EmptyState from "@/components/ui/EmptyState.vue";
+import ModalShell from "@/components/ui/ModalShell.vue";
 import {
   Select,
   SelectContent,
@@ -40,12 +40,13 @@ const loadingMore = ref(false);
 const hasMore = ref(false);
 const pageSize = 12;
 
-const isModalOpen = ref(false);
 const isFilterModalOpen = ref(false);
 
 const favoriteIds = ref<Set<string>>(new Set());
 const loadedImages = ref<Set<string>>(new Set());
 
+const isDeleting = ref(false);
+const actionsBase = ref<ActionsBase | null>(null);
 const deleteModal = ref({
   isOpen: false,
   baseId: null as string | null,
@@ -78,13 +79,6 @@ const selectedType = ref<string>("all");
 
 const tempLevel = ref<string>("all");
 const tempType = ref<string>("all");
-
-function getTypeIcon(type: string) {
-  if (type === "Guerra") return IconSword;
-  if (type === "Liga") return IconTrophy;
-  if (type === "Mejora") return IconHammer;
-  return IconShield;
-}
 
 function openFilterModal() {
   tempLevel.value = selectedLevel.value;
@@ -121,7 +115,8 @@ async function fetchBases(reset = false) {
 
   let query = supabase
     .from("bases")
-    .select("*", { count: "exact" })
+    .select("*, profiles!bases_author_id_fkey(full_name)", { count: "exact" })
+    .eq("status", "approved")
     .order("created_at", { ascending: false })
     .range(from, to);
 
@@ -216,7 +211,7 @@ function openDeleteModal(base: any) {
   deleteModal.value = {
     isOpen: true,
     baseId: base.id,
-    baseTitle: `${base.code}`,
+    baseTitle: `${base.type} · Nivel ${base.level_th}`,
     imageUrl: base.url_foto || "",
   };
 }
@@ -230,19 +225,11 @@ function closeDeleteModal() {
   };
 }
 
-function getStoragePath(publicUrl: string): string | null {
-  const marker = "/storage/v1/object/public/bases-fotos/";
-  const markerIndex = publicUrl.indexOf(marker);
-  if (markerIndex === -1) return null;
-
-  return decodeURIComponent(publicUrl.slice(markerIndex + marker.length));
-}
-
 function openImageViewer(base: any) {
   imageViewer.value = {
     isOpen: true,
     url: base.url_foto,
-    title: `Base ${base.code} - Nivel ${base.level_th} - ${base.type}`,
+    title: `Nivel ${base.level_th} - ${base.type}`,
     level: String(base.level_th),
     type: base.type,
     date: new Date(base.created_at).toLocaleDateString("es-ES"),
@@ -373,25 +360,11 @@ function handleImageViewerKeydown(event: KeyboardEvent) {
 
 async function confirmDelete() {
   const baseId = deleteModal.value.baseId;
-  if (!baseId) return;
+  if (!baseId || isDeleting.value) return;
 
+  isDeleting.value = true;
   try {
-    const imagePath = deleteModal.value.imageUrl
-      ? getStoragePath(deleteModal.value.imageUrl)
-      : null;
-
-    if (imagePath) {
-      const { error: storageError } = await supabase.storage
-        .from("bases-fotos")
-        .remove([imagePath]);
-      if (storageError) throw storageError;
-    }
-
-    const { error } = await supabase
-      .from("bases")
-      .delete()
-      .eq("id", baseId);
-    if (error) throw error;
+    await deleteBase({ id: baseId, url_foto: deleteModal.value.imageUrl });
     allBases.value = allBases.value.filter((b) => b.id !== baseId);
     totalCount.value = Math.max(0, totalCount.value - 1);
     toast.success("Base eliminada.");
@@ -399,12 +372,9 @@ async function confirmDelete() {
   } catch (error) {
     console.error("Error deleting base:", error);
     toast.error("No se pudo eliminar la base.");
+  } finally {
+    isDeleting.value = false;
   }
-}
-
-function handleSuccess() {
-  isModalOpen.value = false;
-  fetchBases(true);
 }
 
 function markLoaded(url: string) {
@@ -444,8 +414,8 @@ onBeforeUnmount(() => {
   document.body.style.overflow = "";
 });
 
-watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => imageViewer.value.isOpen], ([modal, filter, del, viewer]) => {
-  if (modal || filter || del || viewer) {
+watch([isFilterModalOpen, () => deleteModal.value.isOpen, () => imageViewer.value.isOpen, () => actionsBase.value !== null], ([filter, del, viewer, actions]) => {
+  if (filter || del || viewer || actions) {
     document.body.style.overflow = 'hidden'
   } else {
     document.body.style.overflow = ''
@@ -454,19 +424,11 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
 </script>
 
 <template>
-  <div v-if="loading" class="flex flex-col items-center justify-center min-h-[50vh]">
-    <LoadingSpinner size="lg" />
-  </div>
+  <LoadingState v-if="loading" />
 
-  <div v-else class="space-y-[15px] animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out">
-    <div class="flex flex-row items-center justify-between gap-[15px]">
-      <div class="space-y-1">
-        <h2 class="text-[28px] text-yellow-400">
-          Bases
-        </h2>
-      </div>
-
-      <div class="flex flex-row items-center gap-2 sm:gap-[15px]">
+  <div v-else class="space-y-page animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out">
+    <PageHeader title="Bases">
+      <template #actions>
         <button @click="openFilterModal"
             class="flex cursor-pointer items-center justify-center w-[44px] h-[44px] rounded-full transition-all active:scale-95 shadow-xl"
             :class="selectedLevel !== 'all' || selectedType !== 'all'
@@ -475,25 +437,15 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
         >
           <IconFunnel class="w-4 h-4" />
         </button>
-
-        <div v-if="isAdmin" class="ml-auto">
-          <button
-            @click="isModalOpen = true"
-            class="group flex cursor-pointer items-center justify-center gap-3 w-[44px] sm:w-auto px-0 sm:px-[15px] h-[44px] rounded-full bg-card border-2 border-yellow-400 text-yellow-400 text-xs sm:text-xs hover:bg-yellow-400/10 transition-all duration-300 shadow-xl shadow-yellow-400/10 active:scale-95"
-          >
-            <IconAdd class="w-4 h-4" />
-            <span class="hidden sm:inline text-xs sm:text-xs">Nueva Base</span>
-          </button>
-        </div>
-      </div>
-    </div>
+      </template>
+    </PageHeader>
 
     <div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[15px]">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-page">
         <div
           v-for="base in allBases"
           :key="base.id"
-          class="group relative overflow-hidden bg-card shadow-2xl transition-all rounded-xl"
+          class="group relative overflow-hidden bg-card border border-border shadow-2xl transition-all rounded-xl"
         >
           <div class="aspect-video relative overflow-hidden bg-secondary">
             <div v-if="!loadedImages.has(base.url_foto)" class="absolute inset-0 z-0 animate-pulse bg-secondary"></div>
@@ -514,32 +466,33 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
             <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-60 transition-opacity group-hover:opacity-40"></div>
 
             <div class="pointer-events-none absolute bottom-4 left-4 z-20 flex items-center gap-2">
-              <span class="flex h-6 items-center gap-2 rounded-md bg-yellow-400 px-3 text-xs text-black shadow-lg">
-                <IconBusiness class="h-3.5 w-3.5" />
-                {{ base.level_th }}
-              </span>
-              <span class="flex h-6 items-center gap-2 rounded-md bg-yellow-400 px-3 text-xs text-black shadow-lg">
-                <component :is="getTypeIcon(base.type)" class="h-3.5 w-3.5" />
-                {{ base.type }}
-              </span>
-            </div>
-            <div class="pointer-events-none absolute bottom-4 right-4 z-20">
-              <span class="flex h-6 items-center gap-2 rounded-md border border-yellow-400/20 bg-card px-3 text-xs text-yellow-400 shadow-lg">
-                <IconCalendar class="h-3.5 w-3.5" />
-                {{ new Date(base.created_at).toLocaleDateString("es-ES") }}
-              </span>
+              <BaseBadge variant="accent" :icon="IconBusiness" shadow>{{ base.level_th }}</BaseBadge>
+              <BaseBadge variant="accent" :icon="getBaseTypeIcon(base.type)" shadow>{{ base.type }}</BaseBadge>
             </div>
           </div>
 
-          <div class="p-[15px]">
+          <div class="p-page">
             <div class="flex items-center justify-between">
-              <h3 class="text-sm text-white group-hover:text-yellow-400 transition-colors leading-none truncate flex-1">
-                {{ base.code }}
-              </h3>
-
-              <div class="flex gap-2">
+              <div class="flex w-full gap-2">
+                <a
+                  v-if="base.link"
+                  :href="base.link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="flex flex-1 cursor-pointer items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-secondary text-muted-foreground hover:bg-yellow-400/10 hover:text-yellow-400 transition-all border border-border text-xs"
+                >
+                  <IconCopy class="w-4 h-4" />
+                  Copiar Base
+                </a>
+                <div
+                  v-else
+                  class="flex flex-1 items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-secondary text-muted-foreground/50 border border-border cursor-not-allowed text-xs"
+                  title="Esta base no tiene enlace (Nivel 3)"
+                >
+                  <IconCopy class="w-4 h-4" />
+                  Copiar Base
+                </div>
                 <button
-                  v-if="!isAdmin"
                   @click="toggleFavorite(base)"
                   class="cursor-pointer p-2.5 rounded-lg bg-secondary transition-all border border-border"
                   :class="isFavorite(base.id) ? 'text-yellow-400' : 'text-muted-foreground hover:text-yellow-400'"
@@ -547,23 +500,13 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
                 >
                   <component :is="isFavorite(base.id) ? IconHeartFill : IconHeart" class="w-4 h-4" />
                 </button>
-                <a
-                  v-if="base.link"
-                  :href="base.link"
-                  target="_blank"
+                <button
+                  @click="actionsBase = base"
                   class="cursor-pointer p-2.5 rounded-lg bg-secondary text-muted-foreground hover:bg-yellow-400/10 hover:text-yellow-400 transition-all border border-border"
+                  title="Más opciones"
+                  aria-label="Más opciones"
                 >
-                  <IconOpen class="w-4 h-4" />
-                </a>
-                <div
-                  v-else
-                  class="p-2.5 rounded-lg bg-secondary text-muted-foreground/50 border border-border cursor-not-allowed"
-                  title="Esta base no tiene enlace (Nivel 3)"
-                >
-                  <IconOpen class="w-4 h-4" />
-                </div>
-                <button v-if="isAdmin" @click="openDeleteModal(base)" class="cursor-pointer p-2.5 rounded-lg bg-secondary text-muted-foreground hover:bg-red-600 hover:text-white transition-all border border-border">
-                  <IconTrash class="w-4 h-4" />
+                  <IconMore class="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -571,11 +514,10 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
         </div>
       </div>
 
-      <div v-if="allBases.length === 0" class="text-center">
-        <p class="text-muted-foreground text-sm">
-          {{ selectedLevel !== 'all' || selectedType !== 'all' ? 'Sin bases para este filtro' : 'Sin bases' }}
-        </p>
-      </div>
+      <EmptyState
+        v-if="allBases.length === 0"
+        :message="selectedLevel !== 'all' || selectedType !== 'all' ? 'Sin bases para este filtro' : 'Sin bases'"
+      />
 
       <div v-if="hasMore" class="flex justify-center pt-6">
         <button
@@ -589,110 +531,79 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
       </div>
     </div>
 
-    <Teleport to="body">
-      <div v-if="isFilterModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-[15px]">
-        <div class="absolute inset-0 bg-card/90 backdrop-blur-xl" @click="isFilterModalOpen = false"></div>
+    <ModalShell
+      :open="isFilterModalOpen"
+      title="Filtro"
+      max-width-class="max-w-lg"
+      @close="isFilterModalOpen = false"
+    >
+      <div class="grid grid-cols-2 gap-page">
+        <div class="flex flex-col">
+          <label class="text-xs text-muted-foreground mb-2">Nivel</label>
+          <Select v-model="tempLevel">
+            <SelectTrigger class="h-[44px] rounded-lg bg-secondary border border-border text-white">
+              <SelectValue placeholder="Seleccionar" />
+            </SelectTrigger>
+            <SelectContent side="bottom" :side-offset="4" :avoid-collisions="false" class="z-[9999] bg-card border border-border text-white mt-1" data-select-content>
+              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem v-for="n in BASE_LEVELS" :key="n" :value="String(n)">
+                Nivel {{ n }}
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-        <div class="relative bg-card w-full max-w-lg rounded-[1.25rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-yellow-400/20 animate-in zoom-in-95 duration-300 overflow-hidden">
-            <div class="p-[15px] space-y-[15px]">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-lg text-yellow-400 ">Filtro</h3>
-                    <button @click="isFilterModalOpen = false" class="cursor-pointer p-2 rounded-lg bg-secondary text-muted-foreground hover:text-white transition-all">
-                        <IconAdd class="w-5 h-5 rotate-45" />
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-2 gap-[15px]">
-                    <div class="flex flex-col">
-                        <label class="text-xs text-muted-foreground mb-2">Nivel</label>
-                        <Select v-model="tempLevel">
-                            <SelectTrigger class="h-[44px] rounded-lg bg-secondary border border-border text-white">
-                                <SelectValue placeholder="Seleccionar" />
-                            </SelectTrigger>
-                            <SelectContent side="bottom" :side-offset="4" :avoid-collisions="false" class="z-[9999] bg-card border border-border text-white mt-1" data-select-content>
-                                <SelectItem value="all">Todos</SelectItem>
-                                <SelectItem v-for="n in BASE_LEVELS" :key="n" :value="String(n)">
-                                    Nivel {{ n }}
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <div class="flex flex-col">
-                        <label class="text-xs text-muted-foreground mb-2">Categoría</label>
-                        <Select v-model="tempType">
-                            <SelectTrigger class="h-[44px] rounded-lg bg-secondary border border-border text-white">
-                                <SelectValue placeholder="Seleccionar" />
-                            </SelectTrigger>
-                            <SelectContent side="bottom" :side-offset="4" :avoid-collisions="false" class="z-[9999] bg-card border border-border text-white mt-1" data-select-content>
-                                <SelectItem value="all">Todos</SelectItem>
-                                <SelectItem v-for="t in BASE_TYPES" :key="t" :value="t">{{ t }}</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
-
-                <div class="flex gap-[15px] border-border">
-                    <button @click="clearFilters(); isFilterModalOpen = false; fetchBases(true)" class="flex-1 cursor-pointer h-[44px] rounded-full bg-secondary border border-border text-muted-foreground text-xs hover:text-white transition-all active:scale-95">
-                        Limpiar
-                    </button>
-                    <button @click="applyFilters" class="flex-1 cursor-pointer h-[44px] rounded-full bg-yellow-400 text-black text-xs hover:bg-yellow-300 transition-all duration-300 shadow-xl shadow-yellow-400/10 active:scale-95">
-                        Aplicar Filtros
-                    </button>
-                </div>
-            </div>
+        <div class="flex flex-col">
+          <label class="text-xs text-muted-foreground mb-2">Categoría</label>
+          <Select v-model="tempType">
+            <SelectTrigger class="h-[44px] rounded-lg bg-secondary border border-border text-white">
+              <SelectValue placeholder="Seleccionar" />
+            </SelectTrigger>
+            <SelectContent side="bottom" :side-offset="4" :avoid-collisions="false" class="z-[9999] bg-card border border-border text-white mt-1" data-select-content>
+              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem v-for="t in BASE_TYPES" :key="t" :value="t">{{ t }}</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
-    </Teleport>
 
-    <Teleport to="body">
-      <div v-if="isModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-[15px]">
-        <div class="absolute inset-0 bg-card/90 backdrop-blur-xl" @click="isModalOpen = false"></div>
-
-        <div class="relative bg-card w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[1.25rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-yellow-400/20 animate-in zoom-in-95 duration-300 custom-scrollbar">
-          <div class="px-[15px] pt-4 flex items-center justify-between">
-            <h3 class="text-lg text-yellow-400 ">Nueva Base</h3>
-            <button @click="isModalOpen = false" class="cursor-pointer p-2 rounded-lg bg-secondary text-muted-foreground hover:text-white transition-all">
-              <IconAdd class="w-5 h-5 rotate-45" />
-            </button>
-          </div>
-          <div class="p-[15px]">
-            <BaseForm @success="handleSuccess" />
-          </div>
-        </div>
+      <div class="flex gap-page">
+        <button @click="clearFilters(); isFilterModalOpen = false; fetchBases(true)" class="flex-1 cursor-pointer h-[44px] rounded-full bg-secondary border border-border text-muted-foreground text-xs hover:text-white transition-all active:scale-95">
+          Limpiar
+        </button>
+        <button @click="applyFilters" class="flex-1 cursor-pointer h-[44px] rounded-full bg-yellow-400 text-black text-xs hover:bg-yellow-300 transition-all duration-300 shadow-xl shadow-yellow-400/10 active:scale-95">
+          Aplicar Filtros
+        </button>
       </div>
-    </Teleport>
+    </ModalShell>
 
-    <Teleport to="body">
-      <div v-if="deleteModal.isOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-[15px]">
-        <div class="absolute inset-0 bg-card/90 backdrop-blur-xl" @click="closeDeleteModal"></div>
+    <BaseActionsModal
+      :base="actionsBase"
+      :can-delete="isAdmin"
+      @close="actionsBase = null"
+      @delete="openDeleteModal"
+    />
 
-        <div class="relative bg-card w-full max-w-md rounded-[1.25rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-red-500/20 animate-in zoom-in-95 duration-300 overflow-hidden">
-            <div class="p-[15px] space-y-[15px]">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-lg text-yellow-400 ">Eliminar</h3>
-                    <button @click="closeDeleteModal" class="cursor-pointer p-2 rounded-lg bg-secondary text-muted-foreground hover:text-white transition-all">
-                        <IconAdd class="w-5 h-5 rotate-45" />
-                    </button>
-                </div>
-
-                <div class="bg-secondary rounded-xl p-[15px] border border-border">
-                    <p class="text-muted-foreground text-xs mb-1">Base seleccionada:</p>
-                    <p class="text-white truncate text-sm">{{ deleteModal.baseTitle }}</p>
-                </div>
-
-                <div class="flex gap-[15px] pt-2">
-                    <button @click="closeDeleteModal" class="flex-1 cursor-pointer h-[44px] rounded-full bg-secondary border border-border text-muted-foreground text-xs hover:text-white transition-all active:scale-95">
-                        Cancelar
-                    </button>
-                    <button @click="confirmDelete" class="flex-1 cursor-pointer h-[44px] rounded-full bg-red-600 text-white text-xs hover:bg-red-500 transition-all active:scale-95 shadow-xl shadow-red-600/20">
-                        Confirmar
-                    </button>
-                </div>
-            </div>
-        </div>
+    <ModalShell
+      :open="deleteModal.isOpen"
+      title="Eliminar"
+      border-class="border-red-500/20"
+      @close="closeDeleteModal"
+    >
+      <div class="bg-secondary rounded-xl p-page border border-border">
+        <p class="text-muted-foreground text-xs mb-1">Base seleccionada:</p>
+        <p class="text-white truncate text-sm">{{ deleteModal.baseTitle }}</p>
       </div>
-    </Teleport>
+
+      <div class="flex gap-page pt-2">
+        <button @click="closeDeleteModal" class="flex-1 cursor-pointer h-[44px] rounded-full bg-secondary border border-border text-muted-foreground text-xs hover:text-white transition-all active:scale-95">
+          Cancelar
+        </button>
+        <button @click="confirmDelete" :disabled="isDeleting" class="flex-1 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed h-[44px] rounded-full bg-red-600 text-white text-xs hover:bg-red-500 transition-all active:scale-95 shadow-xl shadow-red-600/20">
+          Confirmar
+        </button>
+      </div>
+    </ModalShell>
 
     <Teleport to="body">
       <div v-if="imageViewer.isOpen" class="fixed inset-0 z-[110] flex items-center justify-center bg-card/95 backdrop-blur-xl">
@@ -704,21 +615,15 @@ watch([isModalOpen, isFilterModalOpen, () => deleteModal.value.isOpen, () => ima
         ></button>
 
         <div class="relative z-10 flex h-full w-full flex-col items-center">
-          <div class="relative z-20 flex h-16 w-full shrink-0 items-center justify-between gap-[15px] px-[15px] text-white sm:h-20 sm:px-6">
+          <div class="relative z-20 flex h-16 w-full shrink-0 items-center justify-between gap-page px-page text-white sm:h-20 sm:px-6">
             <div class="flex min-w-0 items-center gap-2">
-              <span class="flex h-6 items-center gap-2 rounded-md bg-yellow-400 px-3 text-xs text-black shadow-lg">
-                <IconBusiness class="h-3.5 w-3.5" />
-                {{ imageViewer.level }}
-              </span>
-              <span class="flex h-6 items-center gap-2 rounded-md bg-yellow-400 px-3 text-xs text-black shadow-lg">
-                <component :is="getTypeIcon(imageViewer.type)" class="h-3.5 w-3.5" />
-                {{ imageViewer.type }}
-              </span>
-              <span class="flex h-6 shrink-0 items-center rounded-md border border-yellow-400/20 bg-card px-3 text-xs text-yellow-400 shadow-lg">{{ imageViewer.date }}</span>
+              <BaseBadge variant="accent" :icon="IconBusiness" shadow>{{ imageViewer.level }}</BaseBadge>
+              <BaseBadge variant="accent" :icon="getBaseTypeIcon(imageViewer.type)" shadow>{{ imageViewer.type }}</BaseBadge>
+              <BaseBadge variant="outline" shadow>{{ imageViewer.date }}</BaseBadge>
             </div>
             <button
               type="button"
-              class="cursor-pointer p-2 rounded-lg bg-secondary text-muted-foreground hover:text-white transition-all"
+              class="cursor-pointer p-2 rounded-full bg-secondary text-muted-foreground hover:text-white transition-all"
               aria-label="Cerrar visor de imagen"
               @click="closeImageViewer"
             >
