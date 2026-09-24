@@ -3,10 +3,12 @@ import { ref } from "vue";
 import Sidebar from "./Sidebar.vue";
 import TopBar from "./TopBar.vue";
 import AppFooter from "@/components/AppFooter.vue";
-import IconMenu from "~icons/ph/list";
-import IconSignIn from "~icons/ph/sign-in";
+import AccountDropdown from "@/components/AccountDropdown.vue";
 import logo from "@/assets/logo.png";
-import { session, profile } from "@/lib/auth";
+import IconMenu from "~icons/ph/list";
+import IconDownload from "~icons/ph/download-simple";
+import IconSignIn from "~icons/ph/sign-in";
+import { session } from "@/lib/auth";
 
 const isMobileMenuOpen = ref(false);
 </script>
@@ -27,14 +29,14 @@ const isMobileMenuOpen = ref(false);
     >
       <Sidebar
         :showLabels="true"
-        :showLogo="false"
+        :showLogo="true"
         className="w-full border-r-0"
         @link-click="isMobileMenuOpen = false"
       />
     </div>
 
     <div class="flex-1 flex flex-col min-w-0 w-full relative min-h-0">
-      <header class="lg:hidden h-16 border-b border-border flex items-center justify-between px-[15px] bg-background sticky top-0 z-30">
+      <header class="lg:hidden h-16 border-b border-border flex items-center justify-between px-page bg-background sticky top-0 z-30">
         <button
           @click="isMobileMenuOpen = true"
           class="-ml-2 cursor-pointer p-2 text-white hover:text-yellow-400"
@@ -42,23 +44,33 @@ const isMobileMenuOpen = ref(false);
           <IconMenu class="w-6 h-6" />
         </button>
 
-        <router-link to="/" aria-label="cocbase" class="ml-auto">
-          <img :src="logo" alt="logo" class="w-10 h-10 object-contain" />
+        <router-link to="/" aria-label="cocbase" class="flex items-center gap-2">
+          <img :src="logo" alt="logo" class="h-9 w-9 object-contain" />
+          <span class="text-lg text-white">cocbase</span>
         </router-link>
 
-        <router-link
-          v-if="!session"
-          to="/login"
-          class="ml-3 flex cursor-pointer items-center gap-2 px-[15px] h-9 rounded-full bg-yellow-400 text-black text-xs hover:bg-yellow-300 transition-all active:scale-95"
-        >
-          <IconSignIn class="h-4 w-4" />
-          <span>Entrar</span>
-        </router-link>
-        <span v-else class="ml-3 text-xs text-yellow-400">{{ profile?.full_name?.split(' ')[0] }}</span>
+        <div class="ml-auto flex items-center gap-2">
+          <router-link
+            to="/descargar"
+            class="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-yellow-400/40 text-yellow-400 transition-all hover:bg-yellow-400/10 active:scale-95"
+            aria-label="Descargar app"
+          >
+            <IconDownload class="h-4 w-4" />
+          </router-link>
+          <AccountDropdown v-if="session" />
+          <router-link
+            v-else
+            to="/login"
+            class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-yellow-400 text-black transition-all hover:bg-yellow-300 active:scale-95"
+            aria-label="Iniciar sesión"
+          >
+            <IconSignIn class="h-5 w-5" />
+          </router-link>
+        </div>
       </header>
 
       <main class="flex-1 flex flex-col min-h-0 lg:overflow-y-auto overflow-x-hidden relative w-full">
-        <div class="flex-1 w-full max-w-7xl mx-auto p-[15px] lg:pt-24">
+        <div class="flex-1 w-full max-w-7xl mx-auto p-page lg:pt-24">
           <slot />
         </div>
         <AppFooter />

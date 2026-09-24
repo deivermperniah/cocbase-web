@@ -79,14 +79,13 @@ const currentVideo = computed(() => videos[currentIndex.value] ?? null);
       <div class="grid grid-cols-1 lg:grid-cols-2 items-center gap-10 lg:gap-14">
         <div class="text-center lg:text-left">
           <h1 class="text-4xl sm:text-5xl lg:text-6xl leading-none text-white">
-            Tus bases de
-            <span class="text-yellow-400">Clash of Clans</span>
+            Tus bases de Clash of Clans
           </h1>
           <p class="mt-4 max-w-xl mx-auto lg:mx-0 font-body text-sm sm:text-base text-muted-foreground leading-relaxed">
             Encuentra, guarda y comparte diseños de base organizados por nivel de ayuntamiento. Todo revisado por la comunidad.
           </p>
 
-          <div class="mt-8 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3">
+          <div class="mt-8 flex flex-row items-center justify-center lg:justify-start gap-3">
             <router-link
               to="/bases"
               class="flex cursor-pointer items-center justify-center gap-2 px-6 h-12 rounded-full bg-yellow-400 text-black text-sm hover:bg-yellow-300 transition-all active:scale-95 shadow-xl shadow-yellow-400/20"
@@ -95,10 +94,10 @@ const currentVideo = computed(() => videos[currentIndex.value] ?? null);
               Ver bases
             </router-link>
             <router-link
-              :to="isAdmin ? '/dashboard' : session ? '/contribuir' : '/login'"
+              :to="isAdmin ? '/panel' : session ? '/contribuir' : '/login'"
               class="flex cursor-pointer items-center justify-center gap-2 px-6 h-12 rounded-full border-2 border-yellow-400 text-yellow-400 text-sm hover:bg-yellow-400/10 transition-all active:scale-95"
             >
-              {{ isAdmin ? 'Dashboard' : 'Contribuir' }}
+              {{ isAdmin ? 'Panel' : 'Contribuir' }}
             </router-link>
           </div>
         </div>
@@ -106,7 +105,7 @@ const currentVideo = computed(() => videos[currentIndex.value] ?? null);
         <!-- Videos -->
         <div class="relative">
           <div class="pointer-events-none absolute -inset-3 -z-10 rounded-3xl bg-gradient-to-br from-yellow-400/25 via-yellow-400/5 to-transparent blur-2xl" />
-          <div class="overflow-hidden rounded-2xl border border-yellow-400/30 bg-[#121212] shadow-2xl shadow-yellow-400/10">
+          <div class="overflow-hidden rounded-2xl border border-yellow-400/30 bg-chrome shadow-2xl shadow-yellow-400/10">
             <div class="aspect-video w-full bg-black">
               <video
                 v-if="currentVideo"
