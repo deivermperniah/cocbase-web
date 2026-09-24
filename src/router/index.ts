@@ -24,7 +24,7 @@ const router = createRouter({
             path: '/favoritos',
             name: 'favoritos',
             component: () => import('@/views/FavoritosView.vue'),
-            meta: { requiresAuth: true, userOnly: true }
+            meta: { requiresAuth: true }
         },
         {
             path: '/contribuir',
@@ -33,16 +33,24 @@ const router = createRouter({
             meta: { requiresAuth: true, userOnly: true }
         },
         {
-            path: '/dashboard',
-            name: 'dashboard',
+            path: '/panel',
+            name: 'panel',
             component: () => import('@/views/Dashboard.vue'),
             meta: { requiresAuth: true, requiresAdmin: true }
         },
         {
-            path: '/revision',
-            name: 'revision',
+            path: '/comunidad',
+            name: 'comunidad',
             component: () => import('@/views/RevisionView.vue'),
             meta: { requiresAuth: true, requiresAdmin: true }
+        },
+        {
+            path: '/dashboard',
+            redirect: '/panel'
+        },
+        {
+            path: '/revision',
+            redirect: '/comunidad'
         },
         {
             path: '/imagenes',
@@ -90,7 +98,7 @@ router.beforeEach(async (to) => {
     }
 
     if (to.meta.userOnly && isAdmin.value) {
-        return { name: 'dashboard' }
+        return { name: 'panel' }
     }
 
     if ((to.name === 'login' || to.name === 'register') && session.value) {

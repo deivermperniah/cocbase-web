@@ -1,4 +1,4 @@
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import IconHouse from "~icons/ph/house";
 import IconLayers from "~icons/ph/stack";
@@ -6,9 +6,8 @@ import IconDownload from "~icons/ph/download-simple";
 import IconHeart from "~icons/ph/heart";
 import IconUpload from "~icons/ph/upload-simple";
 import IconDashboard from "~icons/ph/squares-four";
-import IconClipboard from "~icons/ph/clipboard-text";
-import IconImage from "~icons/ph/image";
 import { signOut, session, isAdmin } from "@/lib/auth";
+import { pendingCount, refreshPendingCount } from "@/lib/admin";
 
 export interface NavItem {
   name: string;
@@ -16,6 +15,7 @@ export interface NavItem {
   path: string;
   requiresAuth?: boolean;
   adminOnly?: boolean;
+  badge?: number;
 }
 
 const publicItems: NavItem[] = [
@@ -24,28 +24,46 @@ const publicItems: NavItem[] = [
   { name: "Descargar app", icon: IconDownload, path: "/descargar" },
 ];
 
+const favoritesItem: NavItem = {
+  name: "Favoritos",
+  icon: IconHeart,
+  path: "/favoritos",
+  requiresAuth: true,
+};
+
 const userItems: NavItem[] = [
-  { name: "Favoritos", icon: IconHeart, path: "/favoritos", requiresAuth: true },
   { name: "Contribuir", icon: IconUpload, path: "/contribuir", requiresAuth: true },
 ];
 
 const adminItems: NavItem[] = [
-  { name: "Dashboard", icon: IconDashboard, path: "/dashboard", adminOnly: true },
-  { name: "Revisión", icon: IconClipboard, path: "/revision", adminOnly: true },
-  { name: "Imágenes", icon: IconImage, path: "/imagenes", adminOnly: true },
+  { name: "Panel", icon: IconDashboard, path: "/panel", adminOnly: true },
 ];
+
+watch(
+  isAdmin,
+  (admin) => {
+    if (!admin) {
+      pendingCount.value = 0;
+      return;
+    }
+    refreshPendingCount().catch((error) => console.error("Error fetching pending count:", error));
+  },
+  { immediate: true }
+);
 
 export function useNavigation() {
   const router = useRouter();
   const isSigningOut = ref(false);
 
   const navItems = computed<NavItem[]>(() => {
-    const items: NavItem[] = [...publicItems];
-    if (isAdmin.value) {
-      items.push(...adminItems);
-    } else {
-      items.push(...userItems);
-    }
+    const items: NavItem[] = [...publicItems, favoritesItem];
+    items.push(
+      ...(isAdmin.value
+        ? adminItems.map((item) =>
+            item.path === "/panel" ? { ...item, badge: pendingCount.value } : item
+          )
+        : userItems)
+    );
     return items;
   });
 

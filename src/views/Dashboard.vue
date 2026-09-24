@@ -1,168 +1,171 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { supabase } from "@/lib/supabase";
-import { BASE_TYPES } from "@/lib/constants";
+import { BASE_TYPES, type BaseType } from "@/lib/constants";
+import { fetchDashboardStats } from "@/lib/admin";
+import { getBaseTypeIcon } from "@/lib/base";
 import { Card, CardContent } from "@/components/ui/card";
-import IconSword from "~icons/ph/sword";
-import IconTrophy from "~icons/ph/trophy";
-import IconHammer from "~icons/ph/hammer";
-import IconShield from "~icons/ph/shield";
 import IconLayers from "~icons/ph/stack";
-import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import IconPlus from "~icons/ph/plus";
+import IconClipboard from "~icons/ph/clipboard-text";
+import IconImage from "~icons/ph/image";
+import IconCaret from "~icons/ph/caret-right";
+import LoadingState from "@/components/ui/LoadingState.vue";
+import PageHeader from "@/components/ui/PageHeader.vue";
+import EmptyState from "@/components/ui/EmptyState.vue";
+import ModalShell from "@/components/ui/ModalShell.vue";
+import BaseForm from "@/components/BaseForm.vue";
 
-const totalBases = ref(0);
-const warBases = ref(0);
-const leagueBases = ref(0);
-const upgradeBases = ref(0);
-const resourceBases = ref(0);
+const approved = ref(0);
+const pending = ref(0);
+const byType = ref<Record<BaseType, number>>({ Guerra: 0, Liga: 0, Mejora: 0, Recursos: 0 });
 const loading = ref(true);
+const loadError = ref(false);
+const isNewBaseOpen = ref(false);
+
+const managementLinks = [
+  { name: "Comunidad", description: "Aprobar envíos de la comunidad", icon: IconClipboard, to: { path: "/comunidad" } },
+  { name: "Imágenes", description: "Gestionar el almacenamiento", icon: IconImage, to: { path: "/imagenes" } },
+];
 
 async function fetchStats() {
+  loading.value = true;
+  loadError.value = false;
   try {
-    const { count: basesCount } = await supabase
-      .from("bases")
-      .select("*", { count: "exact", head: true });
-    totalBases.value = basesCount || 0;
-
-    const counts = await Promise.all(
-      BASE_TYPES.map((type) =>
-        supabase
-          .from("bases")
-          .select("*", { count: "exact", head: true })
-          .eq("type", type)
-      )
-    );
-
-    warBases.value = counts[0]?.count || 0;
-    leagueBases.value = counts[1]?.count || 0;
-    upgradeBases.value = counts[2]?.count || 0;
-    resourceBases.value = counts[3]?.count || 0;
+    const stats = await fetchDashboardStats();
+    approved.value = stats.approved;
+    pending.value = stats.pending;
+    byType.value = stats.byType;
   } catch (error) {
     console.error("Error fetching stats:", error);
+    loadError.value = true;
   } finally {
     loading.value = false;
   }
 }
 
-onMounted(() => fetchStats());
+function handleNewBaseSuccess() {
+  isNewBaseOpen.value = false;
+  fetchDashboardStats()
+    .then((stats) => {
+      approved.value = stats.approved;
+      pending.value = stats.pending;
+      byType.value = stats.byType;
+    })
+    .catch((error) => console.error("Error fetching stats:", error));
+}
+
+onMounted(fetchStats);
 </script>
 
 <template>
-  <div v-if="loading" class="flex flex-col items-center justify-center min-h-[50vh]">
-    <LoadingSpinner size="lg" />
-  </div>
+  <LoadingState v-if="loading" />
 
-  <div v-else class="space-y-[15px] animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-[15px]">
-      <h2 class="text-[28px] text-yellow-400">
-        Dashboard
-      </h2>
-      <router-link
-        to="/bases"
-        class="hidden sm:flex cursor-pointer items-center gap-3 px-[15px] h-[36px] sm:h-[44px] rounded-full bg-card border-2 border-yellow-400 text-yellow-400 text-xs sm:text-xs hover:bg-yellow-400/10 transition-all duration-300 shadow-xl shadow-yellow-400/10 active:scale-95"
+  <div v-else class="space-y-page animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out">
+    <PageHeader title="Panel">
+      <template #actions>
+        <router-link
+          to="/bases"
+          class="hidden sm:flex cursor-pointer items-center gap-3 px-page h-[44px] rounded-full bg-card border-2 border-yellow-400 text-yellow-400 text-xs hover:bg-yellow-400/10 transition-all duration-300 shadow-xl shadow-yellow-400/10 active:scale-95"
+        >
+          <IconLayers class="h-4 w-4" />
+          <span class="text-xs">Ver Bases</span>
+        </router-link>
+      </template>
+    </PageHeader>
+
+    <div v-if="loadError" class="flex flex-col items-center gap-page">
+      <EmptyState message="No se pudieron cargar las estadísticas." />
+      <button
+        type="button"
+        class="cursor-pointer h-[44px] px-page rounded-full bg-yellow-400 text-black text-xs hover:bg-yellow-300 transition-all active:scale-95"
+        @click="fetchStats"
       >
-        <IconLayers class="h-3 w-3 sm:h-4 sm:w-4" />
-        <span class="text-xs sm:text-xs">Ver Bases</span>
-      </router-link>
+        Reintentar
+      </button>
     </div>
 
-    <!-- Hero Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-[15px] mb-[15px]">
-      <div class="lg:col-span-2">
-        <div class="h-[200px] flex flex-col items-center justify-center text-center p-3 rounded-xl bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 shadow-2xl relative overflow-hidden ring-1 ring-black/5 group">
+    <template v-else>
+      <!-- Stats Grid -->
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-page">
+        <div class="col-span-2 h-[200px] flex flex-col items-center justify-center text-center p-3 rounded-xl bg-gradient-to-br from-yellow-300 via-yellow-400 to-yellow-500 shadow-2xl relative overflow-hidden ring-1 ring-black/5 group">
           <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
           <div class="absolute -right-10 -top-10 sm:-right-20 sm:-top-20 h-32 w-32 sm:h-64 sm:w-64 rounded-full bg-white/20 blur-2xl sm:blur-3xl"></div>
           <div class="absolute -left-10 -bottom-10 sm:-left-20 sm:-bottom-20 h-32 w-32 sm:h-64 sm:w-64 rounded-full bg-black/5 blur-2xl sm:blur-3xl"></div>
           <div class="relative z-10 space-y-0">
-            <h1 class="text-[28px] text-black leading-none">
-              {{ totalBases }}
-            </h1>
-            <p class="text-black/60 text-xs">
-              Bases Totales
-            </p>
+            <h1 class="text-[28px] text-black leading-none">{{ approved }}</h1>
+            <p class="text-black/60 text-xs">Bases publicadas</p>
           </div>
         </div>
-      </div>
 
-      <div class="hidden lg:block lg:col-span-1">
-        <Card class="h-[200px] group relative overflow-hidden border-none bg-card shadow-xl transition-all p-1 rounded-xl">
+        <Card
+          v-for="type in BASE_TYPES"
+          :key="type"
+          class="group relative overflow-hidden border-none bg-card shadow-xl transition-all p-1 rounded-xl h-[200px]"
+        >
           <div class="absolute right-0 top-0 h-24 w-24 sm:h-32 sm:w-32 bg-yellow-400/5 rounded-bl-[3rem] sm:rounded-bl-[4rem] translate-x-8 sm:translate-x-12 -translate-y-8 sm:-translate-y-12 transition-transform group-hover:scale-110"></div>
-          <CardContent class="h-full p-3 relative flex flex-col justify-center gap-[15px]">
+          <CardContent class="h-full p-3 relative flex flex-col justify-center gap-page">
             <div class="h-12 w-12 rounded-xl bg-yellow-400/10 flex items-center justify-center group-hover:bg-yellow-400 transition-all duration-500 shadow-lg shadow-yellow-400/10">
-              <IconSword class="h-5 w-5 text-yellow-400 group-hover:text-black transition-colors" />
+              <component :is="getBaseTypeIcon(type)" class="h-5 w-5 text-yellow-400 group-hover:text-black transition-colors" />
             </div>
             <div class="space-y-0">
-              <h3 class="text-base text-white">Guerra</h3>
-              <div class="text-[28px] mt-1 text-yellow-400">
-                {{ warBases }}
-              </div>
+              <h3 class="text-base text-white">{{ type }}</h3>
+              <div class="text-[28px] mt-1 text-yellow-400">{{ byType[type] }}</div>
             </div>
           </CardContent>
         </Card>
       </div>
-    </div>
 
-    <!-- Stats Grid -->
-    <div class="grid grid-cols-2 lg:grid-cols-3 gap-[15px]">
-      <Card class="block lg:hidden group relative overflow-hidden border-none bg-card shadow-xl transition-all p-1 rounded-xl h-[200px]">
-        <div class="absolute right-0 top-0 h-24 w-24 sm:h-32 sm:w-32 bg-yellow-400/5 rounded-bl-[3rem] sm:rounded-bl-[4rem] translate-x-8 sm:translate-x-12 -translate-y-8 sm:-translate-y-12 transition-transform group-hover:scale-110"></div>
-        <CardContent class="h-full p-3 relative flex flex-col justify-center gap-[15px]">
-          <div class="h-12 w-12 rounded-xl bg-yellow-400/10 flex items-center justify-center group-hover:bg-yellow-400 transition-all duration-500 shadow-lg shadow-yellow-400/10">
-            <IconSword class="h-5 w-5 text-yellow-400 group-hover:text-black transition-colors" />
-          </div>
-          <div class="space-y-0 text-white">
-            <h3 class="text-base ">Guerra</h3>
-            <div class="text-[28px] mt-1 text-yellow-400">
-              {{ warBases }}
+      <!-- Gestión -->
+      <div class="space-y-3">
+        <h3 class="text-base text-white">Gestión</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-page">
+          <button
+            type="button"
+            class="group flex cursor-pointer items-center gap-3 rounded-xl border border-border bg-card p-4 text-left transition-all hover:border-yellow-400/40 active:scale-[0.99]"
+            @click="isNewBaseOpen = true"
+          >
+            <div class="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-yellow-400/10 text-yellow-400">
+              <IconPlus class="h-5 w-5" />
             </div>
-          </div>
-        </CardContent>
-      </Card>
+            <div class="min-w-0 flex-1">
+              <p class="text-sm text-white">Nueva base</p>
+              <p class="truncate text-xs text-muted-foreground">Publicar directamente</p>
+            </div>
+            <IconCaret class="h-4 w-4 shrink-0 text-muted-foreground transition-colors group-hover:text-yellow-400" />
+          </button>
+          <router-link
+            v-for="link in managementLinks"
+            :key="link.name"
+            :to="link.to"
+            class="group flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-all hover:border-yellow-400/40 active:scale-[0.99]"
+          >
+            <div class="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-yellow-400/10 text-yellow-400">
+              <component :is="link.icon" class="h-5 w-5" />
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="text-sm text-white">{{ link.name }}</p>
+              <p class="truncate text-xs text-muted-foreground">{{ link.description }}</p>
+            </div>
+            <span
+              v-if="link.to.path === '/comunidad' && pending > 0"
+              class="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 text-[10px] text-white"
+            >
+              {{ pending > 99 ? '99+' : pending }}
+            </span>
+            <IconCaret class="h-4 w-4 shrink-0 text-muted-foreground transition-colors group-hover:text-yellow-400" />
+          </router-link>
+        </div>
+      </div>
+    </template>
 
-      <Card class="group relative overflow-hidden border-none bg-card shadow-xl transition-all p-1 rounded-xl h-[200px]">
-        <div class="absolute right-0 top-0 h-24 w-24 sm:h-32 sm:w-32 bg-yellow-400/5 rounded-bl-[3rem] sm:rounded-bl-[4rem] translate-x-8 sm:translate-x-12 -translate-y-8 sm:-translate-y-12 transition-transform group-hover:scale-110"></div>
-        <CardContent class="h-full p-3 relative flex flex-col justify-center gap-[15px]">
-          <div class="h-12 w-12 rounded-xl bg-yellow-400/10 flex items-center justify-center group-hover:bg-yellow-400 transition-all duration-500 shadow-lg shadow-yellow-400/10">
-            <IconTrophy class="h-5 w-5 text-yellow-400 group-hover:text-black transition-colors" />
-          </div>
-          <div class="space-y-0 text-white">
-            <h3 class="text-base ">Liga</h3>
-            <div class="text-[28px] mt-1 text-yellow-400">
-              {{ leagueBases }}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card class="group relative overflow-hidden border-none bg-card shadow-xl transition-all p-1 rounded-xl h-[200px]">
-        <div class="absolute right-0 top-0 h-24 w-24 sm:h-32 sm:w-32 bg-yellow-400/5 rounded-bl-[3rem] sm:rounded-bl-[4rem] translate-x-8 sm:translate-x-12 -translate-y-8 sm:-translate-y-12 transition-transform group-hover:scale-110"></div>
-        <CardContent class="h-full p-3 relative flex flex-col justify-center gap-[15px]">
-          <div class="h-12 w-12 rounded-xl bg-yellow-400/10 flex items-center justify-center group-hover:bg-yellow-400 transition-all duration-500 shadow-lg shadow-yellow-400/10">
-            <IconHammer class="h-5 w-5 text-yellow-400 group-hover:text-black transition-colors" />
-          </div>
-          <div class="space-y-0 text-white">
-            <h3 class="text-base ">Mejora</h3>
-            <div class="text-[28px] mt-1 text-yellow-400">
-              {{ upgradeBases }}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card class="group relative overflow-hidden border-none bg-card shadow-xl transition-all p-1 rounded-xl h-[200px]">
-        <div class="absolute right-0 top-0 h-24 w-24 sm:h-32 sm:w-32 bg-yellow-400/5 rounded-bl-[3rem] sm:rounded-bl-[4rem] translate-x-8 sm:translate-x-12 -translate-y-8 sm:-translate-y-12 transition-transform group-hover:scale-110"></div>
-        <CardContent class="h-full p-3 relative flex flex-col justify-center gap-[15px]">
-          <div class="h-12 w-12 rounded-xl bg-yellow-400/10 flex items-center justify-center group-hover:bg-yellow-400 transition-all duration-500 shadow-lg shadow-yellow-400/10">
-            <IconShield class="h-5 w-5 text-yellow-400 group-hover:text-black transition-colors" />
-          </div>
-          <div class="space-y-0 text-white">
-            <h3 class="text-base ">Recursos</h3>
-            <div class="text-[28px] mt-1 text-yellow-400">
-              {{ resourceBases }}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    <ModalShell
+      :open="isNewBaseOpen"
+      title="Nueva Base"
+      max-width-class="max-w-2xl"
+      scrollable
+      @close="isNewBaseOpen = false"
+    >
+      <BaseForm @success="handleNewBaseSuccess" />
+    </ModalShell>
   </div>
 </template>
