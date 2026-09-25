@@ -48,12 +48,13 @@ export function initializeAuth() {
     }
 
     if (!authSubscription) {
-      const { data: subscription } = supabase.auth.onAuthStateChange(async (_event, nextSession) => {
+      const { data: subscription } = supabase.auth.onAuthStateChange((_event, nextSession) => {
         session.value = nextSession
         user.value = nextSession?.user ?? null
 
         if (nextSession?.user) {
-          await loadProfile(nextSession.user.id)
+          const userId = nextSession.user.id
+          setTimeout(() => loadProfile(userId), 0)
         } else {
           profile.value = null
         }
