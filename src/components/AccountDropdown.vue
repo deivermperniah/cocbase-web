@@ -1,10 +1,26 @@
+<script lang="ts">
+import { ref, watch } from "vue";
+import { user } from "@/lib/auth";
+
+const avatars = Object.values(
+  import.meta.glob<string>("../assets/avatar/*.png", { eager: true, import: "default" })
+);
+
+function pickAvatar() {
+  return avatars[Math.floor(Math.random() * avatars.length)];
+}
+
+const avatar = ref(pickAvatar());
+watch(() => user.value?.id, (id, previousId) => {
+  if (id && id !== previousId) avatar.value = pickAvatar();
+});
+</script>
+
 <script setup lang="ts">
-import { ref } from "vue";
 import { onClickOutside } from "@vueuse/core";
 import IconSync from "~icons/ph/arrows-clockwise";
 import IconLogOut from "~icons/ph/sign-out";
-import IconUserCircle from "~icons/ph/user-circle";
-import { profile, user, isAdmin } from "@/lib/auth";
+import { profile, isAdmin } from "@/lib/auth";
 import { useNavigation } from "@/lib/navigation";
 
 const { handleSignOut, isSigningOut } = useNavigation();
@@ -18,17 +34,17 @@ onClickOutside(accountRef, () => (isAccountOpen.value = false));
   <div ref="accountRef" class="relative flex items-center">
     <button
       type="button"
-      class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition-colors hover:border-yellow-400/40 hover:text-yellow-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+      class="flex h-9 w-9 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-muted-foreground/40 bg-secondary transition-colors hover:border-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       :aria-expanded="isAccountOpen"
       aria-label="Cuenta"
       @click="isAccountOpen = !isAccountOpen"
     >
-      <IconUserCircle class="h-5 w-5" />
+      <img :src="avatar" alt="" class="h-full w-full object-cover" />
     </button>
 
     <div
       v-if="isAccountOpen"
-      class="absolute right-0 top-12 z-50 w-64 rounded-xl border border-border bg-chrome p-4 shadow-2xl shadow-black/50"
+      class="absolute right-0 top-[58px] lg:top-[54px] z-50 w-64 rounded-xl border border-border bg-chrome p-4 shadow-2xl shadow-black/50"
     >
       <div class="space-y-3">
         <div>
