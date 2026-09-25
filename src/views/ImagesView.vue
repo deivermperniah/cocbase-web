@@ -249,7 +249,7 @@ watch(
               class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"
             ></div>
 
-            <div class="pointer-events-none absolute bottom-4 left-4 z-20">
+            <div class="pointer-events-none absolute top-4 left-4 z-20">
               <BaseBadge :variant="img.inUse ? 'accent' : 'danger'" shadow>
                 {{ img.inUse ? "En uso" : "Huérfana" }}
               </BaseBadge>
