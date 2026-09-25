@@ -105,10 +105,7 @@ onMounted(async () => {
 
 <template>
   <div class="space-y-page animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out">
-    <PageHeader
-      title="Contribuir"
-      subtitle="Comparte tu diseño con la comunidad. Quedará en revisión antes de publicarse."
-    />
+    <PageHeader title="Contribuir" />
 
     <div class="flex items-start gap-3 rounded-xl bg-secondary border border-yellow-400/20 p-page">
       <IconInfo class="mt-0.5 h-5 w-5 shrink-0 text-yellow-400" />
