@@ -5,7 +5,7 @@ withDefaults(defineProps<{ title: string; subtitle?: string }>(), {
 </script>
 
 <template>
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-page">
+  <div class="flex items-center justify-between gap-page">
     <div class="space-y-1">
       <h2 class="text-[28px] text-yellow-400">{{ title }}</h2>
       <p v-if="subtitle" class="text-sm text-muted-foreground">{{ subtitle }}</p>
