@@ -615,21 +615,14 @@ watch([isFilterModalOpen, () => deleteModal.value.isOpen, () => imageViewer.valu
         ></button>
 
         <div class="relative z-10 flex h-full w-full flex-col items-center">
-          <div class="relative z-20 flex h-16 w-full shrink-0 items-center justify-between gap-page px-page text-white sm:h-20 sm:px-6">
-            <div class="flex min-w-0 items-center gap-2">
-              <BaseBadge variant="accent" :icon="IconBusiness" shadow>{{ imageViewer.level }}</BaseBadge>
-              <BaseBadge variant="accent" :icon="getBaseTypeIcon(imageViewer.type)" shadow>{{ imageViewer.type }}</BaseBadge>
-              <BaseBadge variant="outline" shadow>{{ imageViewer.date }}</BaseBadge>
-            </div>
-            <button
-              type="button"
-              class="cursor-pointer p-2 rounded-full bg-secondary text-muted-foreground hover:text-white transition-all"
-              aria-label="Cerrar visor de imagen"
-              @click="closeImageViewer"
-            >
-              <IconClose class="h-5 w-5" />
-            </button>
-          </div>
+          <button
+            type="button"
+            class="absolute right-4 top-4 z-20 cursor-pointer p-2 rounded-full bg-secondary text-muted-foreground hover:text-white transition-all sm:right-6 sm:top-6"
+            aria-label="Cerrar visor de imagen"
+            @click="closeImageViewer"
+          >
+            <IconClose class="h-5 w-5" />
+          </button>
 
           <div ref="imageViewport" class="flex min-h-0 w-full flex-1 touch-none items-center justify-center overflow-hidden">
             <img
