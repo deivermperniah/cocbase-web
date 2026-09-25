@@ -6,7 +6,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="max-w-3xl space-y-page animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out">
+  <div class="space-y-page animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out">
     <h2 class="text-[28px] text-yellow-400">{{ title }}</h2>
     <p class="text-xs text-muted-foreground">Última actualización: septiembre de 2026.</p>
 
