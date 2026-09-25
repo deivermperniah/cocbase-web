@@ -83,17 +83,17 @@ async function confirmDelete() {
 
   if (error || !data?.length) {
     console.error("Error deleting submission:", error);
-    toast.error("No se pudo eliminar el envío.");
+    toast.error("No se pudo eliminar el envío");
     return;
   }
 
   myBases.value = myBases.value.filter((b) => b.id !== base.id);
   deleteTarget.value = null;
-  toast.success("Envío eliminado.");
+  toast.success("Envío eliminado");
 }
 
 function handleSuccess() {
-  toast.info("Gracias por contribuir", "Un administrador revisará tu base pronto.");
+  toast.info("Gracias por contribuir", "Un administrador revisará tu base pronto");
   fetchMyBases();
 }
 
@@ -166,7 +166,7 @@ onMounted(async () => {
                 >
                   <p class="min-w-0 flex-1 whitespace-pre-line break-words text-xs leading-4 text-red-300">
                     <template v-if="base.review_note"><span class="text-red-400">Motivo:</span> {{ base.review_note }}</template>
-                    <template v-else>Rechazada sin motivo.</template>
+                    <template v-else>Rechazada sin motivo</template>
                   </p>
                   <button
                     type="button"

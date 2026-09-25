@@ -53,10 +53,10 @@ async function share() {
       return;
     }
     await navigator.clipboard.writeText(shareUrl.value);
-    toast.success("Enlace copiado al portapapeles.");
+    toast.success("Enlace copiado al portapapeles");
   } catch (error) {
     if ((error as DOMException)?.name !== "AbortError") {
-      toast.error("No se pudo compartir la base.");
+      toast.error("No se pudo compartir la base");
     }
   }
 }

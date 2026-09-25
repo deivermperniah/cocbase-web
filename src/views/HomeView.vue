@@ -30,22 +30,22 @@ const advantages = [
   {
     icon: IconShield,
     title: "Bases verificadas",
-    text: "Cada diseño pasa una revisión antes de publicarse, sin duplicados.",
+    text: "Cada diseño pasa una revisión antes de publicarse, sin duplicados",
   },
   {
     icon: IconFunnel,
     title: "Organizadas por nivel",
-    text: "Filtra por ayuntamiento y categoría para encontrar lo que buscas.",
+    text: "Filtra por ayuntamiento y categoría para encontrar lo que buscas",
   },
   {
     icon: IconHeart,
     title: "Guarda tus favoritas",
-    text: "Crea tu cuenta y guarda las bases que quieras usar después.",
+    text: "Crea tu cuenta y guarda las bases que quieras usar después",
   },
   {
     icon: IconUpload,
     title: "Comparte las tuyas",
-    text: "Contribuye con tus propios diseños y ayuda a la comunidad.",
+    text: "Contribuye con tus propios diseños y ayuda a la comunidad",
   },
 ];
 
@@ -187,7 +187,7 @@ const currentVideo = computed(() => videos[currentIndex.value] ?? null);
     <!-- Síguenos -->
     <section class="text-center">
       <h2 class="text-2xl sm:text-3xl text-white mb-4">Síguenos</h2>
-      <p class="font-body text-sm text-muted-foreground mb-6">Nuevas bases y novedades en nuestras redes.</p>
+      <p class="font-body text-sm text-muted-foreground mb-6">Nuevas bases y novedades en nuestras redes</p>
       <div class="flex items-center justify-center gap-3">
         <a
           v-for="social in socials"

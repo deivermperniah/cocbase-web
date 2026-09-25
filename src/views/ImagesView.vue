@@ -79,7 +79,7 @@ async function loadImages(reset = false) {
 
   if (error) {
     console.error("Error listando storage:", error);
-    toast.error("No se pudieron cargar las imágenes.");
+    toast.error("No se pudieron cargar las imágenes");
     loading.value = false;
     loadingMore.value = false;
     return;
@@ -177,11 +177,11 @@ async function confirmDelete() {
 
     images.value = images.value.filter((img) => img.path !== imagePath);
     storageOffset.value = Math.max(0, storageOffset.value - 1);
-    toast.success("Imagen eliminada.");
+    toast.success("Imagen eliminada");
     closeDeleteModal();
   } catch (error) {
     console.error("Error eliminando imagen:", error);
-    toast.error("No se pudo eliminar la imagen.");
+    toast.error("No se pudo eliminar la imagen");
   } finally {
     isDeleting.value = false;
   }

@@ -33,11 +33,11 @@ async function handleSubmit() {
 
   try {
     await signUp(fullName.value.trim(), email.value.trim(), password.value)
-    successMessage.value = 'Revisa tu correo para confirmar la cuenta y entrar.'
+    successMessage.value = 'Revisa tu correo para confirmar la cuenta y entrar'
   } catch (error) {
     errorMessage.value = error instanceof Error
       ? error.message
-      : 'No se pudo crear la cuenta.'
+      : 'No se pudo crear la cuenta'
   } finally {
     isSubmitting.value = false
   }

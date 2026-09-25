@@ -68,11 +68,11 @@ async function review(base: PendingBase, status: "approved" | "rejected", note: 
   try {
     await reviewBase(base.id, status, note);
     pending.value = pending.value.filter((b) => b.id !== base.id);
-    toast.success(status === "approved" ? "Base aprobada." : "Base rechazada.");
+    toast.success(status === "approved" ? "Base aprobada" : "Base rechazada");
     return true;
   } catch (error) {
     console.error("Error reviewing base:", error);
-    toast.error(status === "approved" ? "No se pudo aprobar la base." : "No se pudo rechazar la base.");
+    toast.error(status === "approved" ? "No se pudo aprobar la base" : "No se pudo rechazar la base");
     return false;
   } finally {
     busyId.value = null;
@@ -124,7 +124,7 @@ onMounted(fetchPending);
     </PageHeader>
 
     <div v-if="loadError" class="flex flex-col items-center gap-page text-center">
-      <EmptyState message="No se pudieron cargar las bases pendientes." />
+      <EmptyState message="No se pudieron cargar las bases pendientes" />
       <button
         type="button"
         class="cursor-pointer h-[44px] px-page rounded-full bg-yellow-400 text-black text-xs hover:bg-yellow-300 transition-all active:scale-95"

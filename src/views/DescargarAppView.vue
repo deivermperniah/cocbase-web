@@ -27,16 +27,16 @@ const guideSections = [
     icon: IconAndroid,
     title: "Android (Chrome)",
     steps: [
-      "Abre el menú del navegador (los tres puntos).",
+      "Abre el menú del navegador (los tres puntos)",
       'Toca "Instalar app" o "Añadir a pantalla de inicio".',
-      "Confirma para instalar cocbase.",
+      "Confirma para instalar cocbase",
     ],
   },
   {
     icon: IconApple,
     title: "iPhone / iPad (Safari)",
     steps: [
-      "Toca el botón Compartir.",
+      "Toca el botón Compartir",
       'Elige "Añadir a pantalla de inicio".',
       'Confirma con "Añadir".',
     ],
@@ -45,7 +45,7 @@ const guideSections = [
     icon: IconBrowsers,
     title: "Escritorio (Chrome / Edge)",
     steps: [
-      "Haz clic en el ícono de instalar de la barra de direcciones.",
+      "Haz clic en el ícono de instalar de la barra de direcciones",
       'Confirma con "Instalar".',
     ],
   },
@@ -105,7 +105,7 @@ onBeforeUnmount(() => {
           </div>
           <div>
             <h3 class="text-xl text-white">cocbase para Android</h3>
-            <p class="text-xs text-muted-foreground">Lleva tus bases de Clash of Clans a todas partes.</p>
+            <p class="text-xs text-muted-foreground">Lleva tus bases de Clash of Clans a todas partes</p>
           </div>
         </div>
 
@@ -133,7 +133,7 @@ onBeforeUnmount(() => {
           </div>
           <div>
             <h3 class="text-xl text-white">cocbase para iOS</h3>
-            <p class="text-xs text-muted-foreground">Próximamente en el App Store.</p>
+            <p class="text-xs text-muted-foreground">Próximamente en el App Store</p>
           </div>
         </div>
 
@@ -161,7 +161,7 @@ onBeforeUnmount(() => {
           </div>
           <div>
             <h3 class="text-xl text-white">cocbase Web</h3>
-            <p class="text-xs text-muted-foreground">Instálala como app desde tu navegador.</p>
+            <p class="text-xs text-muted-foreground">Instálala como app desde tu navegador</p>
           </div>
         </div>
 
@@ -190,7 +190,7 @@ onBeforeUnmount(() => {
       scrollable
       @close="isGuideOpen = false"
     >
-      <p class="text-xs text-muted-foreground">Instala cocbase como app en tu dispositivo.</p>
+      <p class="text-xs text-muted-foreground">Instala cocbase como app en tu dispositivo</p>
 
       <button
         v-if="deferredPrompt && !isInstalled"
@@ -203,7 +203,7 @@ onBeforeUnmount(() => {
       </button>
       <p v-else-if="isInstalled" class="flex items-center gap-2 text-sm text-muted-foreground">
         <IconCheck class="h-4 w-4 shrink-0 text-yellow-400" />
-        Ya tienes cocbase instalada.
+        Ya tienes cocbase instalada
       </p>
 
       <div v-for="section in guideSections" :key="section.title" class="space-y-2">

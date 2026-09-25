@@ -188,22 +188,22 @@ async function toggleFavorite(base: any) {
       .eq("base_id", baseId);
 
     if (error) {
-      toast.error("No se pudo quitar de favoritos.");
+      toast.error("No se pudo quitar de favoritos");
       return;
     }
     favoriteIds.value.delete(baseId);
-    toast.success("Eliminada de favoritos.");
+    toast.success("Eliminada de favoritos");
   } else {
     const { error } = await supabase
       .from("favorites")
       .insert({ user_id: user.value.id, base_id: baseId });
 
     if (error) {
-      toast.error("No se pudo guardar en favoritos.");
+      toast.error("No se pudo guardar en favoritos");
       return;
     }
     favoriteIds.value.add(baseId);
-    toast.success("Guardada en favoritos.");
+    toast.success("Guardada en favoritos");
   }
 }
 
@@ -367,11 +367,11 @@ async function confirmDelete() {
     await deleteBase({ id: baseId, url_foto: deleteModal.value.imageUrl });
     allBases.value = allBases.value.filter((b) => b.id !== baseId);
     totalCount.value = Math.max(0, totalCount.value - 1);
-    toast.success("Base eliminada.");
+    toast.success("Base eliminada");
     closeDeleteModal();
   } catch (error) {
     console.error("Error deleting base:", error);
-    toast.error("No se pudo eliminar la base.");
+    toast.error("No se pudo eliminar la base");
   } finally {
     isDeleting.value = false;
   }

@@ -46,17 +46,17 @@ const isValidLink = computed(() => {
 
 function validateImage(): string | null {
     if (!baseImage.value) {
-        return 'La imagen es requerida.'
+        return 'La imagen es requerida'
     }
 
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
     if (!allowedTypes.includes(baseImage.value.type)) {
-        return 'Solo se permiten imágenes JPG, PNG o WebP.'
+        return 'Solo se permiten imágenes JPG, PNG o WebP'
     }
 
     const maxSize = 5 * 1024 * 1024
     if (baseImage.value.size > maxSize) {
-        return 'La imagen no puede superar los 5MB.'
+        return 'La imagen no puede superar los 5MB'
     }
 
     return null
@@ -74,7 +74,7 @@ async function checkExistingLink(): Promise<string | null> {
         const baseId = url.searchParams.get('id')
 
         if (!baseId) {
-            return 'No se pudo extraer el ID del enlace.'
+            return 'No se pudo extraer el ID del enlace'
         }
 
         const normalizedLink = baseLink.value.trim()
@@ -86,7 +86,7 @@ async function checkExistingLink(): Promise<string | null> {
             .limit(1)
 
         if (exactMatches && exactMatches.length > 0) {
-            return 'Esta base ya fue guardada anteriormente.'
+            return 'Esta base ya fue guardada anteriormente'
         }
 
         const idToken = baseId.split(':').pop() || baseId
@@ -98,7 +98,7 @@ async function checkExistingLink(): Promise<string | null> {
 
         if (fuzzyError) {
             console.error('Error verificando link existente:', fuzzyError)
-            return 'Error al verificar el enlace.'
+            return 'Error al verificar el enlace'
         }
 
         const hasDuplicate = (fuzzyMatches || []).some((b) => {
@@ -113,13 +113,13 @@ async function checkExistingLink(): Promise<string | null> {
         })
 
         if (hasDuplicate) {
-            return 'Esta base ya fue guardada anteriormente.'
+            return 'Esta base ya fue guardada anteriormente'
         }
 
         return null
     } catch (error) {
         console.error('Error en checkExistingLink:', error)
-        return 'Error al validar el enlace.'
+        return 'Error al validar el enlace'
     }
 }
 
@@ -135,7 +135,7 @@ async function checkDuplicateImage(fileName: string): Promise<string | null> {
         }
 
         if (existingImages && existingImages.length > 0) {
-            return 'Esta imagen ya fue subida anteriormente.'
+            return 'Esta imagen ya fue subida anteriormente'
         }
 
         return null
@@ -300,7 +300,7 @@ async function handleSubmit() {
             return
         }
 
-        toast.success('¡Base registrada!', isAdmin.value ? 'La base quedó publicada.' : 'Tu base quedó en revisión.')
+        toast.success('¡Base registrada!', isAdmin.value ? 'La base quedó publicada' : 'Tu base quedó en revisión')
         emit('success')
         resetForm()
     } catch (error: any) {

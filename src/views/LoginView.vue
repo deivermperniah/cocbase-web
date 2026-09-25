@@ -44,7 +44,7 @@ async function handleSubmit() {
   } catch (error) {
     errorMessage.value = error instanceof Error
       ? error.message
-      : 'No se pudo iniciar sesión.'
+      : 'No se pudo iniciar sesión'
   } finally {
     isSubmitting.value = false
   }

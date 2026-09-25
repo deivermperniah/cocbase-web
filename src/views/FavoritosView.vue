@@ -62,12 +62,12 @@ async function removeFavorite(baseId: string) {
     .eq("base_id", baseId);
 
   if (error) {
-    toast.error("No se pudo quitar de favoritos.");
+    toast.error("No se pudo quitar de favoritos");
     return;
   }
 
   bases.value = bases.value.filter((b) => b.id !== baseId);
-  toast.success("Eliminada de favoritos.");
+  toast.success("Eliminada de favoritos");
 }
 
 async function confirmDelete() {
@@ -78,11 +78,11 @@ async function confirmDelete() {
   try {
     await deleteBase(base);
     bases.value = bases.value.filter((b) => b.id !== base.id);
-    toast.success("Base eliminada.");
+    toast.success("Base eliminada");
     deleteTarget.value = null;
   } catch (error) {
     console.error("Error deleting base:", error);
-    toast.error("No se pudo eliminar la base.");
+    toast.error("No se pudo eliminar la base");
   } finally {
     isDeleting.value = false;
   }

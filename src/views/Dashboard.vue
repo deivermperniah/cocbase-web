@@ -74,7 +74,7 @@ onMounted(fetchStats);
     </PageHeader>
 
     <div v-if="loadError" class="flex flex-col items-center gap-page">
-      <EmptyState message="No se pudieron cargar las estadísticas." />
+      <EmptyState message="No se pudieron cargar las estadísticas" />
       <button
         type="button"
         class="cursor-pointer h-[44px] px-page rounded-full bg-yellow-400 text-black text-xs hover:bg-yellow-300 transition-all active:scale-95"
