@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { session } from "@/lib/auth";
 import { useNavigation, type NavItem } from "@/lib/navigation";
 
-const { navItems, isLocked, handleNavClick } = useNavigation();
+const { navItems, handleNavClick } = useNavigation();
 
 const centerItems = computed<NavItem[]>(() =>
   navItems.value.filter((item) => item.path !== "/descargar")
@@ -34,7 +34,7 @@ const centerItems = computed<NavItem[]>(() =>
           @click="(e) => handleNavClick(e, item, navigate)"
           :class="cn(
             'relative flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-2 text-sm transition-colors',
-            (item.path === '/' ? isExactActive : isActive) ? 'text-yellow-400' : isLocked(item) ? 'text-muted-foreground/60' : 'text-muted-foreground hover:text-yellow-400'
+            (item.path === '/' ? isExactActive : isActive) ? 'text-yellow-400' : 'text-muted-foreground hover:text-yellow-400'
           )"
         >
           {{ item.name }}
