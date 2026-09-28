@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
+import { useRoute } from "vue-router";
 import Sidebar from "./Sidebar.vue";
 import TopBar from "./TopBar.vue";
 import AppFooter from "@/components/AppFooter.vue";
@@ -11,6 +12,16 @@ import IconSignIn from "~icons/ph/sign-in";
 import { session } from "@/lib/auth";
 
 const isMobileMenuOpen = ref(false);
+const mainRef = ref<HTMLElement | null>(null);
+const route = useRoute();
+
+watch(
+  () => route.path,
+  () => {
+    if (mainRef.value) mainRef.value.scrollTop = 0;
+    window.scrollTo(0, 0);
+  }
+);
 </script>
 
 <template>
@@ -69,7 +80,7 @@ const isMobileMenuOpen = ref(false);
         </div>
       </header>
 
-      <main class="flex-1 flex flex-col min-h-0 lg:overflow-y-auto overflow-x-hidden relative w-full">
+      <main ref="mainRef" class="flex-1 flex flex-col min-h-0 lg:overflow-y-auto overflow-x-hidden relative w-full">
         <div class="flex-1 w-full max-w-7xl mx-auto p-page lg:pt-24">
           <slot />
         </div>
