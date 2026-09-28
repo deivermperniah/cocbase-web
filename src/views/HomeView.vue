@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { BASE_LEVELS } from "@/lib/constants";
 import { session, isAdmin } from "@/lib/auth";
 import IconShield from "~icons/ph/shield-check";
@@ -12,6 +12,7 @@ import IconYoutube from "~icons/ph/youtube-logo";
 import IconX from "~icons/ph/x-logo";
 import IconReddit from "~icons/ph/reddit-logo";
 import IconPlayCircle from "~icons/ph/play-circle";
+import IconVideo from "~icons/ph/video-camera";
 
 const townhallModules = import.meta.glob("../assets/images/townhalls/th*.webp", {
   eager: true,
@@ -68,6 +69,11 @@ const videos = Object.entries(videoModules)
 
 const currentIndex = ref(0);
 const currentVideo = computed(() => videos[currentIndex.value] ?? null);
+const isVideoLoaded = ref(false);
+
+watch(currentVideo, () => {
+  isVideoLoaded.value = false;
+});
 </script>
 
 <template>
@@ -106,15 +112,26 @@ const currentVideo = computed(() => videos[currentIndex.value] ?? null);
         <div class="relative">
           <div class="pointer-events-none absolute -inset-3 -z-10 rounded-3xl bg-gradient-to-br from-yellow-400/25 via-yellow-400/5 to-transparent blur-2xl" />
           <div class="overflow-hidden rounded-2xl border border-yellow-400/30 bg-chrome shadow-2xl shadow-yellow-400/10">
-            <div class="aspect-video w-full bg-black">
+            <div class="relative aspect-video w-full bg-black">
+              <div
+                v-if="currentVideo && !isVideoLoaded"
+                class="absolute inset-0 flex items-center justify-center"
+              >
+                <div class="absolute inset-0 animate-pulse bg-secondary"></div>
+                <div class="relative flex h-14 w-14 items-center justify-center rounded-full bg-yellow-400/10 animate-pulse">
+                  <IconVideo class="h-7 w-7 text-yellow-400" />
+                </div>
+              </div>
               <video
                 v-if="currentVideo"
                 :src="currentVideo"
-                class="h-full w-full object-cover"
+                class="h-full w-full object-cover transition-opacity duration-500"
+                :class="isVideoLoaded ? 'opacity-100' : 'opacity-0'"
                 autoplay
                 muted
                 loop
                 playsinline
+                @canplay="isVideoLoaded = true"
               />
               <div v-else class="flex h-full w-full flex-col items-center justify-center gap-3">
                 <div class="flex h-14 w-14 items-center justify-center rounded-full bg-yellow-400/10">
