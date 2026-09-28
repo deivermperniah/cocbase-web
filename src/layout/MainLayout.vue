@@ -5,7 +5,7 @@ import Sidebar from "./Sidebar.vue";
 import TopBar from "./TopBar.vue";
 import AppFooter from "@/components/AppFooter.vue";
 import AccountDropdown from "@/components/AccountDropdown.vue";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/images/logo.png";
 import IconMenu from "~icons/ph/list";
 import IconDownload from "~icons/ph/download-simple";
 import IconSignIn from "~icons/ph/sign-in";

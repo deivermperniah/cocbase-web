@@ -10,7 +10,7 @@ import Alert from '@/components/ui/alert/Alert.vue'
 import AlertDescription from '@/components/ui/alert/AlertDescription.vue'
 import Button from '@/components/ui/button/Button.vue'
 import Input from '@/components/ui/input/Input.vue'
-import logo from '@/assets/logo.png'
+import logo from '@/assets/images/logo.png'
 import { signIn } from '@/lib/auth'
 
 const route = useRoute()

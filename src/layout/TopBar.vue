@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import IconDownload from "~icons/ph/download-simple";
 import AccountDropdown from "@/components/AccountDropdown.vue";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/images/logo.png";
 import { cn } from "@/lib/utils";
 import { session } from "@/lib/auth";
 import { useNavigation, type NavItem } from "@/lib/navigation";

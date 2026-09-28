@@ -13,7 +13,7 @@ import IconX from "~icons/ph/x-logo";
 import IconReddit from "~icons/ph/reddit-logo";
 import IconPlayCircle from "~icons/ph/play-circle";
 
-const townhallModules = import.meta.glob("../assets/townhalls/th*.webp", {
+const townhallModules = import.meta.glob("../assets/images/townhalls/th*.webp", {
   eager: true,
 }) as Record<string, { default: string }>;
 
@@ -56,7 +56,7 @@ const socials = [
   { name: "Reddit", icon: IconReddit, href: "https://reddit.com" },
 ];
 
-const videoModules = import.meta.glob("../assets/video/*.{mp4,webm}", {
+const videoModules = import.meta.glob("../assets/videos/*.{mp4,webm}", {
   eager: true,
   query: "?url",
   import: "default",

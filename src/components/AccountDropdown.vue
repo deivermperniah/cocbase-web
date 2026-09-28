@@ -3,7 +3,7 @@ import { ref, watch } from "vue";
 import { user } from "@/lib/auth";
 
 const avatars = Object.values(
-  import.meta.glob<string>("../assets/avatar/*.png", { eager: true, import: "default" })
+  import.meta.glob<string>("../assets/images/avatars/*.webp", { eager: true, import: "default" })
 );
 
 function pickAvatar() {
