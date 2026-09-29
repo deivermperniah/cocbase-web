@@ -177,6 +177,9 @@ watch(currentVideo, () => {
             <img
               :src="th.img"
               :alt="`Ayuntamiento nivel ${th.level}`"
+              width="480"
+              height="480"
+              decoding="async"
               class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover/card:scale-105"
               loading="lazy"
             />

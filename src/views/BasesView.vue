@@ -459,6 +459,8 @@ watch([isFilterModalOpen, () => deleteModal.value.isOpen, () => imageViewer.valu
                 :src="base.url_foto"
                 loading="lazy"
                 decoding="async"
+                width="1280"
+                height="720"
                 class="block w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 @load="markLoaded(base.url_foto)"
               />

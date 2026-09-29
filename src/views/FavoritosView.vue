@@ -108,7 +108,7 @@ onMounted(async () => {
         class="group relative overflow-hidden bg-card border border-border shadow-2xl transition-all rounded-xl"
       >
         <div class="aspect-video relative overflow-hidden bg-secondary">
-          <img :src="base.url_foto" class="block w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
+          <img :src="base.url_foto" alt="" width="1280" height="720" decoding="async" class="block w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
           <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-60"></div>
 
           <div class="pointer-events-none absolute bottom-4 left-4 z-20 flex items-center gap-2">

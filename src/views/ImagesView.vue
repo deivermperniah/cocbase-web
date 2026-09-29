@@ -243,6 +243,8 @@ watch(
               :src="img.url"
               loading="lazy"
               decoding="async"
+              width="1280"
+              height="720"
               class="block w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             />
             <div

@@ -39,7 +39,7 @@ onClickOutside(accountRef, () => (isAccountOpen.value = false));
       aria-label="Cuenta"
       @click="isAccountOpen = !isAccountOpen"
     >
-      <img :src="avatar" alt="" class="h-full w-full object-cover" />
+      <img :src="avatar" alt="" width="36" height="36" class="h-full w-full object-cover" />
     </button>
 
     <div

@@ -21,7 +21,7 @@ const socials = [
     <div class="max-w-7xl mx-auto px-page py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
       <div class="space-y-4 lg:pr-16">
         <router-link to="/" class="flex items-center gap-2">
-          <img src="@/assets/images/logo.png" alt="cocbase" class="h-9 w-9 object-contain" />
+          <img src="@/assets/images/logo.png" alt="cocbase" width="36" height="36" class="h-9 w-9 object-contain" />
           <span class="text-lg text-white">cocbase</span>
         </router-link>
         <p class="font-body text-xs text-muted-foreground leading-relaxed">

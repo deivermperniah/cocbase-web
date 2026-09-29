@@ -150,7 +150,7 @@ onMounted(fetchPending);
             class="block w-full h-full cursor-zoom-in"
             aria-label="Ver imagen completa"
           >
-            <img :src="base.url_foto" :alt="`${base.type} · Nivel ${base.level_th}`" class="block w-full h-full object-cover" loading="lazy" />
+            <img :src="base.url_foto" width="1280" height="720" decoding="async" :alt="`${base.type} · Nivel ${base.level_th}`" class="block w-full h-full object-cover" loading="lazy" />
           </a>
           <div v-else class="flex h-full w-full flex-col items-center justify-center gap-2 text-muted-foreground">
             <IconImage class="h-8 w-8" />

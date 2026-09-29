@@ -67,7 +67,7 @@ async function handleSubmit() {
       <div class="relative rounded-[calc(1.25rem-1px)] bg-card p-6 sm:p-8">
         <div class="mb-page text-center">
           <div class="mx-auto mb-page flex h-16 w-16 items-center justify-center">
-            <img :src="logo" alt="logo" class="h-full w-full object-contain" />
+            <img :src="logo" alt="logo" width="1024" height="1024" class="h-full w-full object-contain" />
           </div>
           <h2 class="text-[28px] text-yellow-400">
             Iniciar sesión
