@@ -67,6 +67,15 @@ export function useNavigation() {
     return items;
   });
 
+  function prefetchRoute(path: string) {
+    for (const record of router.resolve(path).matched) {
+      const component = record.components?.default;
+      if (typeof component === "function") {
+        (component as () => Promise<unknown>)().catch(() => {});
+      }
+    }
+  }
+
   function isLocked(item: NavItem) {
     return Boolean(item.requiresAuth) && !session.value;
   }
@@ -92,5 +101,5 @@ export function useNavigation() {
     }
   }
 
-  return { navItems, isLocked, handleNavClick, handleSignOut, isSigningOut };
+  return { navItems, isLocked, handleNavClick, handleSignOut, isSigningOut, prefetchRoute };
 }

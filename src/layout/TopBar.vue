@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { session } from "@/lib/auth";
 import { useNavigation, type NavItem } from "@/lib/navigation";
 
-const { navItems, handleNavClick } = useNavigation();
+const { navItems, handleNavClick, prefetchRoute } = useNavigation();
 
 const centerItems = computed<NavItem[]>(() =>
   navItems.value.filter((item) => item.path !== "/descargar")
@@ -17,7 +17,7 @@ const centerItems = computed<NavItem[]>(() =>
 <template>
   <header class="fixed top-3 left-1/2 z-40 hidden h-14 w-[min(92vw,54rem)] -translate-x-1/2 items-center gap-5 rounded-full border border-border bg-chrome/95 px-5 shadow-xl shadow-black/40 backdrop-blur lg:flex">
     <router-link to="/" aria-label="cocbase" class="flex shrink-0 items-center gap-2">
-      <img :src="logo" alt="logo" class="h-9 w-9 object-contain" />
+      <img :src="logo" alt="logo" width="36" height="36" class="h-9 w-9 object-contain" />
       <span class="text-lg text-white">cocbase</span>
     </router-link>
 
@@ -32,6 +32,8 @@ const centerItems = computed<NavItem[]>(() =>
         <a
           :href="href"
           @click="(e) => handleNavClick(e, item, navigate)"
+          @mouseenter="prefetchRoute(item.path)"
+          @focus="prefetchRoute(item.path)"
           :class="cn(
             'relative flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-2 text-sm transition-colors',
             (item.path === '/' ? isExactActive : isActive) ? 'text-yellow-400' : 'text-muted-foreground hover:text-yellow-400'

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import Sidebar from "./Sidebar.vue";
 import TopBar from "./TopBar.vue";
@@ -10,10 +10,18 @@ import IconMenu from "~icons/ph/list";
 import IconDownload from "~icons/ph/download-simple";
 import IconSignIn from "~icons/ph/sign-in";
 import { session } from "@/lib/auth";
+import { useNavigation } from "@/lib/navigation";
 
 const isMobileMenuOpen = ref(false);
 const mainRef = ref<HTMLElement | null>(null);
 const route = useRoute();
+const { navItems, prefetchRoute } = useNavigation();
+
+onMounted(() => {
+  const prefetchAll = () => navItems.value.forEach((item) => prefetchRoute(item.path));
+  if ("requestIdleCallback" in window) window.requestIdleCallback(prefetchAll);
+  else setTimeout(prefetchAll, 2000);
+});
 
 watch(
   () => route.path,
@@ -56,7 +64,7 @@ watch(
         </button>
 
         <router-link to="/" aria-label="cocbase" class="flex items-center gap-2">
-          <img :src="logo" alt="logo" class="h-9 w-9 object-contain" />
+          <img :src="logo" alt="logo" width="36" height="36" class="h-9 w-9 object-contain" />
           <span class="text-lg text-white">cocbase</span>
         </router-link>
 

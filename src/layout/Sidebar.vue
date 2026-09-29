@@ -14,7 +14,7 @@ const emit = defineEmits<{
   (e: 'link-click'): void
 }>()
 
-const { navItems, handleNavClick } = useNavigation()
+const { navItems, handleNavClick, prefetchRoute } = useNavigation()
 
 function onNavClick(e: MouseEvent, item: NavItem, navigate?: () => void) {
   handleNavClick(e, item, navigate)
@@ -37,6 +37,8 @@ function onNavClick(e: MouseEvent, item: NavItem, navigate?: () => void) {
         <a
           :href="href"
           @click="(e) => onNavClick(e, item, navigate)"
+          @mouseenter="prefetchRoute(item.path)"
+          @focus="prefetchRoute(item.path)"
           :class="cn(
             'flex cursor-pointer items-center rounded-lg border border-transparent hover:bg-card group relative py-3 transition-all',
             showLabels ? 'justify-start px-page' : 'justify-center',
