@@ -1,0 +1,10 @@
+{
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/(bases|bases/.*|descargar|aviso-legal|privacidad)", "destination": "/app.html" },
+    {
+      "source": "/(panel|comunidad|imagenes|favoritos|contribuir|login|register|dashboard|revision)",
+      "destination": "/app.html"
+    }
+  ]
+}

@@ -10,12 +10,87 @@
     <link rel="preload" href="/fonts/rubik-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" as="image" href="/pwa-192x192.png" />
     <style>
-      body { margin: 0; background: #0a0a0a; }
-      .app-splash { min-height: 100dvh; display: flex; align-items: center; justify-content: center; }
-      .app-splash img { width: 64px; height: 64px; animation: app-splash-pulse 1.2s ease-in-out infinite; }
-      @keyframes app-splash-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .5; transform: scale(.94); } }
+      body {
+        margin: 0;
+        background: #0a0a0a;
+      }
+      .app-splash {
+        min-height: 100dvh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .app-splash img {
+        width: 64px;
+        height: 64px;
+        animation: app-splash-pulse 1.2s ease-in-out infinite;
+      }
+      @keyframes app-splash-pulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.5;
+          transform: scale(0.94);
+        }
+      }
+      html[data-session] #app:not([data-v-app]):not(:has(.app-splash)) {
+        min-height: 100dvh;
+        background: url(/pwa-192x192.png) center / 64px no-repeat;
+      }
+      html[data-session] #app:not([data-v-app]) > :not(.app-splash) {
+        visibility: hidden;
+      }
     </style>
-    <title>cocbase</title>
+    <script>
+      try {
+        if (
+          Object.keys(localStorage).some(function (k) {
+            return /^sb-.+-auth-token$/.test(k);
+          })
+        )
+          document.documentElement.setAttribute("data-session", "");
+      } catch (e) {}
+    </script>
+    <title>Bases de Clash of Clans por ayuntamiento · cocbase</title>
+    <meta
+      name="description"
+      content="Encuentra, guarda y comparte bases de Clash of Clans organizadas por nivel de ayuntamiento (TH3 a TH18): guerra, liga, mejora y recursos. Revisadas por la comunidad."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://cocbase.vercel.app/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="cocbase" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:title" content="Bases de Clash of Clans por ayuntamiento · cocbase" />
+    <meta
+      property="og:description"
+      content="Encuentra, guarda y comparte bases de Clash of Clans organizadas por nivel de ayuntamiento (TH3 a TH18): guerra, liga, mejora y recursos. Revisadas por la comunidad."
+    />
+    <meta property="og:url" content="https://cocbase.vercel.app/" />
+    <meta property="og:image" content="https://cocbase.vercel.app/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="cocbase: bases de Clash of Clans por ayuntamiento" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Bases de Clash of Clans por ayuntamiento · cocbase" />
+    <meta
+      name="twitter:description"
+      content="Encuentra, guarda y comparte bases de Clash of Clans organizadas por nivel de ayuntamiento (TH3 a TH18): guerra, liga, mejora y recursos. Revisadas por la comunidad."
+    />
+    <meta name="twitter:image" content="https://cocbase.vercel.app/og-image.jpg" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "cocbase",
+        "url": "https://cocbase.vercel.app/",
+        "inLanguage": "es",
+        "description": "Bases de Clash of Clans organizadas por nivel de ayuntamiento y revisadas por la comunidad."
+      }
+    </script>
   </head>
   <body>
     <div id="app">
