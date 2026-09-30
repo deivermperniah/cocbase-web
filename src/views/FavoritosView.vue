@@ -4,33 +4,24 @@ import { supabase } from "@/lib/supabase";
 import { user, isAdmin } from "@/lib/auth";
 import { deleteBase } from "@/lib/admin";
 import { toast } from "@/lib/toast";
-import { getBaseTypeIcon } from "@/lib/base";
+import type { Base } from "@/lib/base";
+import BaseCard from "@/components/BaseCard.vue";
+import ImageViewer from "@/components/ImageViewer.vue";
 import LoadingState from "@/components/ui/LoadingState.vue";
 import PageHeader from "@/components/ui/PageHeader.vue";
-import BaseBadge from "@/components/ui/BaseBadge.vue";
 import EmptyState from "@/components/ui/EmptyState.vue";
 import ModalShell from "@/components/ui/ModalShell.vue";
 import IconMore from "~icons/ph/dots-three-bold";
 import BaseActionsModal, { type ActionsBase } from "@/components/BaseActionsModal.vue";
 import IconHeartFill from "~icons/ph/heart-fill";
 import IconCopy from "~icons/ph/copy";
-import IconBusiness from "~icons/ph/buildings";
 
-interface FavBase {
-  id: string;
-  level_th: number;
-  type: string;
-  url_foto: string;
-  link: string | null;
-  created_at: string;
-  profiles: { full_name: string | null } | null;
-}
-
-const bases = ref<FavBase[]>([]);
+const bases = ref<Base[]>([]);
 const loading = ref(true);
-const deleteTarget = ref<FavBase | null>(null);
+const deleteTarget = ref<Base | null>(null);
 const actionsBase = ref<ActionsBase | null>(null);
 const isDeleting = ref(false);
+const viewerBase = ref<Base | null>(null);
 
 async function fetchFavorites() {
   if (!user.value) return;
@@ -46,19 +37,13 @@ async function fetchFavorites() {
     return;
   }
 
-  bases.value = (data || [])
-    .map((row: any) => row.bases)
-    .filter((b: any) => b) as FavBase[];
+  bases.value = (data || []).map((row) => row.bases as unknown as Base | null).filter((b): b is Base => b !== null);
 }
 
 async function removeFavorite(baseId: string) {
   if (!user.value) return;
 
-  const { error } = await supabase
-    .from("favorites")
-    .delete()
-    .eq("user_id", user.value.id)
-    .eq("base_id", baseId);
+  const { error } = await supabase.from("favorites").delete().eq("user_id", user.value.id).eq("base_id", baseId);
 
   if (error) {
     toast.error("No se pudo quitar de favoritos");
@@ -100,53 +85,38 @@ onMounted(async () => {
     <PageHeader title="Favoritos" />
 
     <div v-if="bases.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-page">
-      <div
-        v-for="base in bases"
-        :key="base.id"
-        class="group relative overflow-hidden bg-card border border-border shadow-2xl transition-all rounded-xl"
-      >
-        <div class="aspect-video relative overflow-hidden bg-secondary">
-          <img :src="base.url_foto" alt="" width="1280" height="720" decoding="async" class="block w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
-          <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-60"></div>
-
-          <div class="pointer-events-none absolute bottom-4 left-4 z-20 flex items-center gap-2">
-            <BaseBadge variant="accent" :icon="IconBusiness" shadow>{{ base.level_th }}</BaseBadge>
-            <BaseBadge variant="accent" :icon="getBaseTypeIcon(base.type)" shadow>{{ base.type }}</BaseBadge>
-          </div>
+      <BaseCard v-for="base in bases" :key="base.id" :base="base" @open-image="viewerBase = base">
+        <div class="flex w-full gap-2">
+          <a
+            v-if="base.link"
+            :href="base.link"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex flex-1 cursor-pointer items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-secondary text-muted-foreground hover:bg-yellow-400/10 hover:text-yellow-400 transition-all border border-border text-xs"
+          >
+            <IconCopy class="w-4 h-4" />
+            Copiar Base
+          </a>
+          <button
+            type="button"
+            aria-label="Quitar de favoritos"
+            class="cursor-pointer p-2.5 rounded-lg bg-secondary text-red-500 hover:bg-red-600 hover:text-white transition-all border border-border"
+            title="Quitar de favoritos"
+            @click="removeFavorite(base.id)"
+          >
+            <IconHeartFill class="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            class="cursor-pointer p-2.5 rounded-lg bg-secondary text-muted-foreground hover:bg-yellow-400/10 hover:text-yellow-400 transition-all border border-border"
+            title="Más opciones"
+            aria-label="Más opciones"
+            @click="actionsBase = base"
+          >
+            <IconMore class="w-4 h-4" />
+          </button>
         </div>
-
-        <div class="p-page">
-          <div class="flex items-center justify-between">
-            <div class="flex w-full gap-2">
-              <a
-                v-if="base.link"
-                :href="base.link"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="flex flex-1 cursor-pointer items-center justify-center gap-2 px-3 py-2.5 rounded-lg bg-secondary text-muted-foreground hover:bg-yellow-400/10 hover:text-yellow-400 transition-all border border-border text-xs"
-              >
-                <IconCopy class="w-4 h-4" />
-                Copiar Base
-              </a>
-              <button
-                @click="removeFavorite(base.id)"
-                class="cursor-pointer p-2.5 rounded-lg bg-secondary text-red-500 hover:bg-red-600 hover:text-white transition-all border border-border"
-                title="Quitar de favoritos"
-              >
-                <IconHeartFill class="w-4 h-4" />
-              </button>
-              <button
-                @click="actionsBase = base"
-                class="cursor-pointer p-2.5 rounded-lg bg-secondary text-muted-foreground hover:bg-yellow-400/10 hover:text-yellow-400 transition-all border border-border"
-                title="Más opciones"
-                aria-label="Más opciones"
-              >
-                <IconMore class="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      </BaseCard>
     </div>
 
     <EmptyState v-else message="Aún no tienes bases favoritas" />
@@ -155,7 +125,7 @@ onMounted(async () => {
       :base="actionsBase"
       :can-delete="isAdmin"
       @close="actionsBase = null"
-      @delete="(base) => (deleteTarget = base as FavBase)"
+      @delete="(base) => (deleteTarget = base as Base)"
     />
 
     <ModalShell
@@ -170,13 +140,27 @@ onMounted(async () => {
       </div>
 
       <div class="flex gap-page pt-2">
-        <button @click="deleteTarget = null" class="flex-1 cursor-pointer h-[44px] rounded-full bg-secondary border border-border text-muted-foreground text-xs hover:text-white transition-all active:scale-95">
+        <button
+          class="flex-1 cursor-pointer h-[44px] rounded-full bg-secondary border border-border text-muted-foreground text-xs hover:text-white transition-all active:scale-95"
+          @click="deleteTarget = null"
+        >
           Cancelar
         </button>
-        <button @click="confirmDelete" :disabled="isDeleting" class="flex-1 cursor-pointer h-[44px] rounded-full bg-red-600 text-white text-xs hover:bg-red-500 transition-all active:scale-95 shadow-xl shadow-red-600/20 disabled:opacity-50 disabled:cursor-not-allowed">
+        <button
+          :disabled="isDeleting"
+          class="flex-1 cursor-pointer h-[44px] rounded-full bg-red-600 text-white text-xs hover:bg-red-500 transition-all active:scale-95 shadow-xl shadow-red-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
+          @click="confirmDelete"
+        >
           Confirmar
         </button>
       </div>
     </ModalShell>
+
+    <ImageViewer
+      :open="viewerBase !== null"
+      :url="viewerBase?.url_foto ?? ''"
+      :title="viewerBase ? `Nivel ${viewerBase.level_th} - ${viewerBase.type}` : ''"
+      @close="viewerBase = null"
+    />
   </div>
 </template>

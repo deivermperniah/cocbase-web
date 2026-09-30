@@ -2,20 +2,19 @@
 import { ref, onMounted } from "vue";
 import { supabase } from "@/lib/supabase";
 import { toast } from "@/lib/toast";
-import { formatRelativeDate, getBaseTypeIcon } from "@/lib/base";
+import { formatRelativeDate } from "@/lib/base";
+import BaseCard from "@/components/BaseCard.vue";
+import ImageViewer from "@/components/ImageViewer.vue";
 import { REVIEW_COLUMNS, pendingCount, reviewBase } from "@/lib/admin";
 import LoadingState from "@/components/ui/LoadingState.vue";
 import PageHeader from "@/components/ui/PageHeader.vue";
-import BaseBadge from "@/components/ui/BaseBadge.vue";
 import EmptyState from "@/components/ui/EmptyState.vue";
 import ModalShell from "@/components/ui/ModalShell.vue";
 import IconCheck from "~icons/ph/check";
 import IconX from "~icons/ph/x";
-import IconBusiness from "~icons/ph/buildings";
 import IconUser from "~icons/ph/user";
 import IconOpen from "~icons/ph/arrow-square-out";
 import IconSync from "~icons/ph/arrows-clockwise";
-import IconImage from "~icons/ph/image";
 
 interface PendingBase {
   id: string;
@@ -31,6 +30,7 @@ const pending = ref<PendingBase[]>([]);
 const loading = ref(true);
 const loadError = ref(false);
 const busyId = ref<string | null>(null);
+const viewerBase = ref<PendingBase | null>(null);
 const rejectModal = ref<{ isOpen: boolean; base: PendingBase | null; note: string }>({
   isOpen: false,
   base: null,
@@ -108,7 +108,13 @@ onMounted(fetchPending);
   <div v-else class="space-y-page animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out">
     <PageHeader
       title="Comunidad"
-      :subtitle="loadError || pending.length === 0 ? '' : pending.length === 1 ? '1 base pendiente' : `${pending.length} bases pendientes`"
+      :subtitle="
+        loadError || pending.length === 0
+          ? ''
+          : pending.length === 1
+            ? '1 base pendiente'
+            : `${pending.length} bases pendientes`
+      "
     >
       <template v-if="!loadError && pending.length > 0" #actions>
         <button
@@ -134,36 +140,14 @@ onMounted(fetchPending);
     </div>
 
     <div v-else-if="pending.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-page">
-      <div
+      <BaseCard
         v-for="base in pending"
         :key="base.id"
-        class="group relative overflow-hidden bg-card border border-border shadow-2xl transition-all rounded-xl"
+        :base="base"
         :class="busyId === base.id && 'opacity-60'"
+        @open-image="viewerBase = base"
       >
-        <div class="aspect-video relative overflow-hidden bg-secondary">
-          <a
-            v-if="base.url_foto"
-            :href="base.url_foto"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="block w-full h-full cursor-zoom-in"
-            aria-label="Ver imagen completa"
-          >
-            <img :src="base.url_foto" width="1280" height="720" decoding="async" :alt="`${base.type} · Nivel ${base.level_th}`" class="block w-full h-full object-cover" loading="lazy" />
-          </a>
-          <div v-else class="flex h-full w-full flex-col items-center justify-center gap-2 text-muted-foreground">
-            <IconImage class="h-8 w-8" />
-            <span class="text-xs">Sin imagen</span>
-          </div>
-          <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-60"></div>
-
-          <div class="pointer-events-none absolute bottom-4 left-4 z-20 flex items-center gap-2">
-            <BaseBadge variant="accent" :icon="IconBusiness" shadow>{{ base.level_th }}</BaseBadge>
-            <BaseBadge variant="accent" :icon="getBaseTypeIcon(base.type)" shadow>{{ base.type }}</BaseBadge>
-          </div>
-        </div>
-
-        <div class="p-page space-y-page">
+        <div class="space-y-page">
           <div class="flex items-center justify-between gap-2">
             <div class="min-w-0">
               <p class="flex items-center gap-1 text-xs text-muted-foreground truncate">
@@ -187,8 +171,8 @@ onMounted(fetchPending);
           <div class="flex gap-page">
             <button
               :disabled="busyId !== null"
-              @click="approve(base)"
               class="flex-1 flex cursor-pointer items-center justify-center gap-2 h-[44px] rounded-full bg-yellow-400 text-black text-xs hover:bg-yellow-300 transition-all active:scale-95 shadow-xl shadow-yellow-400/10 disabled:cursor-not-allowed disabled:opacity-50"
+              @click="approve(base)"
             >
               <IconSync v-if="busyId === base.id && !rejectModal.isOpen" class="w-4 h-4 animate-spin" />
               <IconCheck v-else class="w-4 h-4" />
@@ -196,25 +180,20 @@ onMounted(fetchPending);
             </button>
             <button
               :disabled="busyId !== null"
+              class="flex-1 flex cursor-pointer items-center justify-center gap-2 h-[44px] rounded-full bg-secondary border border-border text-red-400 text-xs hover:bg-red-600 hover:text-white transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
               @click="openReject(base)"
-              class="flex-1 flex cursor-pointer items-center justify-center gap-2 h-[44px] rounded-full bg-secondary border border-border text-red-500 text-xs hover:bg-red-600 hover:text-white transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <IconX class="w-4 h-4" />
               Rechazar
             </button>
           </div>
         </div>
-      </div>
+      </BaseCard>
     </div>
 
     <EmptyState v-else message="No hay bases pendientes de revisión" />
 
-    <ModalShell
-      :open="rejectModal.isOpen"
-      title="Rechazar base"
-      border-class="border-red-500/20"
-      @close="closeReject"
-    >
+    <ModalShell :open="rejectModal.isOpen" title="Rechazar base" border-class="border-red-500/20" @close="closeReject">
       <div class="flex flex-col">
         <label for="reject-note" class="text-xs text-muted-foreground mb-2">Motivo (opcional)</label>
         <textarea
@@ -225,26 +204,33 @@ onMounted(fetchPending);
           class="w-full rounded-lg bg-secondary border border-border text-white text-sm p-3 focus-visible:outline-none focus-visible:border-yellow-400 resize-none"
           placeholder="Ej: la captura no corresponde a la base"
         ></textarea>
-        <span class="mt-1 self-end text-[10px] text-muted-foreground">{{ rejectModal.note.length }}/200</span>
+        <span class="mt-1 self-end text-[11px] text-muted-foreground">{{ rejectModal.note.length }}/200</span>
       </div>
 
       <div class="flex gap-page pt-2">
         <button
           :disabled="busyId !== null"
-          @click="closeReject"
           class="flex-1 cursor-pointer h-[44px] rounded-full bg-secondary border border-border text-muted-foreground text-xs hover:text-white transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+          @click="closeReject"
         >
           Cancelar
         </button>
         <button
           :disabled="busyId !== null"
-          @click="confirmReject"
           class="flex-1 flex cursor-pointer items-center justify-center gap-2 h-[44px] rounded-full bg-red-600 text-white text-xs hover:bg-red-500 transition-all active:scale-95 shadow-xl shadow-red-600/20 disabled:cursor-not-allowed disabled:opacity-50"
+          @click="confirmReject"
         >
           <IconSync v-if="busyId !== null" class="w-4 h-4 animate-spin" />
           Rechazar
         </button>
       </div>
     </ModalShell>
+
+    <ImageViewer
+      :open="viewerBase !== null"
+      :url="viewerBase?.url_foto ?? ''"
+      :title="viewerBase ? `Nivel ${viewerBase.level_th} - ${viewerBase.type}` : ''"
+      @close="viewerBase = null"
+    />
   </div>
 </template>
