@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 import { BASE_LEVELS } from "@/lib/constants";
 import { session, isAdmin } from "@/lib/auth";
 import IconShield from "~icons/ph/shield-check";
@@ -11,8 +11,7 @@ import IconInstagram from "~icons/ph/instagram-logo";
 import IconYoutube from "~icons/ph/youtube-logo";
 import IconX from "~icons/ph/x-logo";
 import IconReddit from "~icons/ph/reddit-logo";
-import IconPlayCircle from "~icons/ph/play-circle";
-import IconVideo from "~icons/ph/video-camera";
+import IconImage from "~icons/ph/image";
 
 const townhallModules = import.meta.glob("../assets/images/townhalls/th*.webp", {
   eager: true,
@@ -57,23 +56,41 @@ const socials = [
   { name: "Reddit", icon: IconReddit, href: "https://reddit.com" },
 ];
 
-const videoModules = import.meta.glob("../assets/videos/*.{mp4,webm}", {
+const baseModules = import.meta.glob("../assets/images/bases/*.webp", {
   eager: true,
-  query: "?url",
-  import: "default",
-}) as Record<string, string>;
+}) as Record<string, { default: string }>;
 
-const videos = Object.entries(videoModules)
-  .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
-  .map(([, url]) => url);
+const baseImages = Object.values(baseModules).map((mod) => mod.default);
 
-const currentIndex = ref(0);
-const currentVideo = computed(() => videos[currentIndex.value] ?? null);
-const isVideoLoaded = ref(false);
+function pickRandom(list: string[]) {
+  return list[Math.floor(Math.random() * list.length)]!;
+}
 
-watch(currentVideo, () => {
-  isVideoLoaded.value = false;
+const currentImage = ref<string | null>(baseImages.length ? pickRandom(baseImages) : null);
+const isImageLoaded = ref(false);
+let rotateTimer: ReturnType<typeof setInterval> | undefined;
+
+function preload(url: string) {
+  return new Promise<void>((resolve) => {
+    const img = new Image();
+    img.onload = img.onerror = () => resolve();
+    img.src = url;
+  });
+}
+
+async function showRandomImage() {
+  const pool = baseImages.filter((url) => url !== currentImage.value);
+  if (!pool.length) return;
+  const next = pickRandom(pool);
+  await preload(next);
+  currentImage.value = next;
+}
+
+onMounted(() => {
+  if (baseImages.length > 1) rotateTimer = setInterval(showRandomImage, 3000);
 });
+
+onBeforeUnmount(() => clearInterval(rotateTimer));
 </script>
 
 <template>
@@ -108,50 +125,41 @@ watch(currentVideo, () => {
           </div>
         </div>
 
-        <!-- Videos -->
+        <!-- Bases -->
         <div class="relative">
           <div class="pointer-events-none absolute -inset-3 -z-10 rounded-3xl bg-gradient-to-br from-yellow-400/25 via-yellow-400/5 to-transparent blur-2xl" />
           <div class="overflow-hidden rounded-2xl border border-yellow-400/30 bg-chrome shadow-2xl shadow-yellow-400/10">
             <div class="relative aspect-video w-full bg-black">
               <div
-                v-if="currentVideo && !isVideoLoaded"
+                v-if="currentImage && !isImageLoaded"
                 class="absolute inset-0 flex items-center justify-center"
               >
                 <div class="absolute inset-0 animate-pulse bg-secondary"></div>
-                <div class="relative flex h-14 w-14 items-center justify-center rounded-full bg-yellow-400/10 animate-pulse">
-                  <IconVideo class="h-7 w-7 text-yellow-400" />
-                </div>
               </div>
-              <video
-                v-if="currentVideo"
-                :src="currentVideo"
-                class="h-full w-full object-cover transition-opacity duration-500"
-                :class="isVideoLoaded ? 'opacity-100' : 'opacity-0'"
-                autoplay
-                muted
-                loop
-                playsinline
-                @canplay="isVideoLoaded = true"
-              />
-              <div v-else class="flex h-full w-full flex-col items-center justify-center gap-3">
+              <Transition
+                enter-active-class="transition-opacity duration-700"
+                leave-active-class="transition-opacity duration-700"
+                enter-from-class="opacity-0"
+                leave-to-class="opacity-0"
+              >
+                <img
+                  v-if="currentImage"
+                  :key="currentImage"
+                  :src="currentImage"
+                  alt="Base de Clash of Clans"
+                  decoding="async"
+                  fetchpriority="high"
+                  class="absolute inset-0 h-full w-full object-cover"
+                  @load="isImageLoaded = true"
+                />
+              </Transition>
+              <div v-if="!currentImage" class="flex h-full w-full flex-col items-center justify-center gap-3">
                 <div class="flex h-14 w-14 items-center justify-center rounded-full bg-yellow-400/10">
-                  <IconPlayCircle class="h-7 w-7 text-yellow-400" />
+                  <IconImage class="h-7 w-7 text-yellow-400" />
                 </div>
                 <p class="font-body text-xs text-muted-foreground">Próximamente</p>
               </div>
             </div>
-          </div>
-
-          <div v-if="videos.length > 1" class="mt-3 flex items-center justify-center gap-2">
-            <button
-              v-for="(video, index) in videos"
-              :key="video"
-              type="button"
-              class="h-2 cursor-pointer rounded-full transition-all"
-              :class="index === currentIndex ? 'w-6 bg-yellow-400' : 'w-2 bg-border hover:bg-muted-foreground'"
-              :aria-label="`Video ${index + 1}`"
-              @click="currentIndex = index"
-            />
           </div>
         </div>
       </div>
