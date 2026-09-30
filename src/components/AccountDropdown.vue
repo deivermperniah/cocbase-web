@@ -3,7 +3,7 @@ import { ref, watch } from "vue";
 import { user } from "@/lib/auth";
 
 const avatars = Object.values(
-  import.meta.glob<string>("../assets/images/avatars/*.webp", { eager: true, import: "default" })
+  import.meta.glob<string>("../assets/images/avatars/*.webp", { eager: true, import: "default" }),
 );
 
 function pickAvatar() {
@@ -11,9 +11,12 @@ function pickAvatar() {
 }
 
 const avatar = ref(pickAvatar());
-watch(() => user.value?.id, (id, previousId) => {
-  if (id && id !== previousId) avatar.value = pickAvatar();
-});
+watch(
+  () => user.value?.id,
+  (id, previousId) => {
+    if (id && id !== previousId) avatar.value = pickAvatar();
+  },
+);
 </script>
 
 <script setup lang="ts">
@@ -31,11 +34,12 @@ onClickOutside(accountRef, () => (isAccountOpen.value = false));
 </script>
 
 <template>
-  <div ref="accountRef" class="relative flex items-center">
+  <div ref="accountRef" class="relative flex items-center" @keydown.esc="isAccountOpen = false">
     <button
       type="button"
       class="flex h-9 w-9 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-muted-foreground/40 bg-secondary transition-colors hover:border-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       :aria-expanded="isAccountOpen"
+      aria-controls="account-menu"
       aria-label="Cuenta"
       @click="isAccountOpen = !isAccountOpen"
     >
@@ -44,18 +48,21 @@ onClickOutside(accountRef, () => (isAccountOpen.value = false));
 
     <div
       v-if="isAccountOpen"
+      id="account-menu"
       class="absolute right-0 top-[58px] lg:top-[54px] z-50 w-64 rounded-xl border border-border bg-chrome p-4 shadow-2xl shadow-black/50"
     >
       <div class="space-y-3">
         <div>
-          <p class="text-[10px] uppercase tracking-wide text-muted-foreground">Nombre</p>
+          <p class="text-[11px] uppercase tracking-wide text-muted-foreground">Nombre</p>
           <div class="flex items-center gap-2">
-            <p class="truncate text-sm text-white">{{ profile?.full_name || 'Usuario' }}</p>
-            <span v-if="isAdmin" class="shrink-0 rounded-md bg-yellow-400 px-2 py-0.5 text-[10px] text-black">Admin</span>
+            <p class="truncate text-sm text-white">{{ profile?.full_name || "Usuario" }}</p>
+            <span v-if="isAdmin" class="shrink-0 rounded-md bg-yellow-400 px-2 py-0.5 text-[11px] text-black"
+              >Admin</span
+            >
           </div>
         </div>
         <div>
-          <p class="text-[10px] uppercase tracking-wide text-muted-foreground">Correo Electrónico</p>
+          <p class="text-[11px] uppercase tracking-wide text-muted-foreground">Correo Electrónico</p>
           <p class="truncate text-sm text-white">{{ user?.email }}</p>
         </div>
       </div>
@@ -70,7 +77,7 @@ onClickOutside(accountRef, () => (isAccountOpen.value = false));
       >
         <IconSync v-if="isSigningOut" class="h-4 w-4 shrink-0 animate-spin" />
         <IconLogOut v-else class="h-4 w-4 shrink-0" />
-        <span>{{ isSigningOut ? 'Cerrando...' : 'Cerrar sesión' }}</span>
+        <span>{{ isSigningOut ? "Cerrando..." : "Cerrar sesión" }}</span>
       </button>
     </div>
   </div>

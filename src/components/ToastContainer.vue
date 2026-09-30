@@ -1,33 +1,33 @@
 <script setup lang="ts">
-import IconCheck from "~icons/ph/check-circle"
-import IconWarning from "~icons/ph/warning"
-import IconInfo from "~icons/ph/info"
-import IconClose from "~icons/ph/x"
-import { useToast } from "@/lib/toast"
+import IconCheck from "~icons/ph/check-circle";
+import IconWarning from "~icons/ph/warning";
+import IconInfo from "~icons/ph/info";
+import IconClose from "~icons/ph/x";
+import { useToast } from "@/lib/toast";
 
-const { toasts, dismiss } = useToast()
+const { toasts, dismiss } = useToast();
 
 function iconFor(variant: string) {
-  if (variant === "success") return IconCheck
-  if (variant === "error") return IconWarning
-  return IconInfo
+  if (variant === "success") return IconCheck;
+  if (variant === "error") return IconWarning;
+  return IconInfo;
 }
 
 function accentFor(variant: string) {
-  if (variant === "success") return "text-yellow-400"
-  if (variant === "error") return "text-red-500"
-  return "text-sky-400"
+  if (variant === "success") return "text-yellow-400";
+  if (variant === "error") return "text-red-500";
+  return "text-sky-400";
 }
 </script>
 
 <template>
   <Teleport to="body">
-    <div class="fixed top-3 right-4 z-[200] flex w-full max-w-sm flex-col gap-3 px-page">
-      <TransitionGroup
-        name="toast"
-        tag="div"
-        class="flex flex-col gap-3"
-      >
+    <div
+      role="status"
+      aria-live="polite"
+      class="fixed top-3 right-4 z-[200] flex w-full max-w-sm flex-col gap-3 px-page"
+    >
+      <TransitionGroup name="toast" tag="div" class="flex flex-col gap-3">
         <div
           v-for="t in toasts"
           :key="t.id"
@@ -41,6 +41,7 @@ function accentFor(variant: string) {
           </div>
           <button
             type="button"
+            aria-label="Cerrar notificación"
             class="cursor-pointer shrink-0 p-1 rounded-md text-muted-foreground hover:text-white transition-colors"
             @click="dismiss(t.id)"
           >

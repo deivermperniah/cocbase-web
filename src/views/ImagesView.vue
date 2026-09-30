@@ -39,16 +39,12 @@ const deleteModal = ref<{
 });
 
 async function loadUsedUrls() {
-  const { data, error } = await supabase
-    .from("bases")
-    .select("url_foto")
-    .not("url_foto", "is", null)
-    .limit(10000);
+  const { data, error } = await supabase.from("bases").select("url_foto").not("url_foto", "is", null).limit(10000);
   if (error) {
     console.error("Error loading used urls:", error);
     return;
   }
-  usedUrls.value = new Set((data || []).map((r: any) => r.url_foto).filter(Boolean));
+  usedUrls.value = new Set((data || []).map((r) => r.url_foto).filter(Boolean));
 }
 
 async function loadImages(reset = false) {
@@ -64,13 +60,11 @@ async function loadImages(reset = false) {
 
   const offset = storageOffset.value;
 
-  const { data, error } = await supabase.storage
-    .from("bases-fotos")
-    .list("", {
-      limit: pageSize,
-      offset,
-      sortBy: { column: "created_at", order: "desc" },
-    });
+  const { data, error } = await supabase.storage.from("bases-fotos").list("", {
+    limit: pageSize,
+    offset,
+    sortBy: { column: "created_at", order: "desc" },
+  });
 
   if (error) {
     console.error("Error listando storage:", error);
@@ -85,9 +79,7 @@ async function loadImages(reset = false) {
   for (const file of data || []) {
     if (!file.name.match(/\.(jpg|jpeg|png|webp)$/i)) continue;
 
-    const { data: publicUrl } = supabase.storage
-      .from("bases-fotos")
-      .getPublicUrl(file.name);
+    const { data: publicUrl } = supabase.storage.from("bases-fotos").getPublicUrl(file.name);
 
     const size = file.metadata?.size || 0;
 
@@ -141,9 +133,7 @@ async function confirmDelete() {
   isDeleting.value = true;
   try {
     if (deleteModal.value.inUse) {
-      const { data: publicUrl } = supabase.storage
-        .from("bases-fotos")
-        .getPublicUrl(imagePath);
+      const { data: publicUrl } = supabase.storage.from("bases-fotos").getPublicUrl(imagePath);
       const { error: referencesError } = await supabase
         .from("bases")
         .update({ url_foto: null })
@@ -151,9 +141,7 @@ async function confirmDelete() {
       if (referencesError) throw referencesError;
     }
 
-    const { error } = await supabase.storage
-      .from("bases-fotos")
-      .remove([imagePath]);
+    const { error } = await supabase.storage.from("bases-fotos").remove([imagePath]);
     if (error) throw error;
 
     const deletedImage = images.value.find((img) => img.name === imagePath);
@@ -190,17 +178,14 @@ watch(
     } else {
       document.body.style.overflow = "";
     }
-  }
+  },
 );
 </script>
 
 <template>
   <LoadingState v-if="loading" />
 
-  <div
-    v-else
-    class="space-y-page animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out"
-  >
+  <div v-else class="space-y-page animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out">
     <PageHeader title="Imágenes">
       <template #actions>
         <div class="flex items-center gap-2">
@@ -215,10 +200,7 @@ watch(
     </PageHeader>
 
     <div class="space-y-page">
-      <div
-        v-if="images.length > 0"
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-page"
-      >
+      <div v-if="images.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-page">
         <div
           v-for="img in images"
           :key="img.name"
@@ -227,6 +209,7 @@ watch(
           <div class="aspect-video relative overflow-hidden bg-secondary">
             <img
               :src="img.url"
+              :alt="img.name"
               loading="lazy"
               decoding="async"
               width="1280"
@@ -255,8 +238,10 @@ watch(
 
               <div class="flex gap-2">
                 <button
-                  @click="openDeleteModal(img.name, img.inUse)"
+                  type="button"
+                  aria-label="Eliminar imagen"
                   class="cursor-pointer p-2.5 rounded-lg bg-secondary text-muted-foreground hover:bg-red-600 hover:text-white transition-all border border-border"
+                  @click="openDeleteModal(img.name, img.inUse)"
                 >
                   <IconTrash class="w-4 h-4" />
                 </button>
@@ -270,9 +255,9 @@ watch(
 
       <div v-if="hasMore" class="flex justify-center pt-6">
         <button
-          @click="loadImages(false)"
           :disabled="loadingMore"
           class="flex cursor-pointer items-center justify-center gap-2 px-6 h-11 rounded-full bg-card border-2 border-yellow-400 text-yellow-400 text-xs hover:bg-yellow-400/10 transition-all active:scale-95 disabled:opacity-50"
+          @click="loadImages(false)"
         >
           <span v-if="loadingMore" class="animate-pulse">Cargando...</span>
           <span v-else>Mostrar más</span>
@@ -280,12 +265,7 @@ watch(
       </div>
     </div>
 
-    <ModalShell
-      :open="deleteModal.isOpen"
-      title="Eliminar"
-      border-class="border-red-500/20"
-      @close="closeDeleteModal"
-    >
+    <ModalShell :open="deleteModal.isOpen" title="Eliminar" border-class="border-red-500/20" @close="closeDeleteModal">
       <div class="bg-secondary rounded-xl p-page border border-border">
         <p class="text-muted-foreground text-xs mb-1">Imagen seleccionada:</p>
         <p class="text-white truncate text-sm">
@@ -299,15 +279,15 @@ watch(
 
       <div class="flex gap-page pt-2">
         <button
-          @click="closeDeleteModal"
           class="flex-1 cursor-pointer h-[44px] rounded-full bg-secondary border border-border text-muted-foreground text-xs hover:text-white transition-all active:scale-95"
+          @click="closeDeleteModal"
         >
           Cancelar
         </button>
         <button
-          @click="confirmDelete"
           :disabled="isDeleting"
           class="flex-1 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed h-[44px] rounded-full bg-red-600 text-white text-xs hover:bg-red-500 transition-all active:scale-95 shadow-xl shadow-red-600/20"
+          @click="confirmDelete"
         >
           Eliminar
         </button>

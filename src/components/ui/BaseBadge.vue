@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, type Component } from "vue";
 
 const props = withDefaults(
   defineProps<{
     variant?: "accent" | "danger";
-    icon?: any;
+    icon?: Component;
     shadow?: boolean;
   }>(),
-  { variant: "accent", icon: undefined, shadow: false }
+  { variant: "accent", icon: undefined, shadow: false },
 );
 
 const variantClass = computed(() => {

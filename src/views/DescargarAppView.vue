@@ -16,11 +16,7 @@ interface BeforeInstallPromptEvent extends Event {
 
 const apkUrl = import.meta.env.VITE_APP_APK_URL || "/download/cocbase.apk";
 
-const features = [
-  "Explora bases sin conexión",
-  "Guarda tus favoritas en el móvil",
-  "Recibe avisos de nuevas bases",
-];
+const features = ["Explora bases sin conexión", "Guarda tus favoritas en el móvil", "Recibe avisos de nuevas bases"];
 
 const guideSections = [
   {
@@ -35,19 +31,12 @@ const guideSections = [
   {
     icon: IconApple,
     title: "iPhone / iPad (Safari)",
-    steps: [
-      "Toca el botón Compartir",
-      'Elige "Añadir a pantalla de inicio".',
-      'Confirma con "Añadir".',
-    ],
+    steps: ["Toca el botón Compartir", 'Elige "Añadir a pantalla de inicio".', 'Confirma con "Añadir".'],
   },
   {
     icon: IconBrowsers,
     title: "Escritorio (Chrome / Edge)",
-    steps: [
-      "Haz clic en el ícono de instalar de la barra de direcciones",
-      'Confirma con "Instalar".',
-    ],
+    steps: ["Haz clic en el ícono de instalar de la barra de direcciones", 'Confirma con "Instalar".'],
   },
 ];
 
@@ -104,7 +93,7 @@ onBeforeUnmount(() => {
             <IconAndroid class="h-7 w-7 text-yellow-400" />
           </div>
           <div>
-            <h3 class="text-xl text-white">cocbase para Android</h3>
+            <h2 class="text-xl text-white">cocbase para Android</h2>
             <p class="text-xs text-muted-foreground">Lleva tus bases de Clash of Clans a todas partes</p>
           </div>
         </div>
@@ -132,7 +121,7 @@ onBeforeUnmount(() => {
             <IconApple class="h-7 w-7 text-yellow-400" />
           </div>
           <div>
-            <h3 class="text-xl text-white">cocbase para iOS</h3>
+            <h2 class="text-xl text-white">cocbase para iOS</h2>
             <p class="text-xs text-muted-foreground">Próximamente en el App Store</p>
           </div>
         </div>
@@ -160,7 +149,7 @@ onBeforeUnmount(() => {
             <IconBrowsers class="h-7 w-7 text-yellow-400" />
           </div>
           <div>
-            <h3 class="text-xl text-white">cocbase Web</h3>
+            <h2 class="text-xl text-white">cocbase Web</h2>
             <p class="text-xs text-muted-foreground">Instálala como app desde tu navegador</p>
           </div>
         </div>
@@ -209,7 +198,7 @@ onBeforeUnmount(() => {
       <div v-for="section in guideSections" :key="section.title" class="space-y-2">
         <div class="flex items-center gap-2">
           <component :is="section.icon" class="h-5 w-5 text-yellow-400" />
-          <h4 class="text-sm text-white">{{ section.title }}</h4>
+          <h3 class="text-sm text-white">{{ section.title }}</h3>
         </div>
         <ol class="space-y-1">
           <li v-for="(step, index) in section.steps" :key="index" class="flex gap-2 text-xs text-muted-foreground">

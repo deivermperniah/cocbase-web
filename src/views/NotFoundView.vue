@@ -3,9 +3,11 @@ import IconHouse from "~icons/ph/house";
 </script>
 
 <template>
-  <div class="flex min-h-[60vh] flex-col items-center justify-center text-center animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out">
+  <div
+    class="flex min-h-[60vh] flex-col items-center justify-center text-center animate-in fade-in slide-in-from-bottom-2 duration-700 ease-out"
+  >
     <p class="text-[96px] leading-none text-yellow-400">404</p>
-    <h2 class="mt-2 text-2xl text-white">Página no encontrada</h2>
+    <h1 class="mt-2 text-2xl text-white">Página no encontrada</h1>
 
     <router-link
       to="/"

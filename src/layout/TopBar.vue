@@ -2,49 +2,55 @@
 import { computed } from "vue";
 import IconDownload from "~icons/ph/download-simple";
 import AccountDropdown from "@/components/AccountDropdown.vue";
-import logo from "@/assets/images/logo.png";
+import logo from "@/assets/images/logo.webp";
 import { cn } from "@/lib/utils";
 import { session } from "@/lib/auth";
 import { useNavigation, type NavItem } from "@/lib/navigation";
 
 const { navItems, handleNavClick, prefetchRoute } = useNavigation();
 
-const centerItems = computed<NavItem[]>(() =>
-  navItems.value.filter((item) => item.path !== "/descargar")
-);
+const centerItems = computed<NavItem[]>(() => navItems.value.filter((item) => item.path !== "/descargar"));
 </script>
 
 <template>
-  <header class="fixed top-3 left-1/2 z-40 hidden h-14 w-[min(92vw,54rem)] -translate-x-1/2 items-center gap-5 rounded-full border border-border bg-chrome/95 px-5 shadow-xl shadow-black/40 backdrop-blur lg:flex">
+  <header
+    class="fixed top-3 left-1/2 z-40 hidden h-14 w-[min(92vw,54rem)] -translate-x-1/2 items-center gap-5 rounded-full border border-border bg-chrome/95 px-5 shadow-xl shadow-black/40 backdrop-blur lg:flex"
+  >
     <router-link to="/" aria-label="cocbase" class="flex shrink-0 items-center gap-2">
-      <img :src="logo" alt="logo" width="36" height="36" class="h-9 w-9 object-contain" />
+      <img :src="logo" alt="" width="36" height="36" class="h-9 w-9 object-contain" />
       <span class="text-lg text-white">cocbase</span>
     </router-link>
 
-    <nav class="flex flex-1 items-center justify-center gap-1">
+    <nav aria-label="Principal" class="flex flex-1 items-center justify-center gap-1">
       <router-link
         v-for="item in centerItems"
         :key="item.name"
+        v-slot="{ navigate, href, isActive, isExactActive }"
         :to="item.path"
         custom
-        v-slot="{ navigate, href, isActive, isExactActive }"
       >
         <a
           :href="href"
+          :aria-current="(item.path === '/' ? isExactActive : isActive) ? 'page' : undefined"
+          :class="
+            cn(
+              'relative flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-2 text-sm transition-colors',
+              (item.path === '/' ? isExactActive : isActive)
+                ? 'text-yellow-400'
+                : 'text-muted-foreground hover:text-yellow-400',
+            )
+          "
           @click="(e) => handleNavClick(e, item, navigate)"
           @mouseenter="prefetchRoute(item.path)"
           @focus="prefetchRoute(item.path)"
-          :class="cn(
-            'relative flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-2 text-sm transition-colors',
-            (item.path === '/' ? isExactActive : isActive) ? 'text-yellow-400' : 'text-muted-foreground hover:text-yellow-400'
-          )"
         >
           {{ item.name }}
           <span
             v-if="item.badge"
-            class="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 text-[10px] text-white"
+            :aria-label="`${item.badge} pendientes`"
+            class="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 text-[11px] text-white"
           >
-            {{ item.badge > 99 ? '99+' : item.badge }}
+            {{ item.badge > 99 ? "99+" : item.badge }}
           </span>
         </a>
       </router-link>

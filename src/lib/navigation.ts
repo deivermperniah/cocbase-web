@@ -1,4 +1,4 @@
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, type Component } from "vue";
 import { useRouter } from "vue-router";
 import IconHouse from "~icons/ph/house";
 import IconLayers from "~icons/ph/stack";
@@ -11,7 +11,7 @@ import { pendingCount, refreshPendingCount } from "@/lib/admin";
 
 export interface NavItem {
   name: string;
-  icon: any;
+  icon: Component;
   path: string;
   requiresAuth?: boolean;
   badge?: number;
@@ -30,13 +30,9 @@ const favoritesItem: NavItem = {
   requiresAuth: true,
 };
 
-const userItems: NavItem[] = [
-  { name: "Contribuir", icon: IconUpload, path: "/contribuir", requiresAuth: true },
-];
+const userItems: NavItem[] = [{ name: "Contribuir", icon: IconUpload, path: "/contribuir", requiresAuth: true }];
 
-const adminItems: NavItem[] = [
-  { name: "Panel", icon: IconDashboard, path: "/panel" },
-];
+const adminItems: NavItem[] = [{ name: "Panel", icon: IconDashboard, path: "/panel" }];
 
 watch(
   isAdmin,
@@ -47,7 +43,7 @@ watch(
     }
     refreshPendingCount().catch((error) => console.error("Error fetching pending count:", error));
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 export function useNavigation() {
@@ -56,11 +52,7 @@ export function useNavigation() {
 
   const navItems = computed<NavItem[]>(() => {
     const items: NavItem[] = [...publicItems, favoritesItem];
-    items.push(
-      ...(isAdmin.value
-        ? adminItems.map((item) => ({ ...item, badge: pendingCount.value }))
-        : userItems)
-    );
+    items.push(...(isAdmin.value ? adminItems.map((item) => ({ ...item, badge: pendingCount.value })) : userItems));
     return items;
   });
 

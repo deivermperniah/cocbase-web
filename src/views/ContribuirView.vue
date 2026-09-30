@@ -72,12 +72,7 @@ async function confirmDelete() {
   if (!base || isDeleting.value) return;
 
   isDeleting.value = true;
-  const { data, error } = await supabase
-    .from("bases")
-    .delete()
-    .eq("id", base.id)
-    .eq("status", "rejected")
-    .select("id");
+  const { data, error } = await supabase.from("bases").delete().eq("id", base.id).eq("status", "rejected").select("id");
   isDeleting.value = false;
 
   if (error || !data?.length) {
@@ -104,18 +99,19 @@ onMounted(async () => {
     <div class="flex items-start gap-3 rounded-xl bg-secondary border border-yellow-400/20 p-page">
       <IconInfo class="mt-0.5 h-5 w-5 shrink-0 text-yellow-400" />
       <p class="font-body text-xs text-muted-foreground leading-relaxed">
-        Revisa que la base no esté repetida y que la captura sea clara. Las bases aprobadas aparecen en el explorador para todos.
+        Revisa que la base no esté repetida y que la captura sea clara. Las bases aprobadas aparecen en el explorador
+        para todos.
       </p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-page">
       <div class="bg-card rounded-xl border border-border p-page">
-        <h3 class="text-base text-white mb-page">Nueva base</h3>
+        <h2 class="text-base text-white mb-page">Nueva base</h2>
         <BaseForm @success="fetchMyBases" />
       </div>
 
       <div class="flex flex-col bg-card rounded-xl border border-border p-page">
-        <h3 class="text-base text-white mb-page">Mis envíos</h3>
+        <h2 class="text-base text-white mb-page">Mis envíos</h2>
 
         <div v-if="loadingBases" class="flex flex-1 items-center justify-center py-8">
           <LoadingSpinner size="sm" />
@@ -137,7 +133,7 @@ onMounted(async () => {
             <div v-if="basesByStatus(group.status).length > 0" class="space-y-2.5">
               <div class="flex items-center gap-1.5" :class="group.colorClass">
                 <component :is="group.icon" class="h-4 w-4" />
-                <h4 class="text-xs uppercase tracking-wide">{{ group.title }}</h4>
+                <h3 class="text-xs uppercase tracking-wide">{{ group.title }}</h3>
               </div>
 
               <div
@@ -159,7 +155,9 @@ onMounted(async () => {
                   class="flex items-center gap-3 border-t border-red-500/30 bg-red-500/10 px-2.5 py-2"
                 >
                   <p class="min-w-0 flex-1 whitespace-pre-line break-words text-xs leading-4 text-red-300">
-                    <template v-if="base.review_note"><span class="text-red-400">Motivo:</span> {{ base.review_note }}</template>
+                    <template v-if="base.review_note"
+                      ><span class="text-red-400">Motivo:</span> {{ base.review_note }}</template
+                    >
                     <template v-else>Rechazada sin motivo</template>
                   </p>
                   <button
@@ -195,10 +193,17 @@ onMounted(async () => {
       </div>
 
       <div class="flex gap-page pt-2">
-        <button @click="deleteTarget = null" class="flex-1 cursor-pointer h-[44px] rounded-full bg-secondary border border-border text-muted-foreground text-xs hover:text-white transition-all active:scale-95">
+        <button
+          class="flex-1 cursor-pointer h-[44px] rounded-full bg-secondary border border-border text-muted-foreground text-xs hover:text-white transition-all active:scale-95"
+          @click="deleteTarget = null"
+        >
           Cancelar
         </button>
-        <button @click="confirmDelete" :disabled="isDeleting" class="flex-1 cursor-pointer h-[44px] rounded-full bg-red-600 text-white text-xs hover:bg-red-500 transition-all active:scale-95 shadow-xl shadow-red-600/20 disabled:opacity-50 disabled:cursor-not-allowed">
+        <button
+          :disabled="isDeleting"
+          class="flex-1 cursor-pointer h-[44px] rounded-full bg-red-600 text-white text-xs hover:bg-red-500 transition-all active:scale-95 shadow-xl shadow-red-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
+          @click="confirmDelete"
+        >
           Eliminar
         </button>
       </div>

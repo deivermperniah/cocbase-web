@@ -1,17 +1,15 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
-import { BASE_LEVELS } from "@/lib/constants";
+import { BASE_LEVELS, SOCIAL_LINKS } from "@/lib/constants";
 import { session, isAdmin } from "@/lib/auth";
 import IconShield from "~icons/ph/shield-check";
 import IconFunnel from "~icons/ph/funnel";
 import IconHeart from "~icons/ph/heart";
 import IconUpload from "~icons/ph/upload-simple";
 import IconLayers from "~icons/ph/stack";
-import IconInstagram from "~icons/ph/instagram-logo";
-import IconYoutube from "~icons/ph/youtube-logo";
-import IconX from "~icons/ph/x-logo";
-import IconReddit from "~icons/ph/reddit-logo";
 import IconImage from "~icons/ph/image";
+import IconPause from "~icons/ph/pause-fill";
+import IconPlay from "~icons/ph/play-fill";
 
 const townhallModules = import.meta.glob("../assets/images/townhalls/th*.webp", {
   eager: true,
@@ -49,13 +47,6 @@ const advantages = [
   },
 ];
 
-const socials = [
-  { name: "Instagram", icon: IconInstagram, href: "https://instagram.com" },
-  { name: "YouTube", icon: IconYoutube, href: "https://youtube.com" },
-  { name: "X", icon: IconX, href: "https://x.com" },
-  { name: "Reddit", icon: IconReddit, href: "https://reddit.com" },
-];
-
 const baseModules = import.meta.glob("../assets/images/bases/*.webp", {
   eager: true,
 }) as Record<string, { default: string }>;
@@ -66,8 +57,10 @@ function pickRandom(list: string[]) {
   return list[Math.floor(Math.random() * list.length)]!;
 }
 
-const currentImage = ref<string | null>(baseImages.length ? pickRandom(baseImages) : null);
+const currentImage = ref<string | null>(baseImages[0] ?? null);
 const isImageLoaded = ref(false);
+const canRotate = baseImages.length > 1;
+const isPaused = ref(false);
 let rotateTimer: ReturnType<typeof setInterval> | undefined;
 
 function preload(url: string) {
@@ -86,26 +79,50 @@ async function showRandomImage() {
   currentImage.value = next;
 }
 
+function startRotation() {
+  if (!canRotate || rotateTimer || isPaused.value) return;
+  rotateTimer = setInterval(showRandomImage, 5000);
+}
+
+function stopRotation() {
+  clearInterval(rotateTimer);
+  rotateTimer = undefined;
+}
+
+function togglePause() {
+  isPaused.value = !isPaused.value;
+  if (isPaused.value) stopRotation();
+  else startRotation();
+}
+
+function onHeroPointer(event: PointerEvent) {
+  if (event.pointerType !== "mouse") return;
+  if (event.type === "pointerenter") stopRotation();
+  else startRotation();
+}
+
 onMounted(() => {
-  if (baseImages.length > 1) rotateTimer = setInterval(showRandomImage, 3000);
+  isPaused.value = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  startRotation();
 });
 
-onBeforeUnmount(() => clearInterval(rotateTimer));
+onBeforeUnmount(stopRotation);
 </script>
 
 <template>
   <div class="space-y-16 pb-6">
     <!-- Hero -->
     <section class="relative pt-10 sm:pt-16 pb-6">
-      <div class="pointer-events-none absolute left-1/2 top-14 -z-10 h-56 w-[36rem] max-w-full -translate-x-1/2 rounded-full bg-yellow-400/10 blur-3xl" />
+      <div
+        class="pointer-events-none absolute left-1/2 top-14 -z-10 h-56 w-[36rem] max-w-full -translate-x-1/2 rounded-full bg-yellow-400/10 blur-3xl"
+      />
 
       <div class="grid grid-cols-1 lg:grid-cols-2 items-center gap-10 lg:gap-14">
         <div class="text-center lg:text-left">
-          <h1 class="text-4xl sm:text-5xl lg:text-6xl leading-none text-white">
-            Tus bases de Clash of Clans
-          </h1>
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl leading-none text-white">Tus bases de Clash of Clans</h1>
           <p class="mt-4 max-w-xl mx-auto lg:mx-0 font-body text-sm sm:text-base text-muted-foreground leading-relaxed">
-            Encuentra, guarda y comparte diseños de base organizados por nivel de ayuntamiento. Todo revisado por la comunidad.
+            Encuentra, guarda y comparte diseños de base organizados por nivel de ayuntamiento. Todo revisado por la
+            comunidad.
           </p>
 
           <div class="mt-8 flex flex-row items-center justify-center lg:justify-start gap-3">
@@ -120,20 +137,21 @@ onBeforeUnmount(() => clearInterval(rotateTimer));
               :to="isAdmin ? '/panel' : session ? '/contribuir' : '/login'"
               class="flex cursor-pointer items-center justify-center gap-2 px-6 h-12 rounded-full border-2 border-yellow-400 text-yellow-400 text-sm hover:bg-yellow-400/10 transition-all active:scale-95"
             >
-              {{ isAdmin ? 'Panel' : 'Contribuir' }}
+              {{ isAdmin ? "Panel" : "Contribuir" }}
             </router-link>
           </div>
         </div>
 
         <!-- Bases -->
-        <div class="relative">
-          <div class="pointer-events-none absolute -inset-3 -z-10 rounded-3xl bg-gradient-to-br from-yellow-400/25 via-yellow-400/5 to-transparent blur-2xl" />
-          <div class="overflow-hidden rounded-2xl border border-yellow-400/30 bg-chrome shadow-2xl shadow-yellow-400/10">
+        <div class="relative" @pointerenter="onHeroPointer" @pointerleave="onHeroPointer">
+          <div
+            class="pointer-events-none absolute -inset-3 -z-10 rounded-3xl bg-gradient-to-br from-yellow-400/25 via-yellow-400/5 to-transparent blur-2xl"
+          />
+          <div
+            class="overflow-hidden rounded-2xl border border-yellow-400/30 bg-chrome shadow-2xl shadow-yellow-400/10"
+          >
             <div class="relative aspect-video w-full bg-black">
-              <div
-                v-if="currentImage && !isImageLoaded"
-                class="absolute inset-0 flex items-center justify-center"
-              >
+              <div v-if="currentImage && !isImageLoaded" class="absolute inset-0 flex items-center justify-center">
                 <div class="absolute inset-0 animate-pulse bg-secondary"></div>
               </div>
               <Transition
@@ -146,7 +164,9 @@ onBeforeUnmount(() => clearInterval(rotateTimer));
                   v-if="currentImage"
                   :key="currentImage"
                   :src="currentImage"
-                  alt="Base de Clash of Clans"
+                  alt="Ejemplo de base de Clash of Clans"
+                  width="788"
+                  height="443"
                   decoding="async"
                   fetchpriority="high"
                   class="absolute inset-0 h-full w-full object-cover"
@@ -159,6 +179,16 @@ onBeforeUnmount(() => clearInterval(rotateTimer));
                 </div>
                 <p class="font-body text-xs text-muted-foreground">Próximamente</p>
               </div>
+              <button
+                v-if="canRotate"
+                type="button"
+                class="absolute bottom-3 right-3 z-10 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white backdrop-blur transition-colors hover:bg-yellow-400 hover:text-black"
+                :aria-label="isPaused ? 'Reanudar imágenes' : 'Pausar imágenes'"
+                :aria-pressed="isPaused"
+                @click="togglePause"
+              >
+                <component :is="isPaused ? IconPlay : IconPause" class="h-4 w-4" />
+              </button>
             </div>
           </div>
         </div>
@@ -175,11 +205,15 @@ onBeforeUnmount(() => clearInterval(rotateTimer));
       </div>
 
       <div class="group relative overflow-hidden">
-        <div class="flex w-max animate-marquee group-hover:[animation-play-state:paused]">
+        <div
+          class="flex w-max animate-marquee group-hover:[animation-play-state:paused] group-focus-within:[animation-play-state:paused]"
+        >
           <router-link
             v-for="(th, index) in townhallsLoop"
             :key="index"
-            :to="`/bases?level=${th.level}`"
+            :to="`/bases/th-${th.level}`"
+            :aria-hidden="index >= townhalls.length || undefined"
+            :tabindex="index >= townhalls.length ? -1 : undefined"
             class="group/card mr-3 block h-56 w-56 shrink-0 overflow-hidden rounded-xl border border-border bg-card transition-all duration-300 ease-out hover:border-yellow-400/60 hover:shadow-xl hover:shadow-yellow-400/10"
           >
             <img
@@ -218,12 +252,12 @@ onBeforeUnmount(() => clearInterval(rotateTimer));
       <p class="font-body text-sm text-muted-foreground mb-6">Nuevas bases y novedades en nuestras redes</p>
       <div class="flex items-center justify-center gap-3">
         <a
-          v-for="social in socials"
+          v-for="social in SOCIAL_LINKS"
           :key="social.name"
           :href="social.href"
           target="_blank"
           rel="noopener noreferrer"
-          :aria-label="social.name"
+          :aria-label="`${social.name} (se abre en una pestaña nueva)`"
           class="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-card border border-border text-muted-foreground hover:bg-yellow-400 hover:text-black hover:border-yellow-400 transition-all"
         >
           <component :is="social.icon" class="h-5 w-5" />
