@@ -10,7 +10,6 @@ import IconTrash from "~icons/ph/trash";
 
 export interface ActionsBase {
   id: string;
-  code?: string;
   level_th: number;
   type: string;
   url_foto?: string | null;

@@ -4,7 +4,6 @@ import { supabase } from '@/lib/supabase'
 
 export const session = ref<Session | null>(null)
 export const user = ref<User | null>(null)
-export const isAuthInitialized = ref(false)
 
 export interface Profile {
   id: string
@@ -16,7 +15,6 @@ export const profile = ref<Profile | null>(null)
 
 export const isAdmin = computed(() => profile.value?.role === 'admin')
 
-let authSubscription: { unsubscribe: () => void } | null = null
 let initializationPromise: Promise<void> | null = null
 
 async function loadProfile(userId: string) {
@@ -47,25 +45,19 @@ export function initializeAuth() {
       await loadProfile(data.session.user.id)
     }
 
-    if (!authSubscription) {
-      const { data: subscription } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-        session.value = nextSession
-        user.value = nextSession?.user ?? null
+    supabase.auth.onAuthStateChange((_event, nextSession) => {
+      session.value = nextSession
+      user.value = nextSession?.user ?? null
 
-        if (nextSession?.user) {
-          const userId = nextSession.user.id
-          setTimeout(() => loadProfile(userId), 0)
-        } else {
-          profile.value = null
-        }
-      })
-      authSubscription = subscription.subscription
-    }
-
-    isAuthInitialized.value = true
+      if (nextSession?.user) {
+        const userId = nextSession.user.id
+        setTimeout(() => loadProfile(userId), 0)
+      } else {
+        profile.value = null
+      }
+    })
   }).catch((error) => {
     initializationPromise = null
-    isAuthInitialized.value = true
     throw error
   })
 

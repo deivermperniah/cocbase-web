@@ -3,7 +3,7 @@ import { computed } from "vue";
 
 const props = withDefaults(
   defineProps<{
-    variant?: "accent" | "danger" | "muted" | "outline";
+    variant?: "accent" | "danger";
     icon?: any;
     shadow?: boolean;
   }>(),
@@ -14,10 +14,6 @@ const variantClass = computed(() => {
   switch (props.variant) {
     case "danger":
       return "bg-red-500/90 text-white";
-    case "muted":
-      return "bg-secondary text-muted-foreground border border-border";
-    case "outline":
-      return "border border-yellow-400/20 bg-card text-yellow-400";
     default:
       return "bg-yellow-400 text-black";
   }

@@ -34,7 +34,6 @@ const route = useRoute();
 const router = useRouter();
 
 const allBases = ref<any[]>([]);
-const totalCount = ref(0);
 const loading = ref(true);
 const loadingMore = ref(false);
 const hasMore = ref(false);
@@ -58,9 +57,6 @@ const imageViewer = ref({
   isOpen: false,
   url: "",
   title: "",
-  level: "",
-  type: "",
-  date: "",
   scale: 1,
   x: 0,
   y: 0,
@@ -96,14 +92,11 @@ function applyFilters() {
 function clearFilters() {
   selectedLevel.value = "all";
   selectedType.value = "all";
-  tempLevel.value = "all";
-  tempType.value = "all";
 }
 
 async function fetchBases(reset = false) {
   if (reset) {
     allBases.value = [];
-    totalCount.value = 0;
     hasMore.value = false;
     loading.value = true;
   } else {
@@ -137,16 +130,11 @@ async function fetchBases(reset = false) {
     } else {
       allBases.value = allBases.value.concat(data || []);
     }
-    totalCount.value = count ?? allBases.value.length;
     hasMore.value = allBases.value.length < (count ?? allBases.value.length);
   }
 
   loading.value = false;
   loadingMore.value = false;
-}
-
-function loadMore() {
-  fetchBases(false);
 }
 
 async function fetchFavorites() {
@@ -230,9 +218,6 @@ function openImageViewer(base: any) {
     isOpen: true,
     url: base.url_foto,
     title: `Nivel ${base.level_th} - ${base.type}`,
-    level: String(base.level_th),
-    type: base.type,
-    date: new Date(base.created_at).toLocaleDateString("es-ES"),
     scale: 1,
     x: 0,
     y: 0,
@@ -244,9 +229,6 @@ function closeImageViewer() {
     isOpen: false,
     url: "",
     title: "",
-    level: "",
-    type: "",
-    date: "",
     scale: 1,
     x: 0,
     y: 0,
@@ -366,7 +348,6 @@ async function confirmDelete() {
   try {
     await deleteBase({ id: baseId, url_foto: deleteModal.value.imageUrl });
     allBases.value = allBases.value.filter((b) => b.id !== baseId);
-    totalCount.value = Math.max(0, totalCount.value - 1);
     toast.success("Base eliminada");
     closeDeleteModal();
   } catch (error) {
@@ -523,7 +504,7 @@ watch([isFilterModalOpen, () => deleteModal.value.isOpen, () => imageViewer.valu
 
       <div v-if="hasMore" class="flex justify-center pt-6">
         <button
-          @click="loadMore"
+          @click="fetchBases(false)"
           :disabled="loadingMore"
           class="flex cursor-pointer items-center justify-center gap-2 px-6 h-11 rounded-full bg-card border-2 border-yellow-400 text-yellow-400 text-xs hover:bg-yellow-400/10 transition-all active:scale-95 disabled:opacity-50"
         >
@@ -546,7 +527,7 @@ watch([isFilterModalOpen, () => deleteModal.value.isOpen, () => imageViewer.valu
             <SelectTrigger class="h-[44px] rounded-lg bg-secondary border border-border text-white">
               <SelectValue placeholder="Seleccionar" />
             </SelectTrigger>
-            <SelectContent side="bottom" :side-offset="4" :avoid-collisions="false" class="z-[9999] bg-card border border-border text-white mt-1" data-select-content>
+            <SelectContent side="bottom" :side-offset="4" :avoid-collisions="false" class="z-[9999] bg-card border border-border text-white mt-1">
               <SelectItem value="all">Todos</SelectItem>
               <SelectItem v-for="n in BASE_LEVELS" :key="n" :value="String(n)">
                 Nivel {{ n }}
@@ -561,7 +542,7 @@ watch([isFilterModalOpen, () => deleteModal.value.isOpen, () => imageViewer.valu
             <SelectTrigger class="h-[44px] rounded-lg bg-secondary border border-border text-white">
               <SelectValue placeholder="Seleccionar" />
             </SelectTrigger>
-            <SelectContent side="bottom" :side-offset="4" :avoid-collisions="false" class="z-[9999] bg-card border border-border text-white mt-1" data-select-content>
+            <SelectContent side="bottom" :side-offset="4" :avoid-collisions="false" class="z-[9999] bg-card border border-border text-white mt-1">
               <SelectItem value="all">Todos</SelectItem>
               <SelectItem v-for="t in BASE_TYPES" :key="t" :value="t">{{ t }}</SelectItem>
             </SelectContent>

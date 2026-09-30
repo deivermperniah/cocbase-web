@@ -18,7 +18,6 @@ import IconBusiness from "~icons/ph/buildings";
 
 interface FavBase {
   id: string;
-  code: string;
   level_th: number;
   type: string;
   url_foto: string;
@@ -38,7 +37,7 @@ async function fetchFavorites() {
 
   const { data, error } = await supabase
     .from("favorites")
-    .select("base_id, bases(id, code, level_th, type, url_foto, link, created_at, profiles!bases_author_id_fkey(full_name))")
+    .select("bases(id, level_th, type, url_foto, link, created_at, profiles!bases_author_id_fkey(full_name))")
     .eq("user_id", user.value.id)
     .order("created_at", { ascending: false });
 
@@ -89,7 +88,6 @@ async function confirmDelete() {
 }
 
 onMounted(async () => {
-  loading.value = true;
   await fetchFavorites();
   loading.value = false;
 });

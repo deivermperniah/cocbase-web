@@ -19,7 +19,6 @@ import { formatRelativeDate, getBaseTypeIcon } from "@/lib/base";
 
 interface MyBase {
   id: string;
-  code: string;
   level_th: number;
   type: string;
   status: BaseStatus;
@@ -49,7 +48,7 @@ async function fetchMyBases() {
 
   const { data, error } = await supabase
     .from("bases")
-    .select("id, code, level_th, type, status, review_note, created_at")
+    .select("id, level_th, type, status, review_note, created_at")
     .eq("author_id", user.value.id)
     .order("created_at", { ascending: false });
 
@@ -92,11 +91,6 @@ async function confirmDelete() {
   toast.success("Envío eliminado");
 }
 
-function handleSuccess() {
-  toast.info("Gracias por contribuir", "Un administrador revisará tu base pronto");
-  fetchMyBases();
-}
-
 onMounted(async () => {
   await fetchMyBases();
   loadingBases.value = false;
@@ -117,7 +111,7 @@ onMounted(async () => {
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-page">
       <div class="bg-card rounded-xl border border-border p-page">
         <h3 class="text-base text-white mb-page">Nueva base</h3>
-        <BaseForm @success="handleSuccess" />
+        <BaseForm @success="fetchMyBases" />
       </div>
 
       <div class="flex flex-col bg-card rounded-xl border border-border p-page">

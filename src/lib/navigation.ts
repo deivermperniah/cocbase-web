@@ -14,7 +14,6 @@ export interface NavItem {
   icon: any;
   path: string;
   requiresAuth?: boolean;
-  adminOnly?: boolean;
   badge?: number;
 }
 
@@ -36,7 +35,7 @@ const userItems: NavItem[] = [
 ];
 
 const adminItems: NavItem[] = [
-  { name: "Panel", icon: IconDashboard, path: "/panel", adminOnly: true },
+  { name: "Panel", icon: IconDashboard, path: "/panel" },
 ];
 
 watch(
@@ -59,9 +58,7 @@ export function useNavigation() {
     const items: NavItem[] = [...publicItems, favoritesItem];
     items.push(
       ...(isAdmin.value
-        ? adminItems.map((item) =>
-            item.path === "/panel" ? { ...item, badge: pendingCount.value } : item
-          )
+        ? adminItems.map((item) => ({ ...item, badge: pendingCount.value }))
         : userItems)
     );
     return items;
@@ -101,5 +98,5 @@ export function useNavigation() {
     }
   }
 
-  return { navItems, isLocked, handleNavClick, handleSignOut, isSigningOut, prefetchRoute };
+  return { navItems, handleNavClick, handleSignOut, isSigningOut, prefetchRoute };
 }

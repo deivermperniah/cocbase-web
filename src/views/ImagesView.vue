@@ -13,7 +13,6 @@ import ModalShell from "@/components/ui/ModalShell.vue";
 
 interface Img {
   name: string;
-  path: string;
   url: string;
   size?: number;
   inUse: boolean;
@@ -31,17 +30,13 @@ const isDeleting = ref(false);
 
 const deleteModal = ref<{
   isOpen: boolean;
-  imagePath: string | null;
   imageName: string | null;
   inUse: boolean;
 }>({
   isOpen: false,
-  imagePath: null,
   imageName: null,
   inUse: false,
 });
-
-const FOLDER = "";
 
 async function loadUsedUrls() {
   const { data, error } = await supabase
@@ -71,7 +66,7 @@ async function loadImages(reset = false) {
 
   const { data, error } = await supabase.storage
     .from("bases-fotos")
-    .list(FOLDER, {
+    .list("", {
       limit: pageSize,
       offset,
       sortBy: { column: "created_at", order: "desc" },
@@ -90,16 +85,14 @@ async function loadImages(reset = false) {
   for (const file of data || []) {
     if (!file.name.match(/\.(jpg|jpeg|png|webp)$/i)) continue;
 
-    const fullPath = file.name;
     const { data: publicUrl } = supabase.storage
       .from("bases-fotos")
-      .getPublicUrl(fullPath);
+      .getPublicUrl(file.name);
 
     const size = file.metadata?.size || 0;
 
     batch.push({
       name: file.name,
-      path: fullPath,
       url: publicUrl.publicUrl,
       size,
       inUse: usedUrls.value.has(publicUrl.publicUrl),
@@ -120,20 +113,14 @@ async function loadImages(reset = false) {
   loadingMore.value = false;
 }
 
-function loadMore() {
-  loadImages(false);
-}
-
 function formatBytes(bytes: number): string {
-  if (bytes === 0) return "0.00";
   const mb = bytes / (1024 * 1024);
   return mb.toFixed(2);
 }
 
-function openDeleteModal(imagePath: string, imageName: string, inUse = false) {
+function openDeleteModal(imageName: string, inUse = false) {
   deleteModal.value = {
     isOpen: true,
-    imagePath,
     imageName,
     inUse,
   };
@@ -142,14 +129,13 @@ function openDeleteModal(imagePath: string, imageName: string, inUse = false) {
 function closeDeleteModal() {
   deleteModal.value = {
     isOpen: false,
-    imagePath: null,
     imageName: null,
     inUse: false,
   };
 }
 
 async function confirmDelete() {
-  const imagePath = deleteModal.value.imagePath;
+  const imagePath = deleteModal.value.imageName;
   if (!imagePath || isDeleting.value) return;
 
   isDeleting.value = true;
@@ -170,12 +156,12 @@ async function confirmDelete() {
       .remove([imagePath]);
     if (error) throw error;
 
-    const deletedImage = images.value.find((img) => img.path === imagePath);
+    const deletedImage = images.value.find((img) => img.name === imagePath);
     if (deletedImage?.size) {
       totalSize.value -= deletedImage.size;
     }
 
-    images.value = images.value.filter((img) => img.path !== imagePath);
+    images.value = images.value.filter((img) => img.name !== imagePath);
     storageOffset.value = Math.max(0, storageOffset.value - 1);
     toast.success("Imagen eliminada");
     closeDeleteModal();
@@ -235,7 +221,7 @@ watch(
       >
         <div
           v-for="img in images"
-          :key="img.path"
+          :key="img.name"
           class="group relative overflow-hidden bg-card border border-border shadow-2xl transition-all rounded-xl"
         >
           <div class="aspect-video relative overflow-hidden bg-secondary">
@@ -269,7 +255,7 @@ watch(
 
               <div class="flex gap-2">
                 <button
-                  @click="openDeleteModal(img.path, img.name, img.inUse)"
+                  @click="openDeleteModal(img.name, img.inUse)"
                   class="cursor-pointer p-2.5 rounded-lg bg-secondary text-muted-foreground hover:bg-red-600 hover:text-white transition-all border border-border"
                 >
                   <IconTrash class="w-4 h-4" />
@@ -284,7 +270,7 @@ watch(
 
       <div v-if="hasMore" class="flex justify-center pt-6">
         <button
-          @click="loadMore"
+          @click="loadImages(false)"
           :disabled="loadingMore"
           class="flex cursor-pointer items-center justify-center gap-2 px-6 h-11 rounded-full bg-card border-2 border-yellow-400 text-yellow-400 text-xs hover:bg-yellow-400/10 transition-all active:scale-95 disabled:opacity-50"
         >

@@ -6,7 +6,7 @@ const BUCKET = "bases-fotos";
 const STORAGE_MARKER = `/storage/v1/object/public/${BUCKET}/`;
 
 export const REVIEW_COLUMNS =
-  "id, code, level_th, type, url_foto, link, created_at, profiles!bases_author_id_fkey(full_name)";
+  "id, level_th, type, url_foto, link, created_at, profiles!bases_author_id_fkey(full_name)";
 
 export const pendingCount = ref(0);
 

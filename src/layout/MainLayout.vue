@@ -47,8 +47,6 @@ watch(
       :class="isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'"
     >
       <Sidebar
-        :showLabels="true"
-        :showLogo="true"
         className="w-full border-r-0"
         @link-click="isMobileMenuOpen = false"
       />

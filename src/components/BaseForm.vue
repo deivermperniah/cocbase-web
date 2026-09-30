@@ -49,7 +49,7 @@ function validateImage(): string | null {
         return 'La imagen es requerida'
     }
 
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
     if (!allowedTypes.includes(baseImage.value.type)) {
         return 'Solo se permiten imágenes JPG, PNG o WebP'
     }
@@ -316,12 +316,12 @@ async function handleSubmit() {
     <div class="space-y-page">
         <div class="grid grid-cols-2 gap-page">
             <div class="flex flex-col">
-                <label for="level" class="text-xs text-muted-foreground mb-2">Nivel *</label>
+                <label class="text-xs text-muted-foreground mb-2">Nivel *</label>
                 <Select v-model="baseLevel">
                     <SelectTrigger class="h-[44px] rounded-lg bg-secondary border border-border text-white">
                         <SelectValue placeholder="Selecciona" />
                     </SelectTrigger>
-                    <SelectContent side="bottom" :side-offset="4" :avoid-collisions="false" class="z-[9999] bg-card border border-border text-white mt-1" data-select-content>
+                    <SelectContent side="bottom" :side-offset="4" :avoid-collisions="false" class="z-[9999] bg-card border border-border text-white mt-1">
                         <SelectItem v-for="n in BASE_LEVELS" :key="n" :value="String(n)">
                             Nivel {{ n }}
                         </SelectItem>
@@ -330,12 +330,12 @@ async function handleSubmit() {
             </div>
 
             <div class="flex flex-col">
-                <label for="type" class="text-xs text-muted-foreground mb-2">Categoría *</label>
+                <label class="text-xs text-muted-foreground mb-2">Categoría *</label>
                 <Select v-model="baseType">
                     <SelectTrigger class="h-[44px] rounded-lg bg-secondary border border-border text-white">
                         <SelectValue placeholder="Selecciona" />
                     </SelectTrigger>
-                    <SelectContent side="bottom" :side-offset="4" :avoid-collisions="false" class="z-[9999] bg-card border border-border text-white mt-1" data-select-content>
+                    <SelectContent side="bottom" :side-offset="4" :avoid-collisions="false" class="z-[9999] bg-card border border-border text-white mt-1">
                         <SelectItem v-for="t in BASE_TYPES" :key="t" :value="t">{{ t }}</SelectItem>
                     </SelectContent>
                 </Select>

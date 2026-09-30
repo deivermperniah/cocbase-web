@@ -19,7 +19,6 @@ import IconImage from "~icons/ph/image";
 
 interface PendingBase {
   id: string;
-  code: string;
   level_th: number;
   type: string;
   url_foto: string | null;

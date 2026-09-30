@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, onBeforeUnmount } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 import IconDownload from "~icons/ph/download-simple";
 import IconAndroid from "~icons/ph/android-logo";
 import IconApple from "~icons/ph/apple-logo";
@@ -14,7 +14,7 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
-const apkUrl = computed(() => import.meta.env.VITE_APP_APK_URL || "/download/cocbase.apk");
+const apkUrl = import.meta.env.VITE_APP_APK_URL || "/download/cocbase.apk";
 
 const features = [
   "Explora bases sin conexión",
