@@ -8,6 +8,7 @@ import MainLayout from "@/layouts/MainLayout.astro";
 import AppButton from "@/components/ui/AppButton.vue";
 import Icon from "@/components/ui/Icon.vue";
 import PageHeader from "@/components/ui/PageHeader.vue";
+import InstallGuide from "@/components/download/InstallGuide.vue";
 
 const apkUrl = import.meta.env.PUBLIC_APP_APK_URL || "/download/cocbase.apk";
 
@@ -57,6 +58,7 @@ const platforms = [
                 Muy pronto
               </AppButton>
             )}
+            {platform.id === "web" && <InstallGuide client:load />}
           </div>
         ))
       }
