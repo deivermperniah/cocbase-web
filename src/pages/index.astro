@@ -1,7 +1,45 @@
 ---
+import IconLayers from "~icons/ph/stack";
 import MainLayout from "@/layouts/MainLayout.astro";
+import AppButton from "@/components/ui/AppButton.vue";
+import HeroRotator from "@/components/home/HeroRotator.vue";
+
+const baseImages = Object.values(
+  import.meta.glob<{ default: ImageMetadata }>("@/assets/images/bases/*.webp", { eager: true }),
+).map((mod) => mod.default.src);
 ---
 
 <MainLayout title="Bases de Clash of Clans por ayuntamiento">
-  <h1 class="text-4xl text-primary">cocbase</h1>
+  <div class="space-y-16 pb-6">
+    <section class="relative pb-6 pt-10 sm:pt-16">
+      <div
+        class="pointer-events-none absolute left-1/2 top-14 -z-10 h-56 w-[36rem] max-w-full -translate-x-1/2 rounded-full bg-primary/10 blur-3xl"
+      >
+      </div>
+
+      <div class="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-14">
+        <div class="text-center lg:text-left">
+          <h1 class="text-4xl leading-none text-white sm:text-5xl lg:text-6xl">Tus bases de Clash of Clans</h1>
+          <p class="mx-auto mt-4 max-w-xl font-body text-sm leading-relaxed text-muted-foreground sm:text-base lg:mx-0">
+            Encuentra, guarda y comparte diseños de base organizados por nivel de ayuntamiento. Todo revisado por la
+            comunidad.
+          </p>
+          <div class="mt-8 flex items-center justify-center gap-3 lg:justify-start">
+            <AppButton href="/bases" size="lg" icon={IconLayers}>Ver bases</AppButton>
+            <AppButton href="/contribuir" size="lg" variant="outline">Contribuir</AppButton>
+          </div>
+        </div>
+
+        <div class="relative">
+          <div
+            class="pointer-events-none absolute -inset-3 -z-10 rounded-3xl bg-gradient-to-br from-primary/25 via-primary/5 to-transparent blur-2xl"
+          >
+          </div>
+          <div class="overflow-hidden rounded-2xl border border-primary/30 bg-chrome shadow-2xl shadow-primary/10">
+            <HeroRotator client:load images={baseImages} />
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
 </MainLayout>
