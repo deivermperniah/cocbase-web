@@ -1,12 +1,22 @@
 ---
+import { Image } from "astro:assets";
 import IconLayers from "~icons/ph/stack";
 import MainLayout from "@/layouts/MainLayout.astro";
 import AppButton from "@/components/ui/AppButton.vue";
 import HeroRotator from "@/components/home/HeroRotator.vue";
+import { BASE_LEVELS } from "@/lib/constants";
 
 const baseImages = Object.values(
   import.meta.glob<{ default: ImageMetadata }>("@/assets/images/bases/*.webp", { eager: true }),
 ).map((mod) => mod.default.src);
+
+const townhallImages = import.meta.glob<{ default: ImageMetadata }>("@/assets/images/townhalls/th*.webp", {
+  eager: true,
+});
+const townhalls = BASE_LEVELS.map((level) => ({
+  level,
+  image: townhallImages[`/src/assets/images/townhalls/th${level}.webp`]!.default,
+}));
 ---
 
 <MainLayout title="Bases de Clash of Clans por ayuntamiento">
@@ -38,6 +48,34 @@ const baseImages = Object.values(
           <div class="overflow-hidden rounded-2xl border border-primary/30 bg-chrome shadow-2xl shadow-primary/10">
             <HeroRotator client:load images={baseImages} />
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="mb-6 flex items-end justify-between">
+        <h2 class="text-2xl text-white sm:text-3xl">Explora por ayuntamiento</h2>
+        <a href="/bases" class="text-xs text-primary transition-colors hover:text-yellow-300">Ver todas</a>
+      </div>
+
+      <div class="group overflow-hidden">
+        <div class="flex w-max animate-marquee group-hover:[animation-play-state:paused]">
+          {
+            [...townhalls, ...townhalls].map((th) => (
+              <a
+                href={`/bases/th-${th.level}`}
+                class="group/card mr-3 block h-56 w-56 shrink-0 overflow-hidden rounded-xl border border-border bg-card transition-all duration-300 hover:border-primary/60 hover:shadow-xl hover:shadow-primary/10"
+              >
+                <Image
+                  src={th.image}
+                  alt={`Ayuntamiento nivel ${th.level}`}
+                  width={480}
+                  height={480}
+                  class="h-full w-full object-cover transition-transform duration-500 group-hover/card:scale-105"
+                />
+              </a>
+            ))
+          }
         </div>
       </div>
     </section>

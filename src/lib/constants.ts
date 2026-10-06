@@ -3,6 +3,8 @@ import IconYoutube from "~icons/ph/youtube-logo";
 import IconX from "~icons/ph/x-logo";
 import IconReddit from "~icons/ph/reddit-logo";
 
+export const BASE_LEVELS = Array.from({ length: 16 }, (_, i) => i + 3);
+
 export const CONTACT_EMAIL = "deivermph@gmail.com";
 
 export const SOCIAL_LINKS = [

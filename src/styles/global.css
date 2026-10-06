@@ -29,6 +29,14 @@
   --color-secondary: #2a2a2a;
   --color-muted-foreground: #999999;
   --color-border: #333333;
+
+  --animate-marquee: marquee 40s linear infinite;
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
 }
 
 @layer base {
