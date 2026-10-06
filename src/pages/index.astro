@@ -1,8 +1,14 @@
 ---
 import { Image } from "astro:assets";
 import IconLayers from "~icons/ph/stack";
+import IconShield from "~icons/ph/shield-check";
+import IconFunnel from "~icons/ph/funnel";
+import IconHeart from "~icons/ph/heart";
+import IconUpload from "~icons/ph/upload-simple";
 import MainLayout from "@/layouts/MainLayout.astro";
 import AppButton from "@/components/ui/AppButton.vue";
+import Icon from "@/components/ui/Icon.vue";
+import SocialLinks from "@/components/ui/SocialLinks.vue";
 import HeroRotator from "@/components/home/HeroRotator.vue";
 import { BASE_LEVELS } from "@/lib/constants";
 
@@ -17,6 +23,13 @@ const townhalls = BASE_LEVELS.map((level) => ({
   level,
   image: townhallImages[`/src/assets/images/townhalls/th${level}.webp`]!.default,
 }));
+
+const advantages = [
+  { icon: IconShield, title: "Bases verificadas", text: "Cada diseño pasa una revisión antes de publicarse, sin duplicados" },
+  { icon: IconFunnel, title: "Organizadas por nivel", text: "Filtra por ayuntamiento y categoría para encontrar lo que buscas" },
+  { icon: IconHeart, title: "Guarda tus favoritas", text: "Crea tu cuenta y guarda las bases que quieras usar después" },
+  { icon: IconUpload, title: "Comparte las tuyas", text: "Contribuye con tus propios diseños y ayuda a la comunidad" },
+];
 ---
 
 <MainLayout title="Bases de Clash of Clans por ayuntamiento">
@@ -78,6 +91,31 @@ const townhalls = BASE_LEVELS.map((level) => ({
           }
         </div>
       </div>
+    </section>
+
+    <section>
+      <h2 class="mb-8 text-2xl text-white sm:text-3xl">Por qué usar cocbase</h2>
+      <div class="grid grid-cols-1 gap-x-10 gap-y-8 sm:grid-cols-2">
+        {
+          advantages.map((adv) => (
+            <div class="flex items-start gap-4">
+              <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                <Icon icon={adv.icon} class="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h3 class="text-base text-white">{adv.title}</h3>
+                <p class="mt-1 font-body text-sm leading-relaxed text-muted-foreground">{adv.text}</p>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="text-center">
+      <h2 class="mb-4 text-2xl text-white sm:text-3xl">Síguenos</h2>
+      <p class="mb-6 font-body text-sm text-muted-foreground">Nuevas bases y novedades en nuestras redes</p>
+      <SocialLinks variant="round" />
     </section>
   </div>
 </MainLayout>
