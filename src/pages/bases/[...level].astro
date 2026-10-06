@@ -1,0 +1,17 @@
+---
+import type { GetStaticPaths } from "astro";
+import MainLayout from "@/layouts/MainLayout.astro";
+import BasesExplorer from "@/components/bases/BasesExplorer.vue";
+import { BASE_LEVELS } from "@/lib/constants";
+
+export const getStaticPaths = (() => [
+  { params: { level: undefined }, props: { level: null } },
+  ...BASE_LEVELS.map((level) => ({ params: { level: `th-${level}` }, props: { level } })),
+]) satisfies GetStaticPaths;
+
+const { level } = Astro.props;
+---
+
+<MainLayout title={level ? `Bases para Ayuntamiento ${level}` : "Bases de Clash of Clans"}>
+  <BasesExplorer client:only="vue" level={level} />
+</MainLayout>
