@@ -1,0 +1,8 @@
+---
+import MainLayout from "@/layouts/MainLayout.astro";
+import FavoritesView from "@/components/favorites/FavoritesView.vue";
+---
+
+<MainLayout title="Favoritos">
+  <FavoritesView client:only="vue" />
+</MainLayout>
