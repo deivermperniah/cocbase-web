@@ -1,0 +1,38 @@
+---
+import { Image } from "astro:assets";
+import IconX from "~icons/ph/x";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Icon from "@/components/ui/Icon.vue";
+import logo from "@/assets/images/logo.webp";
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<BaseLayout title={title}>
+  <main class="relative flex min-h-dvh items-center justify-center overflow-hidden px-5 py-12 sm:px-10">
+    <a
+      href="/"
+      class="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary sm:right-8 sm:top-8"
+    >
+      <Icon icon={IconX} class="h-5 w-5" />
+    </a>
+
+    <section class="relative w-full max-w-md overflow-hidden rounded-[1.25rem] p-px shadow-2xl shadow-primary/10">
+      <div
+        class="absolute inset-[-100%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_58%,var(--color-primary)_72%,var(--color-yellow-300)_80%,transparent_92%)]"
+      >
+      </div>
+      <div class="relative rounded-[calc(1.25rem-1px)] bg-card p-6 sm:p-8">
+        <div class="mb-page text-center">
+          <Image src={logo} alt="cocbase" width={128} height={128} class="mx-auto mb-page h-16 w-16 object-contain" />
+          <h1 class="text-[28px] text-primary">{title}</h1>
+        </div>
+        <slot />
+      </div>
+    </section>
+  </main>
+</BaseLayout>
