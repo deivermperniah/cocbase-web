@@ -1,0 +1,26 @@
+---
+import MainLayout from "@/layouts/MainLayout.astro";
+import PageHeader from "@/components/ui/PageHeader.vue";
+import type { LegalSection } from "@/data/legal";
+
+interface Props {
+  title: string;
+  sections: LegalSection[];
+}
+
+const { title, sections } = Astro.props;
+---
+
+<MainLayout title={title}>
+  <div class="space-y-page">
+    <PageHeader title={title} subtitle="Última actualización: septiembre de 2026." />
+    {
+      sections.map((section) => (
+        <section class="space-y-2">
+          <h2 class="text-base text-white">{section.title}</h2>
+          <p class="font-body text-sm leading-relaxed text-muted-foreground">{section.body}</p>
+        </section>
+      ))
+    }
+  </div>
+</MainLayout>
