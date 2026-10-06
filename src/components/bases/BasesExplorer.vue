@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import IconFunnel from "~icons/ph/funnel";
+import IconMore from "~icons/ph/dots-three-bold";
 import AppButton from "@/components/ui/AppButton.vue";
 import BaseGrid from "@/components/bases/BaseGrid.vue";
 import CopyBaseButton from "@/components/bases/CopyBaseButton.vue";
 import CardSkeletonGrid from "@/components/ui/CardSkeletonGrid.vue";
 import EmptyState from "@/components/ui/EmptyState.vue";
 import FormSelect from "@/components/ui/FormSelect.vue";
+import IconButton from "@/components/ui/IconButton.vue";
 import Modal from "@/components/ui/Modal.vue";
 import PageHeader from "@/components/ui/PageHeader.vue";
 import { fetchApprovedBases, type Base } from "@/lib/bases";
@@ -103,9 +105,10 @@ onMounted(() => loadBases(true));
 
     <template v-else>
       <BaseGrid :bases="bases">
-        <template #actions="{ base }">
+        <template #actions="{ base, openDetails }">
           <div class="flex gap-2">
             <CopyBaseButton :link="base.link" />
+            <IconButton :icon="IconMore" @click="openDetails" />
           </div>
         </template>
       </BaseGrid>
