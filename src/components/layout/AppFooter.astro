@@ -1,0 +1,61 @@
+---
+import IconEnvelope from "~icons/ph/envelope";
+import Icon from "@/components/ui/Icon.vue";
+import Logo from "@/components/ui/Logo.vue";
+import SocialLinks from "@/components/ui/SocialLinks.vue";
+import { CONTACT_EMAIL } from "@/lib/constants";
+
+const quickLinks = [
+  { name: "Bases", href: "/bases" },
+  { name: "Descargar app", href: "/descargar" },
+  { name: "Contribuir", href: "/contribuir" },
+];
+
+const legalLinks = [
+  { name: "Aviso legal", href: "/aviso-legal" },
+  { name: "Privacidad", href: "/privacidad" },
+];
+
+const linkClass = "text-xs text-muted-foreground transition-colors hover:text-primary";
+---
+
+<footer class="mt-10 border-t border-border bg-chrome">
+  <div class="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-page py-10 sm:grid-cols-2 lg:flex lg:justify-between">
+    <div class="space-y-4">
+      <Logo />
+      <p class="font-body text-xs leading-relaxed text-muted-foreground">
+        La colección de bases de Clash of Clans para la comunidad.<br class="hidden lg:inline" />
+        Encuentra, comparte y usa diseños.
+      </p>
+    </div>
+
+    <div>
+      <h2 class="mb-4 text-sm text-white">Enlaces rápidos</h2>
+      <ul class="space-y-2">
+        {quickLinks.map((link) => <li><a href={link.href} class={linkClass}>{link.name}</a></li>)}
+      </ul>
+    </div>
+
+    <div>
+      <h2 class="mb-4 text-sm text-white">Síguenos</h2>
+      <SocialLinks variant="square" />
+    </div>
+
+    <div>
+      <h2 class="mb-4 text-sm text-white">Contacto</h2>
+      <a href={`mailto:${CONTACT_EMAIL}`} class:list={["flex items-center gap-2", linkClass]}>
+        <Icon icon={IconEnvelope} class="h-4 w-4" />
+        {CONTACT_EMAIL}
+      </a>
+    </div>
+  </div>
+
+  <div class="border-t border-border">
+    <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-page py-4 sm:flex-row">
+      <p class="text-xs text-muted-foreground">© 2026 cocbase. Todos los derechos reservados.</p>
+      <nav class="flex gap-4">
+        {legalLinks.map((link) => <a href={link.href} class={linkClass}>{link.name}</a>)}
+      </nav>
+    </div>
+  </div>
+</footer>
