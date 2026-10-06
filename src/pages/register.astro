@@ -1,0 +1,8 @@
+---
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import AuthForm from "@/components/auth/AuthForm.vue";
+---
+
+<AuthLayout title="Crear cuenta">
+  <AuthForm client:only="vue" mode="register" />
+</AuthLayout>
