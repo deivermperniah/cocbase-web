@@ -2,7 +2,7 @@
 import { onMounted, ref } from "vue";
 import IconFunnel from "~icons/ph/funnel";
 import AppButton from "@/components/ui/AppButton.vue";
-import BaseCard from "@/components/bases/BaseCard.vue";
+import BaseGrid from "@/components/bases/BaseGrid.vue";
 import CopyBaseButton from "@/components/bases/CopyBaseButton.vue";
 import CardSkeletonGrid from "@/components/ui/CardSkeletonGrid.vue";
 import EmptyState from "@/components/ui/EmptyState.vue";
@@ -102,13 +102,13 @@ onMounted(() => loadBases(true));
     />
 
     <template v-else>
-      <div class="card-grid">
-        <BaseCard v-for="base in bases" :key="base.id" :base="base">
+      <BaseGrid :bases="bases">
+        <template #actions="{ base }">
           <div class="flex gap-2">
             <CopyBaseButton :link="base.link" />
           </div>
-        </BaseCard>
-      </div>
+        </template>
+      </BaseGrid>
 
       <div v-if="bases.length < total" class="flex justify-center pt-6">
         <AppButton variant="outline" :loading="loadingMore" @click="loadBases(false)">Mostrar más</AppButton>
