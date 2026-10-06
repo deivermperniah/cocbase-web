@@ -1,0 +1,13 @@
+---
+import IconHouse from "~icons/ph/house";
+import MainLayout from "@/layouts/MainLayout.astro";
+import AppButton from "@/components/ui/AppButton.vue";
+---
+
+<MainLayout title="Página no encontrada">
+  <div class="flex min-h-[60vh] flex-col items-center justify-center text-center">
+    <p class="text-[96px] leading-none text-primary">404</p>
+    <h1 class="mt-2 text-2xl text-white">Página no encontrada</h1>
+    <AppButton href="/" size="lg" icon={IconHouse} class="mt-8">Volver al inicio</AppButton>
+  </div>
+</MainLayout>
