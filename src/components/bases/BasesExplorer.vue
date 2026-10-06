@@ -2,6 +2,8 @@
 import { onMounted, ref } from "vue";
 import IconFunnel from "~icons/ph/funnel";
 import IconMore from "~icons/ph/dots-three-bold";
+import IconHeart from "~icons/ph/heart";
+import IconHeartFill from "~icons/ph/heart-fill";
 import AppButton from "@/components/ui/AppButton.vue";
 import BaseGrid from "@/components/bases/BaseGrid.vue";
 import CopyBaseButton from "@/components/bases/CopyBaseButton.vue";
@@ -11,8 +13,11 @@ import FormSelect from "@/components/ui/FormSelect.vue";
 import IconButton from "@/components/ui/IconButton.vue";
 import Modal from "@/components/ui/Modal.vue";
 import PageHeader from "@/components/ui/PageHeader.vue";
+import { initializeAuth, loginUrl, user } from "@/lib/auth";
 import { fetchApprovedBases, type Base } from "@/lib/bases";
 import { BASE_LEVELS, BASE_TYPES } from "@/lib/constants";
+import { addFavorite, fetchFavoriteIds, removeFavorite } from "@/lib/favorites";
+import { toast } from "@/lib/toast";
 
 const PAGE_SIZE = 12;
 
@@ -30,6 +35,7 @@ const loadError = ref(false);
 const selectedType = ref("");
 const isFilterOpen = ref(false);
 const draft = ref({ level: "", type: "" });
+const favoriteIds = ref(new Set<string>());
 
 async function loadBases(reset: boolean) {
   if (reset) loading.value = true;
@@ -65,7 +71,37 @@ function applyFilters(level: string, type: string) {
   loadBases(true);
 }
 
-onMounted(() => loadBases(true));
+async function toggleFavorite(base: Base) {
+  if (!user.value) {
+    window.location.href = loginUrl(window.location.pathname);
+    return;
+  }
+
+  const isFavorite = favoriteIds.value.has(base.id);
+  try {
+    if (isFavorite) {
+      await removeFavorite(user.value.id, base.id);
+      favoriteIds.value.delete(base.id);
+    } else {
+      await addFavorite(user.value.id, base.id);
+      favoriteIds.value.add(base.id);
+    }
+    toast.success(isFavorite ? "Eliminada de favoritos" : "Guardada en favoritos");
+  } catch {
+    toast.error(isFavorite ? "No se pudo quitar de favoritos" : "No se pudo guardar en favoritos");
+  }
+}
+
+async function loadFavorites() {
+  await initializeAuth().catch(() => {});
+  if (!user.value) return;
+  favoriteIds.value = await fetchFavoriteIds(user.value.id).catch(() => new Set<string>());
+}
+
+onMounted(() => {
+  loadBases(true);
+  loadFavorites();
+});
 </script>
 
 <template>
@@ -108,6 +144,11 @@ onMounted(() => loadBases(true));
         <template #actions="{ base, openDetails }">
           <div class="flex gap-2">
             <CopyBaseButton :link="base.link" />
+            <IconButton
+              :icon="favoriteIds.has(base.id) ? IconHeartFill : IconHeart"
+              :tone="favoriteIds.has(base.id) ? 'active' : 'default'"
+              @click="toggleFavorite(base)"
+            />
             <IconButton :icon="IconMore" @click="openDetails" />
           </div>
         </template>
