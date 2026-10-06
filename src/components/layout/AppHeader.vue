@@ -1,15 +1,19 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import IconMenu from "~icons/ph/list";
 import IconDownload from "~icons/ph/download-simple";
 import IconSignIn from "~icons/ph/sign-in";
 import AppButton from "@/components/ui/AppButton.vue";
 import Logo from "@/components/ui/Logo.vue";
+import AccountMenu from "@/components/layout/AccountMenu.vue";
 import NavLinks from "@/components/layout/NavLinks.vue";
+import { initializeAuth, session } from "@/lib/auth";
 
 defineProps<{ currentPath: string }>();
 
 const isMenuOpen = ref(false);
+
+onMounted(() => initializeAuth().catch((error) => console.error("Error initializing auth:", error)));
 </script>
 
 <template>
@@ -20,7 +24,8 @@ const isMenuOpen = ref(false);
     <NavLinks :current-path="currentPath" variant="pill" />
     <div class="flex shrink-0 items-center gap-2">
       <AppButton href="/descargar" variant="outline" size="sm" :icon="IconDownload">Descargar app</AppButton>
-      <AppButton href="/login" size="sm">Iniciar sesión</AppButton>
+      <AccountMenu v-if="session" />
+      <AppButton v-else href="/login" size="sm">Iniciar sesión</AppButton>
     </div>
   </header>
 
@@ -38,7 +43,8 @@ const isMenuOpen = ref(false);
       >
         <IconDownload class="h-4 w-4" />
       </a>
-      <a href="/login" class="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-black hover:bg-yellow-300">
+      <AccountMenu v-if="session" />
+      <a v-else href="/login" class="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-black hover:bg-yellow-300">
         <IconSignIn class="h-5 w-5" />
       </a>
     </div>
