@@ -47,3 +47,7 @@
     @apply bg-background font-sans text-foreground;
   }
 }
+
+@utility card-grid {
+  @apply grid grid-cols-1 gap-page md:grid-cols-2 lg:grid-cols-3;
+}

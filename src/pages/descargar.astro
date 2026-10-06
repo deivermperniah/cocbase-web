@@ -1,0 +1,65 @@
+---
+import IconDownload from "~icons/ph/download-simple";
+import IconAndroid from "~icons/ph/android-logo";
+import IconApple from "~icons/ph/apple-logo";
+import IconBrowsers from "~icons/ph/browsers";
+import IconCheck from "~icons/ph/check";
+import MainLayout from "@/layouts/MainLayout.astro";
+import AppButton from "@/components/ui/AppButton.vue";
+import Icon from "@/components/ui/Icon.vue";
+import PageHeader from "@/components/ui/PageHeader.vue";
+
+const apkUrl = import.meta.env.PUBLIC_APP_APK_URL || "/download/cocbase.apk";
+
+const features = ["Explora bases sin conexión", "Guarda tus favoritas en el móvil", "Recibe avisos de nuevas bases"];
+
+const platforms = [
+  { id: "android", icon: IconAndroid, title: "cocbase para Android", text: "Lleva tus bases de Clash of Clans a todas partes" },
+  { id: "ios", icon: IconApple, title: "cocbase para iOS", text: "Próximamente en el App Store" },
+  { id: "web", icon: IconBrowsers, title: "cocbase Web", text: "Instálala como app desde tu navegador" },
+];
+---
+
+<MainLayout title="Descargar app">
+  <div class="space-y-page">
+    <PageHeader title="Descargar app" />
+
+    <div class="card-grid">
+      {
+        platforms.map((platform) => (
+          <div class="space-y-6 rounded-xl border border-border bg-card p-6 sm:p-8">
+            <div class="flex items-center gap-4">
+              <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary/10">
+                <Icon icon={platform.icon} class="h-7 w-7 text-primary" />
+              </div>
+              <div>
+                <h2 class="text-xl text-white">{platform.title}</h2>
+                <p class="text-xs text-muted-foreground">{platform.text}</p>
+              </div>
+            </div>
+
+            <ul class="space-y-3">
+              {features.map((feature) => (
+                <li class="flex items-center gap-3 text-sm text-muted-foreground">
+                  <Icon icon={IconCheck} class="h-4 w-4 shrink-0 text-primary" />
+                  {feature}
+                </li>
+              ))}
+            </ul>
+
+            {platform.id === "android" && (
+              <AppButton href={apkUrl} size="lg" icon={IconDownload} download class="w-full">
+                Descargar APK
+              </AppButton>
+            )}
+            {platform.id === "ios" && (
+              <AppButton size="lg" variant="secondary" icon={IconApple} disabled class="w-full">
+                Muy pronto
+              </AppButton>
+            )}
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</MainLayout>
