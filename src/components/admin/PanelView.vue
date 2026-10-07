@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import IconLayers from "~icons/ph/stack";
+import IconPlus from "~icons/ph/plus";
 import IconClipboard from "~icons/ph/clipboard-text";
 import IconImage from "~icons/ph/image";
 import IconCaret from "~icons/ph/caret-right";
 import AuthGate from "@/components/auth/AuthGate.vue";
+import BaseForm from "@/components/bases/BaseForm.vue";
 import AppButton from "@/components/ui/AppButton.vue";
 import CountBadge from "@/components/ui/CountBadge.vue";
 import EmptyState from "@/components/ui/EmptyState.vue";
 import LoadingState from "@/components/ui/LoadingState.vue";
+import Modal from "@/components/ui/Modal.vue";
 import PageHeader from "@/components/ui/PageHeader.vue";
 import { fetchDashboardStats } from "@/lib/admin";
 import { getBaseTypeIcon } from "@/lib/bases";
@@ -23,6 +26,7 @@ const managementLinks = [
 
 const stats = ref<Stats | null>(null);
 const loading = ref(true);
+const isNewBaseOpen = ref(false);
 
 async function load() {
   loading.value = true;
@@ -35,6 +39,11 @@ async function load() {
     loading.value = false;
   }
 }
+
+function handleNewBase() {
+  isNewBaseOpen.value = false;
+  load();
+}
 </script>
 
 <template>
@@ -45,6 +54,7 @@ async function load() {
       <PageHeader title="Panel">
         <template #actions>
           <AppButton href="/bases" variant="outline" :icon="IconLayers" class="hidden sm:flex">Ver bases</AppButton>
+          <AppButton :icon="IconPlus" @click="isNewBaseOpen = true">Nueva base</AppButton>
         </template>
       </PageHeader>
 
@@ -98,6 +108,10 @@ async function load() {
           </div>
         </div>
       </template>
+
+      <Modal :open="isNewBaseOpen" title="Nueva base" size="xl" @close="isNewBaseOpen = false">
+        <BaseForm @success="handleNewBase" />
+      </Modal>
     </div>
   </AuthGate>
 </template>
