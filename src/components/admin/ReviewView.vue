@@ -59,49 +59,51 @@ function openReject(base: Base) {
 </script>
 
 <template>
-  <AuthGate access="admin" @ready="load">
-    <div class="space-y-page">
-      <PageHeader
-        title="Comunidad"
-        :subtitle="pending.length ? `${pending.length} ${pending.length === 1 ? 'base pendiente' : 'bases pendientes'}` : ''"
-      />
+  <div class="space-y-page">
+    <PageHeader
+      title="Comunidad"
+      :subtitle="pending.length ? `${pending.length} ${pending.length === 1 ? 'base pendiente' : 'bases pendientes'}` : ''"
+    />
 
-      <CardSkeletonGrid v-if="loading" />
+    <CardSkeletonGrid v-if="loading" />
 
-      <EmptyState v-else-if="loadError" message="No se pudieron cargar las bases pendientes">
-        <AppButton @click="load">Reintentar</AppButton>
-      </EmptyState>
+    <AuthGate access="admin" @ready="load">
+      <template v-if="!loading">
+        <EmptyState v-if="loadError" message="No se pudieron cargar las bases pendientes">
+          <AppButton @click="load">Reintentar</AppButton>
+        </EmptyState>
 
-      <EmptyState v-else-if="pending.length === 0" message="No hay bases pendientes de revisión" />
+        <EmptyState v-else-if="pending.length === 0" message="No hay bases pendientes de revisión" />
 
-      <BaseGrid v-else :bases="pending" @removed="(id) => (pending = pending.filter((b) => b.id !== id))">
-        <template #actions="{ base }">
-          <div class="space-y-page">
-            <div class="flex min-h-[38px] items-center justify-between gap-2">
-              <p class="flex min-w-0 items-center gap-1 text-xs text-muted-foreground">
-                <IconUser class="h-3 w-3 shrink-0" />
-                <span class="truncate">{{ base.profiles?.full_name || "Sin nombre" }}</span>
-                <span class="shrink-0">· {{ formatRelativeDate(base.created_at) }}</span>
-              </p>
-              <IconButton v-if="base.link" :icon="IconOpen" :href="base.link" />
+        <BaseGrid v-else :bases="pending" @removed="(id) => (pending = pending.filter((b) => b.id !== id))">
+          <template #actions="{ base }">
+            <div class="space-y-page">
+              <div class="flex min-h-[38px] items-center justify-between gap-2">
+                <p class="flex min-w-0 items-center gap-1 text-xs text-muted-foreground">
+                  <IconUser class="h-3 w-3 shrink-0" />
+                  <span class="truncate">{{ base.profiles?.full_name || "Sin nombre" }}</span>
+                  <span class="shrink-0">· {{ formatRelativeDate(base.created_at) }}</span>
+                </p>
+                <IconButton v-if="base.link" :icon="IconOpen" :href="base.link" />
+              </div>
+              <div class="flex gap-page">
+                <AppButton
+                  :icon="IconCheck"
+                  :loading="busyId === base.id && !rejectTarget"
+                  :disabled="busyId !== null"
+                  class="flex-1"
+                  @click="review(base, 'approved')"
+                >
+                  Aprobar
+                </AppButton>
+                <AppButton variant="secondary" :icon="IconX" :disabled="busyId !== null" class="flex-1" @click="openReject(base)">
+                  Rechazar
+                </AppButton>
+              </div>
             </div>
-            <div class="flex gap-page">
-              <AppButton
-                :icon="IconCheck"
-                :loading="busyId === base.id && !rejectTarget"
-                :disabled="busyId !== null"
-                class="flex-1"
-                @click="review(base, 'approved')"
-              >
-                Aprobar
-              </AppButton>
-              <AppButton variant="secondary" :icon="IconX" :disabled="busyId !== null" class="flex-1" @click="openReject(base)">
-                Rechazar
-              </AppButton>
-            </div>
-          </div>
-        </template>
-      </BaseGrid>
+          </template>
+        </BaseGrid>
+      </template>
 
       <ConfirmModal
         :open="rejectTarget !== null"
@@ -124,6 +126,6 @@ function openReject(base: Base) {
           <span class="self-end text-[11px] text-muted-foreground">{{ rejectNote.length }}/200</span>
         </div>
       </ConfirmModal>
-    </div>
-  </AuthGate>
+    </AuthGate>
+  </div>
 </template>

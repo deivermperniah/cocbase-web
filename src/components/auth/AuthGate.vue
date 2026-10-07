@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import LoadingState from "@/components/ui/LoadingState.vue";
 import { getAccessRedirect, initializeAuth, type Access } from "@/lib/auth";
 
-const props = withDefaults(defineProps<{ access: Access; loadingSize?: "sm" | "lg" }>(), { loadingSize: "lg" });
+const props = defineProps<{ access: Access }>();
 const emit = defineEmits<{ ready: [] }>();
 
 const isReady = ref(false);
@@ -22,5 +21,4 @@ onMounted(async () => {
 
 <template>
   <slot v-if="isReady" />
-  <LoadingState v-else :size="loadingSize" />
 </template>

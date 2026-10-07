@@ -42,7 +42,7 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <AuthGate access="guest" loading-size="sm">
+  <AuthGate access="guest">
     <form class="space-y-page" @submit.prevent="handleSubmit">
       <p v-if="errorMessage" class="rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-300">
         {{ errorMessage }}

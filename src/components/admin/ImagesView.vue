@@ -85,55 +85,57 @@ async function confirmDelete() {
 </script>
 
 <template>
-  <AuthGate access="admin" @ready="load">
-    <div class="space-y-page">
-      <PageHeader title="Imágenes">
-        <template v-if="!loading && !loadError" #actions>
-          <span class="flex items-center gap-2 text-sm text-white">
-            <IconImage class="h-4 w-4 text-primary" />
-            {{ images.length }}
-          </span>
-          <span class="flex items-center gap-2 text-sm text-white">
-            <IconServer class="h-4 w-4 text-primary" />
-            {{ totalMb }} MB
-          </span>
-        </template>
-      </PageHeader>
+  <div class="space-y-page">
+    <PageHeader title="Imágenes">
+      <template v-if="!loading && !loadError" #actions>
+        <span class="flex items-center gap-2 text-sm text-white">
+          <IconImage class="h-4 w-4 text-primary" />
+          {{ images.length }}
+        </span>
+        <span class="flex items-center gap-2 text-sm text-white">
+          <IconServer class="h-4 w-4 text-primary" />
+          {{ totalMb }} MB
+        </span>
+      </template>
+    </PageHeader>
 
-      <CardSkeletonGrid v-if="loading" />
+    <CardSkeletonGrid v-if="loading" />
 
-      <EmptyState v-else-if="loadError" message="No se pudieron cargar las imágenes">
-        <AppButton @click="load">Reintentar</AppButton>
-      </EmptyState>
+    <AuthGate access="admin" @ready="load">
+      <template v-if="!loading">
+        <EmptyState v-if="loadError" message="No se pudieron cargar las imágenes">
+          <AppButton @click="load">Reintentar</AppButton>
+        </EmptyState>
 
-      <EmptyState v-else-if="images.length === 0" message="Sin imágenes" />
+        <EmptyState v-else-if="images.length === 0" message="Sin imágenes" />
 
-      <template v-else>
-        <div class="card-grid">
-          <div v-for="img in images" :key="img.name" class="group overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
-            <div class="relative aspect-video overflow-hidden bg-secondary">
-              <img
-                :src="img.url"
-                :alt="img.name"
-                loading="lazy"
-                width="1280"
-                height="720"
-                class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-              <div class="absolute left-4 top-4">
-                <Badge :variant="isInUse(img) ? 'accent' : 'danger'">{{ isInUse(img) ? "En uso" : "Huérfana" }}</Badge>
+        <template v-else>
+          <div class="card-grid">
+            <div v-for="img in images" :key="img.name" class="group overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
+              <div class="relative aspect-video overflow-hidden bg-secondary">
+                <img
+                  :src="img.url"
+                  :alt="img.name"
+                  loading="lazy"
+                  width="1280"
+                  height="720"
+                  class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div class="absolute left-4 top-4">
+                  <Badge :variant="isInUse(img) ? 'accent' : 'danger'">{{ isInUse(img) ? "En uso" : "Huérfana" }}</Badge>
+                </div>
+              </div>
+              <div class="flex min-h-[68px] items-center gap-3 p-page">
+                <h3 class="flex-1 truncate text-sm text-white group-hover:text-primary">{{ img.name }}</h3>
+                <IconButton :icon="IconTrash" tone="danger" @click="deleteTarget = img" />
               </div>
             </div>
-            <div class="flex min-h-[68px] items-center gap-3 p-page">
-              <h3 class="flex-1 truncate text-sm text-white group-hover:text-primary">{{ img.name }}</h3>
-              <IconButton :icon="IconTrash" tone="danger" @click="deleteTarget = img" />
-            </div>
           </div>
-        </div>
 
-        <div v-if="hasMore" class="flex justify-center pt-6">
-          <AppButton variant="outline" :loading="loadingMore" @click="loadMore">Mostrar más</AppButton>
-        </div>
+          <div v-if="hasMore" class="flex justify-center pt-6">
+            <AppButton variant="outline" :loading="loadingMore" @click="loadMore">Mostrar más</AppButton>
+          </div>
+        </template>
       </template>
 
       <ConfirmModal
@@ -153,6 +155,6 @@ async function confirmDelete() {
           Esta imagen está en uso. La base que la usa quedará sin foto.
         </p>
       </ConfirmModal>
-    </div>
-  </AuthGate>
+    </AuthGate>
+  </div>
 </template>

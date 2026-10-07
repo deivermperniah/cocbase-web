@@ -44,27 +44,29 @@ async function unfavorite(id: string) {
 </script>
 
 <template>
-  <AuthGate access="auth" @ready="load">
-    <div class="space-y-page">
-      <PageHeader title="Favoritos" />
+  <div class="space-y-page">
+    <PageHeader title="Favoritos" />
 
-      <CardSkeletonGrid v-if="loading" />
+    <CardSkeletonGrid v-if="loading" />
 
-      <EmptyState v-else-if="loadError" message="No se pudieron cargar tus favoritos">
-        <AppButton @click="load">Reintentar</AppButton>
-      </EmptyState>
+    <AuthGate access="auth" @ready="load">
+      <template v-if="!loading">
+        <EmptyState v-if="loadError" message="No se pudieron cargar tus favoritos">
+          <AppButton @click="load">Reintentar</AppButton>
+        </EmptyState>
 
-      <EmptyState v-else-if="bases.length === 0" message="Aún no tienes bases favoritas" />
+        <EmptyState v-else-if="bases.length === 0" message="Aún no tienes bases favoritas" />
 
-      <BaseGrid v-else :bases="bases" @removed="(id) => (bases = bases.filter((b) => b.id !== id))">
-        <template #actions="{ base, openDetails }">
-          <div class="flex gap-2">
-            <CopyBaseButton :link="base.link" />
-            <IconButton :icon="IconHeartFill" tone="danger" @click="unfavorite(base.id)" />
-            <IconButton :icon="IconMore" @click="openDetails" />
-          </div>
-        </template>
-      </BaseGrid>
-    </div>
-  </AuthGate>
+        <BaseGrid v-else :bases="bases" @removed="(id) => (bases = bases.filter((b) => b.id !== id))">
+          <template #actions="{ base, openDetails }">
+            <div class="flex gap-2">
+              <CopyBaseButton :link="base.link" />
+              <IconButton :icon="IconHeartFill" tone="danger" @click="unfavorite(base.id)" />
+              <IconButton :icon="IconMore" @click="openDetails" />
+            </div>
+          </template>
+        </BaseGrid>
+      </template>
+    </AuthGate>
+  </div>
 </template>
