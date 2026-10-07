@@ -8,13 +8,13 @@ import MySubmissions from "@/components/contribute/MySubmissions.vue";
 import AppButton from "@/components/ui/AppButton.vue";
 import ConfirmModal from "@/components/ui/ConfirmModal.vue";
 import EmptyState from "@/components/ui/EmptyState.vue";
-import LoadingState from "@/components/ui/LoadingState.vue";
 import PageHeader from "@/components/ui/PageHeader.vue";
 import { user } from "@/lib/auth";
 import { baseLabel, deleteRejectedBase, fetchMyBases, type MyBase } from "@/lib/bases";
 import { toast } from "@/lib/toast";
 
 const myBases = ref<MyBase[]>([]);
+const ready = ref(false);
 const loading = ref(true);
 const loadError = ref(false);
 const deleteTarget = ref<MyBase | null>(null);
@@ -31,6 +31,11 @@ async function load() {
   } finally {
     loading.value = false;
   }
+}
+
+function onReady() {
+  ready.value = true;
+  load();
 }
 
 async function confirmDelete() {
@@ -53,18 +58,22 @@ async function confirmDelete() {
 </script>
 
 <template>
-  <AuthGate access="user" @ready="load">
-    <div class="space-y-page">
-      <PageHeader title="Contribuir" />
+  <div class="space-y-page">
+    <PageHeader title="Contribuir" />
 
-      <div class="flex items-start gap-3 rounded-xl border border-primary/20 bg-secondary p-page">
-        <IconInfo class="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-        <p class="font-body text-xs leading-relaxed text-muted-foreground">
-          Revisa que la base no esté repetida y que la captura sea clara. Las bases aprobadas aparecen en el explorador
-          para todos.
-        </p>
-      </div>
+    <div class="flex items-start gap-3 rounded-xl border border-primary/20 bg-secondary p-page">
+      <IconInfo class="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+      <p class="font-body text-xs leading-relaxed text-muted-foreground">
+        Revisa que la base no esté repetida y que la captura sea clara. Las bases aprobadas aparecen en el explorador
+        para todos.
+      </p>
+    </div>
 
+    <div v-if="!ready" class="grid grid-cols-1 gap-page lg:grid-cols-2">
+      <div v-for="i in 2" :key="i" class="skeleton h-[420px] rounded-xl"></div>
+    </div>
+
+    <AuthGate access="user" @ready="onReady">
       <div class="grid grid-cols-1 gap-page lg:grid-cols-2">
         <section class="rounded-xl border border-border bg-card p-page">
           <h2 class="mb-page text-base text-white">Nueva base</h2>
@@ -74,7 +83,9 @@ async function confirmDelete() {
         <section class="rounded-xl border border-border bg-card p-page">
           <h2 class="mb-page text-base text-white">Mis envíos</h2>
 
-          <LoadingState v-if="loading" size="sm" />
+          <div v-if="loading && myBases.length === 0" class="space-y-2.5">
+            <div v-for="i in 3" :key="i" class="skeleton h-11 rounded-xl"></div>
+          </div>
 
           <EmptyState v-else-if="loadError" message="No se pudieron cargar tus envíos">
             <AppButton @click="load">Reintentar</AppButton>
@@ -107,6 +118,6 @@ async function confirmDelete() {
         @close="deleteTarget = null"
         @confirm="confirmDelete"
       />
-    </div>
-  </AuthGate>
+    </AuthGate>
+  </div>
 </template>
