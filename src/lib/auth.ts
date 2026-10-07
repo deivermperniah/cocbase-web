@@ -13,9 +13,19 @@ export type Access = "auth" | "admin" | "user" | "guest";
 export const session = ref<Session | null>(null);
 export const user = ref<User | null>(null);
 export const profile = ref<Profile | null>(null);
-export const authReady = ref(false);
+const authReady = ref(false);
 
-export const isAdmin = computed(() => profile.value?.role === "admin");
+const ROLE_KEY = "cocbase-role";
+const storedSession = ref(false);
+const storedRole = ref<string | null>(null);
+
+export const isSignedIn = computed(() => (authReady.value ? session.value !== null : storedSession.value));
+export const isAdmin = computed(() => (profile.value ? profile.value.role : storedRole.value) === "admin");
+
+export function restoreStoredAuth() {
+  storedSession.value = Object.keys(localStorage).some((key) => /^sb-.+-auth-token$/.test(key));
+  storedRole.value = storedSession.value ? localStorage.getItem(ROLE_KEY) : null;
+}
 
 let initialization: Promise<void> | null = null;
 
@@ -23,13 +33,18 @@ async function loadProfile(userId: string) {
   const { data, error } = await supabase.from("profiles").select("id, full_name, role").eq("id", userId).maybeSingle();
   if (error) console.error("Error loading profile:", error);
   profile.value = data as Profile | null;
+  if (profile.value) localStorage.setItem(ROLE_KEY, profile.value.role);
 }
 
 async function setSession(next: Session | null) {
   session.value = next;
   user.value = next?.user ?? null;
   if (next?.user) await loadProfile(next.user.id);
-  else profile.value = null;
+  else {
+    profile.value = null;
+    storedRole.value = null;
+    localStorage.removeItem(ROLE_KEY);
+  }
 }
 
 export function initializeAuth() {
