@@ -4,6 +4,7 @@ import IconTrophy from "~icons/ph/trophy";
 import IconHammer from "~icons/ph/hammer";
 import IconShield from "~icons/ph/shield";
 import { supabase } from "@/lib/supabase";
+import type { BaseStatus } from "@/lib/constants";
 
 export interface Base {
   id: string;
@@ -13,6 +14,15 @@ export interface Base {
   link: string | null;
   created_at: string;
   profiles: { full_name: string | null } | null;
+}
+
+export interface NewBase {
+  link: string | null;
+  type: string;
+  level_th: number;
+  url_foto: string;
+  status: BaseStatus;
+  author_id: string | undefined;
 }
 
 export const BASE_COLUMNS = "id, level_th, type, url_foto, link, created_at, profiles!bases_author_id_fkey(full_name)";
@@ -47,4 +57,36 @@ export async function fetchApprovedBases(filters: { level: number | null; type: 
   const { data, count, error } = await query;
   if (error) throw error;
   return { bases: (data ?? []) as unknown as Base[], total: count ?? 0 };
+}
+
+function parseUrl(link: string) {
+  try {
+    return new URL(link);
+  } catch {
+    return null;
+  }
+}
+
+function getLinkId(link: string) {
+  return parseUrl(link)?.searchParams.get("id") ?? null;
+}
+
+export function isValidBaseLink(link: string) {
+  const url = parseUrl(link);
+  return Boolean(url?.hostname.includes("link.clashofclans.com") && url.searchParams.has("id"));
+}
+
+export async function isLinkTaken(link: string) {
+  const id = getLinkId(link);
+  if (!id) return false;
+  const token = (id.split(":").pop() ?? id).replace(/[\\%_]/g, (c) => "\\" + c);
+
+  const { data, error } = await supabase.from("bases").select("link").ilike("link", `%${token}%`).limit(50);
+  if (error) throw error;
+  return (data ?? []).some((row) => row.link && getLinkId(row.link) === id);
+}
+
+export async function createBase(base: NewBase) {
+  const { error } = await supabase.from("bases").insert(base);
+  if (error) throw error;
 }
