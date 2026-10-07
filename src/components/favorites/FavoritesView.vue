@@ -56,7 +56,7 @@ async function unfavorite(id: string) {
 
       <EmptyState v-else-if="bases.length === 0" message="Aún no tienes bases favoritas" />
 
-      <BaseGrid v-else :bases="bases">
+      <BaseGrid v-else :bases="bases" @removed="(id) => (bases = bases.filter((b) => b.id !== id))">
         <template #actions="{ base, openDetails }">
           <div class="flex gap-2">
             <CopyBaseButton :link="base.link" />

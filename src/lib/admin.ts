@@ -1,6 +1,6 @@
 import { ref } from "vue";
 import { supabase } from "@/lib/supabase";
-import { getPublicUrl, removeImage } from "@/lib/storage";
+import { getPublicUrl, getStoragePath, removeImage } from "@/lib/storage";
 import { BASE_TYPES, type BaseStatus, type BaseType } from "@/lib/constants";
 
 export const pendingCount = ref(0);
@@ -53,4 +53,12 @@ export async function deleteStoredImage(path: string, inUse: boolean) {
     if (error) throw error;
   }
   await removeImage(path);
+}
+
+export async function deleteBase(base: { id: string; url_foto: string | null }) {
+  const { data, error } = await supabase.from("bases").delete().eq("id", base.id).select("id");
+  if (error || !data?.length) throw error ?? new Error("Base no eliminada");
+
+  const path = getStoragePath(base.url_foto);
+  if (path) await removeImage(path).catch((err) => console.error("Error eliminando imagen:", err));
 }

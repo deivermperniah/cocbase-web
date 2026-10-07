@@ -74,7 +74,7 @@ function openReject(base: Base) {
 
       <EmptyState v-else-if="pending.length === 0" message="No hay bases pendientes de revisión" />
 
-      <BaseGrid v-else :bases="pending">
+      <BaseGrid v-else :bases="pending" @removed="(id) => (pending = pending.filter((b) => b.id !== id))">
         <template #actions="{ base }">
           <div class="space-y-page">
             <div class="flex min-h-[38px] items-center justify-between gap-2">

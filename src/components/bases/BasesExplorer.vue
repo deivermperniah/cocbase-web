@@ -92,6 +92,11 @@ async function toggleFavorite(base: Base) {
   }
 }
 
+function removeBase(id: string) {
+  bases.value = bases.value.filter((base) => base.id !== id);
+  total.value--;
+}
+
 async function loadFavorites() {
   await initializeAuth().catch(() => {});
   if (!user.value) return;
@@ -140,7 +145,7 @@ onMounted(() => {
     />
 
     <template v-else>
-      <BaseGrid :bases="bases">
+      <BaseGrid :bases="bases" @removed="removeBase">
         <template #actions="{ base, openDetails }">
           <div class="flex gap-2">
             <CopyBaseButton :link="base.link" />

@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import IconBuildings from "~icons/ph/buildings";
 import IconShare from "~icons/ph/share-network";
+import IconTrash from "~icons/ph/trash";
 import AppButton from "@/components/ui/AppButton.vue";
 import Badge from "@/components/ui/Badge.vue";
 import Modal from "@/components/ui/Modal.vue";
@@ -10,8 +11,8 @@ import { toast } from "@/lib/toast";
 
 const DEFAULT_DESIGNER = "Deiver Pernia";
 
-const props = defineProps<{ base: Base | null }>();
-const emit = defineEmits<{ close: [] }>();
+const props = defineProps<{ base: Base | null; canDelete?: boolean }>();
+const emit = defineEmits<{ close: []; delete: [base: Base] }>();
 
 const shareUrl = computed(() => props.base?.link || props.base?.url_foto || "");
 
@@ -29,6 +30,12 @@ async function share() {
   } catch (error) {
     if ((error as DOMException).name !== "AbortError") toast.error("No se pudo compartir la base");
   }
+}
+
+function remove() {
+  if (!props.base) return;
+  emit("delete", props.base);
+  emit("close");
 }
 
 const rowClass = "flex w-full items-center gap-3 px-4 py-3";
@@ -53,10 +60,17 @@ const rowClass = "flex w-full items-center gap-3 px-4 py-3";
         </div>
       </div>
 
-      <div v-if="shareUrl" class="overflow-hidden rounded-xl border border-border bg-secondary text-sm">
-        <button type="button" :class="rowClass" class="cursor-pointer text-white hover:bg-card" @click="share">
+      <div
+        v-if="shareUrl || canDelete"
+        class="divide-y divide-border overflow-hidden rounded-xl border border-border bg-secondary text-sm"
+      >
+        <button v-if="shareUrl" type="button" :class="rowClass" class="cursor-pointer text-white hover:bg-card" @click="share">
           <IconShare class="h-5 w-5 text-primary" />
           Compartir
+        </button>
+        <button v-if="canDelete" type="button" :class="rowClass" class="cursor-pointer text-red-400 hover:bg-red-500/10" @click="remove">
+          <IconTrash class="h-5 w-5" />
+          Eliminar base
         </button>
       </div>
 
