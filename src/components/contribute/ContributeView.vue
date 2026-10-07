@@ -1,19 +1,24 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import IconInfo from "~icons/ph/info";
+import IconTrash from "~icons/ph/trash";
 import AuthGate from "@/components/auth/AuthGate.vue";
 import BaseForm from "@/components/bases/BaseForm.vue";
 import MySubmissions from "@/components/contribute/MySubmissions.vue";
 import AppButton from "@/components/ui/AppButton.vue";
+import ConfirmModal from "@/components/ui/ConfirmModal.vue";
 import EmptyState from "@/components/ui/EmptyState.vue";
 import LoadingState from "@/components/ui/LoadingState.vue";
 import PageHeader from "@/components/ui/PageHeader.vue";
 import { user } from "@/lib/auth";
-import { fetchMyBases, type MyBase } from "@/lib/bases";
+import { baseLabel, deleteRejectedBase, fetchMyBases, type MyBase } from "@/lib/bases";
+import { toast } from "@/lib/toast";
 
 const myBases = ref<MyBase[]>([]);
 const loading = ref(true);
 const loadError = ref(false);
+const deleteTarget = ref<MyBase | null>(null);
+const isDeleting = ref(false);
 
 async function load() {
   loading.value = true;
@@ -25,6 +30,24 @@ async function load() {
     loadError.value = true;
   } finally {
     loading.value = false;
+  }
+}
+
+async function confirmDelete() {
+  const base = deleteTarget.value;
+  if (!base) return;
+
+  isDeleting.value = true;
+  try {
+    await deleteRejectedBase(base.id);
+    myBases.value = myBases.value.filter((b) => b.id !== base.id);
+    deleteTarget.value = null;
+    toast.success("Envío eliminado");
+  } catch (error) {
+    console.error("Error deleting submission:", error);
+    toast.error("No se pudo eliminar el envío");
+  } finally {
+    isDeleting.value = false;
   }
 }
 </script>
@@ -59,9 +82,31 @@ async function load() {
 
           <EmptyState v-else-if="myBases.length === 0" message="Aún no has enviado bases" />
 
-          <MySubmissions v-else :bases="myBases" />
+          <MySubmissions v-else :bases="myBases">
+            <template #rejected-actions="{ base }">
+              <button
+                type="button"
+                class="flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg bg-card px-3 text-xs text-red-400 hover:bg-red-600 hover:text-white"
+                @click="deleteTarget = base"
+              >
+                <IconTrash class="h-4 w-4" />
+                Eliminar
+              </button>
+            </template>
+          </MySubmissions>
         </section>
       </div>
+
+      <ConfirmModal
+        :open="deleteTarget !== null"
+        title="Eliminar envío"
+        label="Envío rechazado:"
+        :detail="deleteTarget ? baseLabel(deleteTarget) : ''"
+        confirm-text="Eliminar"
+        :loading="isDeleting"
+        @close="deleteTarget = null"
+        @confirm="confirmDelete"
+      />
     </div>
   </AuthGate>
 </template>

@@ -85,6 +85,11 @@ export async function fetchMyBases(userId: string) {
   return (data ?? []) as MyBase[];
 }
 
+export async function deleteRejectedBase(id: string) {
+  const { data, error } = await supabase.from("bases").delete().eq("id", id).eq("status", "rejected").select("id");
+  if (error || !data?.length) throw error ?? new Error("Envío no eliminado");
+}
+
 function parseUrl(link: string) {
   try {
     return new URL(link);
