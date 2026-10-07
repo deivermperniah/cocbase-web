@@ -14,7 +14,6 @@ import { baseLabel, deleteRejectedBase, fetchMyBases, type MyBase } from "@/lib/
 import { toast } from "@/lib/toast";
 
 const myBases = ref<MyBase[]>([]);
-const ready = ref(false);
 const loading = ref(true);
 const loadError = ref(false);
 const deleteTarget = ref<MyBase | null>(null);
@@ -31,11 +30,6 @@ async function load() {
   } finally {
     loading.value = false;
   }
-}
-
-function onReady() {
-  ready.value = true;
-  load();
 }
 
 async function confirmDelete() {
@@ -69,55 +63,51 @@ async function confirmDelete() {
       </p>
     </div>
 
-    <div v-if="!ready" class="grid grid-cols-1 gap-page lg:grid-cols-2">
-      <div v-for="i in 2" :key="i" class="skeleton h-[420px] rounded-xl"></div>
+    <AuthGate access="user" @ready="load" />
+
+    <div class="grid grid-cols-1 gap-page lg:grid-cols-2">
+      <section class="rounded-xl border border-border bg-card p-page">
+        <h2 class="mb-page text-base text-white">Nueva base</h2>
+        <BaseForm @success="load" />
+      </section>
+
+      <section class="rounded-xl border border-border bg-card p-page">
+        <h2 class="mb-page text-base text-white">Mis envíos</h2>
+
+        <div v-if="loading && myBases.length === 0" class="space-y-2.5">
+          <div v-for="i in 3" :key="i" class="skeleton h-11 rounded-xl"></div>
+        </div>
+
+        <EmptyState v-else-if="loadError" message="No se pudieron cargar tus envíos">
+          <AppButton @click="load">Reintentar</AppButton>
+        </EmptyState>
+
+        <EmptyState v-else-if="myBases.length === 0" message="Aún no has enviado bases" />
+
+        <MySubmissions v-else :bases="myBases">
+          <template #rejected-actions="{ base }">
+            <button
+              type="button"
+              class="flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg bg-card px-3 text-xs text-red-400 hover:bg-red-600 hover:text-white"
+              @click="deleteTarget = base"
+            >
+              <IconTrash class="h-4 w-4" />
+              Eliminar
+            </button>
+          </template>
+        </MySubmissions>
+      </section>
     </div>
 
-    <AuthGate access="user" @ready="onReady">
-      <div class="grid grid-cols-1 gap-page lg:grid-cols-2">
-        <section class="rounded-xl border border-border bg-card p-page">
-          <h2 class="mb-page text-base text-white">Nueva base</h2>
-          <BaseForm @success="load" />
-        </section>
-
-        <section class="rounded-xl border border-border bg-card p-page">
-          <h2 class="mb-page text-base text-white">Mis envíos</h2>
-
-          <div v-if="loading && myBases.length === 0" class="space-y-2.5">
-            <div v-for="i in 3" :key="i" class="skeleton h-11 rounded-xl"></div>
-          </div>
-
-          <EmptyState v-else-if="loadError" message="No se pudieron cargar tus envíos">
-            <AppButton @click="load">Reintentar</AppButton>
-          </EmptyState>
-
-          <EmptyState v-else-if="myBases.length === 0" message="Aún no has enviado bases" />
-
-          <MySubmissions v-else :bases="myBases">
-            <template #rejected-actions="{ base }">
-              <button
-                type="button"
-                class="flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg bg-card px-3 text-xs text-red-400 hover:bg-red-600 hover:text-white"
-                @click="deleteTarget = base"
-              >
-                <IconTrash class="h-4 w-4" />
-                Eliminar
-              </button>
-            </template>
-          </MySubmissions>
-        </section>
-      </div>
-
-      <ConfirmModal
-        :open="deleteTarget !== null"
-        title="Eliminar envío"
-        label="Envío rechazado:"
-        :detail="deleteTarget ? baseLabel(deleteTarget) : ''"
-        confirm-text="Eliminar"
-        :loading="isDeleting"
-        @close="deleteTarget = null"
-        @confirm="confirmDelete"
-      />
-    </AuthGate>
+    <ConfirmModal
+      :open="deleteTarget !== null"
+      title="Eliminar envío"
+      label="Envío rechazado:"
+      :detail="deleteTarget ? baseLabel(deleteTarget) : ''"
+      confirm-text="Eliminar"
+      :loading="isDeleting"
+      @close="deleteTarget = null"
+      @confirm="confirmDelete"
+    />
   </div>
 </template>
