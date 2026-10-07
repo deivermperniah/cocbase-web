@@ -13,5 +13,5 @@ const { level } = Astro.props;
 ---
 
 <MainLayout title={level ? `Bases para Ayuntamiento ${level}` : "Bases de Clash of Clans"}>
-  <BasesExplorer client:only="vue" level={level} />
+  <BasesExplorer client:load level={level} />
 </MainLayout>
