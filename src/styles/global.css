@@ -51,3 +51,7 @@
 @utility card-grid {
   @apply grid grid-cols-1 gap-page md:grid-cols-2 lg:grid-cols-3;
 }
+
+@utility skeleton {
+  @apply animate-pulse bg-secondary;
+}

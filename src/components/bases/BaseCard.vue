@@ -15,7 +15,7 @@ const isLoaded = ref(false);
   <div class="group overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
     <div class="relative aspect-video overflow-hidden bg-secondary">
       <button v-if="base.url_foto" type="button" class="block h-full w-full cursor-zoom-in" @click="emit('openImage')">
-        <div v-if="!isLoaded" class="absolute inset-0 animate-pulse bg-secondary"></div>
+        <div v-if="!isLoaded" class="skeleton absolute inset-0"></div>
         <img
           :src="base.url_foto"
           alt=""
