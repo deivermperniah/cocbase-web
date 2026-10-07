@@ -87,14 +87,16 @@ async function confirmDelete() {
 <template>
   <div class="space-y-page">
     <PageHeader title="Imágenes">
-      <template v-if="!loading && !loadError" #actions>
+      <template v-if="!loadError" #actions>
         <span class="flex items-center gap-2 text-sm text-white">
           <IconImage class="h-4 w-4 text-primary" />
-          {{ images.length }}
+          <span v-if="loading" class="skeleton h-4 w-6 rounded"></span>
+          <template v-else>{{ images.length }}</template>
         </span>
         <span class="flex items-center gap-2 text-sm text-white">
           <IconServer class="h-4 w-4 text-primary" />
-          {{ totalMb }} MB
+          <span v-if="loading" class="skeleton h-4 w-14 rounded"></span>
+          <template v-else>{{ totalMb }} MB</template>
         </span>
       </template>
     </PageHeader>
