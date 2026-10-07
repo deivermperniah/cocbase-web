@@ -1,0 +1,8 @@
+---
+import MainLayout from "@/layouts/MainLayout.astro";
+import ImagesView from "@/components/admin/ImagesView.vue";
+---
+
+<MainLayout title="Imágenes">
+  <ImagesView client:only="vue" />
+</MainLayout>

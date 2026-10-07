@@ -39,3 +39,9 @@ export async function reviewBase(id: string, status: "approved" | "rejected", no
   if (error || !data?.length) throw error ?? new Error("Base no actualizada");
   pendingCount.value = Math.max(0, pendingCount.value - 1);
 }
+
+export async function fetchUsedImageUrls() {
+  const { data, error } = await supabase.from("bases").select("url_foto").not("url_foto", "is", null).limit(10000);
+  if (error) throw error;
+  return new Set((data ?? []).map((row) => row.url_foto as string));
+}
