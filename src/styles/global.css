@@ -55,3 +55,8 @@
 @utility skeleton {
   @apply animate-pulse bg-secondary;
 }
+
+html[data-session] .signed-out-only,
+html:not([data-session]) .signed-in-only {
+  display: none;
+}

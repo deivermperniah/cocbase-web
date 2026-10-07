@@ -38,6 +38,7 @@ async function loadProfile(userId: string) {
 
 async function setSession(next: Session | null) {
   session.value = next;
+  document.documentElement.toggleAttribute("data-session", next !== null);
   user.value = next?.user ?? null;
   if (next?.user) await loadProfile(next.user.id);
   else {

@@ -14,7 +14,6 @@ import { getNavItems } from "@/lib/navigation";
 defineProps<{ currentPath: string }>();
 
 const isMenuOpen = ref(false);
-const isRestored = ref(false);
 const navItems = computed(() => getNavItems(isSignedIn.value, isAdmin.value, pendingCount.value));
 
 watch(isAdmin, (admin) => {
@@ -23,7 +22,6 @@ watch(isAdmin, (admin) => {
 
 onMounted(() => {
   restoreStoredAuth();
-  isRestored.value = true;
   initializeAuth().catch((error) => console.error("Error initializing auth:", error));
 });
 </script>
@@ -36,9 +34,8 @@ onMounted(() => {
     <NavLinks :items="navItems" :current-path="currentPath" variant="pill" />
     <div class="flex shrink-0 items-center gap-2">
       <AppButton href="/descargar" variant="outline" size="sm" :icon="IconDownload">Descargar app</AppButton>
-      <div v-if="!isRestored" class="skeleton h-9 w-9 rounded-full"></div>
-      <AccountMenu v-else-if="isSignedIn" />
-      <AppButton v-else href="/login" size="sm">Iniciar sesión</AppButton>
+      <AccountMenu class="signed-in-only" />
+      <AppButton href="/login" size="sm" class="signed-out-only">Iniciar sesión</AppButton>
     </div>
   </header>
 
@@ -56,9 +53,8 @@ onMounted(() => {
       >
         <IconDownload class="h-4 w-4" />
       </a>
-      <div v-if="!isRestored" class="skeleton h-9 w-9 rounded-full"></div>
-      <AccountMenu v-else-if="isSignedIn" />
-      <a v-else href="/login" class="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-black hover:bg-yellow-300">
+      <AccountMenu class="signed-in-only" />
+      <a href="/login" class="signed-out-only flex h-9 w-9 items-center justify-center rounded-full bg-primary text-black hover:bg-yellow-300">
         <IconSignIn class="h-5 w-5" />
       </a>
     </div>
