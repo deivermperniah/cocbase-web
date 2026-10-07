@@ -22,7 +22,7 @@
 - `src/pages/`: una página `.astro` por ruta. Deben ser finas: layout + contenido estático o una isla.
 - `src/layouts/`: `BaseLayout`, `MainLayout`, `AuthLayout`, `LegalLayout`.
 - `src/components/ui/`: componentes reutilizables (AppButton, IconButton, Modal, ConfirmModal, FormField, FormSelect, Badge, CountBadge, PageHeader, EmptyState, CardSkeletonGrid, Icon, Logo, SocialLinks).
-- `src/components/<sección>/`: componentes de cada sección (bases, favorites, contribute, admin, auth, layout, home, download).
+- `src/components/<sección>/`: componentes de cada sección (bases, favorites, contribute, admin, auth, layout, home).
 - `src/lib/`: lógica y consultas a Supabase, agrupadas por tema (auth, bases, favorites, admin, storage, image, navigation, toast, constants).
 - `src/data/`: textos estáticos (legales).
 
