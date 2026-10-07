@@ -1,12 +1,36 @@
 <script setup lang="ts">
+import { ref } from "vue";
 import IconInfo from "~icons/ph/info";
 import AuthGate from "@/components/auth/AuthGate.vue";
 import BaseForm from "@/components/bases/BaseForm.vue";
+import MySubmissions from "@/components/contribute/MySubmissions.vue";
+import AppButton from "@/components/ui/AppButton.vue";
+import EmptyState from "@/components/ui/EmptyState.vue";
+import LoadingState from "@/components/ui/LoadingState.vue";
 import PageHeader from "@/components/ui/PageHeader.vue";
+import { user } from "@/lib/auth";
+import { fetchMyBases, type MyBase } from "@/lib/bases";
+
+const myBases = ref<MyBase[]>([]);
+const loading = ref(true);
+const loadError = ref(false);
+
+async function load() {
+  loading.value = true;
+  loadError.value = false;
+  try {
+    myBases.value = await fetchMyBases(user.value!.id);
+  } catch (error) {
+    console.error("Error fetching my bases:", error);
+    loadError.value = true;
+  } finally {
+    loading.value = false;
+  }
+}
 </script>
 
 <template>
-  <AuthGate access="user">
+  <AuthGate access="user" @ready="load">
     <div class="space-y-page">
       <PageHeader title="Contribuir" />
 
@@ -21,7 +45,21 @@ import PageHeader from "@/components/ui/PageHeader.vue";
       <div class="grid grid-cols-1 gap-page lg:grid-cols-2">
         <section class="rounded-xl border border-border bg-card p-page">
           <h2 class="mb-page text-base text-white">Nueva base</h2>
-          <BaseForm />
+          <BaseForm @success="load" />
+        </section>
+
+        <section class="rounded-xl border border-border bg-card p-page">
+          <h2 class="mb-page text-base text-white">Mis envíos</h2>
+
+          <LoadingState v-if="loading" size="sm" />
+
+          <EmptyState v-else-if="loadError" message="No se pudieron cargar tus envíos">
+            <AppButton @click="load">Reintentar</AppButton>
+          </EmptyState>
+
+          <EmptyState v-else-if="myBases.length === 0" message="Aún no has enviado bases" />
+
+          <MySubmissions v-else :bases="myBases" />
         </section>
       </div>
     </div>

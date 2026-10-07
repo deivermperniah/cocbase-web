@@ -16,6 +16,15 @@ export interface Base {
   profiles: { full_name: string | null } | null;
 }
 
+export interface MyBase {
+  id: string;
+  level_th: number;
+  type: string;
+  status: BaseStatus;
+  review_note: string | null;
+  created_at: string;
+}
+
 export interface NewBase {
   link: string | null;
   type: string;
@@ -34,6 +43,13 @@ export function baseLabel(base: { type: string; level_th: number }) {
 export function formatDate(value: string | null | undefined) {
   if (!value) return "—";
   return new Date(value).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" });
+}
+
+export function formatRelativeDate(value: string) {
+  const days = Math.floor((Date.now() - new Date(value).getTime()) / 86_400_000);
+  if (days <= 0) return "hoy";
+  if (days === 1) return "ayer";
+  return `hace ${days} días`;
 }
 
 export function getBaseTypeIcon(type: string): Component {
@@ -57,6 +73,16 @@ export async function fetchApprovedBases(filters: { level: number | null; type: 
   const { data, count, error } = await query;
   if (error) throw error;
   return { bases: (data ?? []) as unknown as Base[], total: count ?? 0 };
+}
+
+export async function fetchMyBases(userId: string) {
+  const { data, error } = await supabase
+    .from("bases")
+    .select("id, level_th, type, status, review_note, created_at")
+    .eq("author_id", userId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as MyBase[];
 }
 
 function parseUrl(link: string) {
