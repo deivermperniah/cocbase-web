@@ -1,0 +1,8 @@
+---
+import MainLayout from "@/layouts/MainLayout.astro";
+import PanelView from "@/components/admin/PanelView.vue";
+---
+
+<MainLayout title="Panel">
+  <PanelView client:only="vue" />
+</MainLayout>
