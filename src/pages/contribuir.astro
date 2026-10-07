@@ -1,0 +1,8 @@
+---
+import MainLayout from "@/layouts/MainLayout.astro";
+import ContributeView from "@/components/contribute/ContributeView.vue";
+---
+
+<MainLayout title="Contribuir">
+  <ContributeView client:only="vue" />
+</MainLayout>
