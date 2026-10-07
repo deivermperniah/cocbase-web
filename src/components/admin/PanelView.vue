@@ -10,7 +10,6 @@ import BaseForm from "@/components/bases/BaseForm.vue";
 import AppButton from "@/components/ui/AppButton.vue";
 import CountBadge from "@/components/ui/CountBadge.vue";
 import EmptyState from "@/components/ui/EmptyState.vue";
-import LoadingState from "@/components/ui/LoadingState.vue";
 import Modal from "@/components/ui/Modal.vue";
 import PageHeader from "@/components/ui/PageHeader.vue";
 import { fetchDashboardStats } from "@/lib/admin";
@@ -47,22 +46,24 @@ function handleNewBase() {
 </script>
 
 <template>
-  <AuthGate access="admin" @ready="load">
-    <LoadingState v-if="loading" />
+  <div class="space-y-page">
+    <PageHeader title="Panel">
+      <template v-if="!loading || stats" #actions>
+        <AppButton href="/bases" variant="outline" :icon="IconLayers" class="hidden sm:flex">Ver bases</AppButton>
+        <AppButton :icon="IconPlus" @click="isNewBaseOpen = true">Nueva base</AppButton>
+      </template>
+    </PageHeader>
 
-    <div v-else class="space-y-page">
-      <PageHeader title="Panel">
-        <template #actions>
-          <AppButton href="/bases" variant="outline" :icon="IconLayers" class="hidden sm:flex">Ver bases</AppButton>
-          <AppButton :icon="IconPlus" @click="isNewBaseOpen = true">Nueva base</AppButton>
-        </template>
-      </PageHeader>
+    <div v-if="loading && !stats" class="grid grid-cols-2 gap-page md:grid-cols-3">
+      <div v-for="i in 5" :key="i" class="skeleton h-[200px] rounded-xl" :class="i === 1 && 'col-span-2'"></div>
+    </div>
 
-      <EmptyState v-if="!stats" message="No se pudieron cargar las estadísticas">
+    <AuthGate access="admin" @ready="load">
+      <EmptyState v-if="!loading && !stats" message="No se pudieron cargar las estadísticas">
         <AppButton @click="load">Reintentar</AppButton>
       </EmptyState>
 
-      <template v-else>
+      <template v-else-if="stats">
         <div class="grid grid-cols-2 gap-page md:grid-cols-3">
           <div
             class="col-span-2 flex h-[200px] flex-col items-center justify-center rounded-xl bg-gradient-to-br from-yellow-300 via-primary to-yellow-500 text-center shadow-2xl"
@@ -112,6 +113,6 @@ function handleNewBase() {
       <Modal :open="isNewBaseOpen" title="Nueva base" size="xl" @close="isNewBaseOpen = false">
         <BaseForm @success="handleNewBase" />
       </Modal>
-    </div>
-  </AuthGate>
+    </AuthGate>
+  </div>
 </template>
