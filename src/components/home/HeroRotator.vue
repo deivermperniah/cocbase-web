@@ -48,7 +48,7 @@ onBeforeUnmount(stop);
       <img
         :key="current"
         :src="current"
-        alt="Ejemplo de base de Clash of Clans"
+        alt=""
         width="788"
         height="443"
         class="absolute inset-0 h-full w-full object-cover"
