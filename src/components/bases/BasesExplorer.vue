@@ -112,11 +112,9 @@ onMounted(() => {
 <template>
   <div class="space-y-page">
     <PageHeader
-      :title="level ? `Bases para Ayuntamiento ${level}` : 'Bases de Clash of Clans'"
+      :title="level ? `Bases para Ayuntamiento ${level}` : 'Bases'"
       :subtitle="
-        level
-          ? `Bases de guerra, liga, competitivo y mejora para TH${level}, listas para copiar en el juego.`
-          : 'Bases de guerra, liga, competitivo y mejora para todos los niveles de ayuntamiento.'
+        level ? `Bases de guerra, liga, competitivo y mejora para TH${level}, listas para copiar en el juego.` : ''
       "
     >
       <template #actions>
