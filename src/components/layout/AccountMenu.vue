@@ -43,7 +43,7 @@ async function handleSignOut() {
           <p class="truncate text-sm text-white">{{ user?.email }}</p>
         </div>
         <div class="border-t border-border pt-3">
-          <AppButton variant="secondary" :icon="IconLogOut" :loading="isSigningOut" class="w-full" @click="handleSignOut">
+          <AppButton variant="danger" :icon="IconLogOut" :loading="isSigningOut" class="w-full" @click="handleSignOut">
             Cerrar sesión
           </AppButton>
         </div>
