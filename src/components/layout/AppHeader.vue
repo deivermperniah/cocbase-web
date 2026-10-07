@@ -14,7 +14,7 @@ import { getNavItems } from "@/lib/navigation";
 defineProps<{ currentPath: string }>();
 
 const isMenuOpen = ref(false);
-const navItems = computed(() => getNavItems(isSignedIn.value, isAdmin.value, pendingCount.value));
+const navItems = computed(() => getNavItems(isSignedIn.value, pendingCount.value));
 
 watch(isAdmin, (admin) => {
   if (admin) refreshPendingCount().catch((error) => console.error("Error fetching pending count:", error));

@@ -57,6 +57,8 @@
 }
 
 html[data-session] .signed-out-only,
-html:not([data-session]) .signed-in-only {
+html:not([data-session]) .signed-in-only,
+html[data-admin] .user-only,
+html:not([data-admin]) .admin-only {
   display: none;
 }

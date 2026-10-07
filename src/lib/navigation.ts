@@ -12,17 +12,17 @@ export interface NavItem {
   path: string;
   href: string;
   badge?: number;
+  className?: string;
 }
 
-export function getNavItems(signedIn: boolean, admin: boolean, pending: number): NavItem[] {
+export function getNavItems(signedIn: boolean, pending: number): NavItem[] {
   const privateHref = (path: string) => (signedIn ? path : loginUrl(path));
   return [
     { name: "Inicio", icon: IconHouse, path: "/", href: "/" },
     { name: "Bases", icon: IconLayers, path: "/bases", href: "/bases" },
     { name: "Favoritos", icon: IconHeart, path: "/favoritos", href: privateHref("/favoritos") },
-    admin
-      ? { name: "Panel", icon: IconDashboard, path: "/panel", href: "/panel", badge: pending }
-      : { name: "Contribuir", icon: IconUpload, path: "/contribuir", href: privateHref("/contribuir") },
+    { name: "Contribuir", icon: IconUpload, path: "/contribuir", href: privateHref("/contribuir"), className: "user-only" },
+    { name: "Panel", icon: IconDashboard, path: "/panel", href: "/panel", badge: pending, className: "admin-only" },
   ];
 }
 

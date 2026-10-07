@@ -21,6 +21,7 @@ const { title } = Astro.props;
     <script is:inline>
       if (Object.keys(localStorage).some((key) => /^sb-.+-auth-token$/.test(key))) {
         document.documentElement.setAttribute("data-session", "");
+        if (localStorage.getItem("cocbase-role") === "admin") document.documentElement.setAttribute("data-admin", "");
       }
     </script>
   </head>

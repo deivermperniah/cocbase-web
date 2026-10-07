@@ -23,8 +23,8 @@ export const isSignedIn = computed(() => (authReady.value ? session.value !== nu
 export const isAdmin = computed(() => (profile.value ? profile.value.role : storedRole.value) === "admin");
 
 export function restoreStoredAuth() {
-  storedSession.value = Object.keys(localStorage).some((key) => /^sb-.+-auth-token$/.test(key));
-  storedRole.value = storedSession.value ? localStorage.getItem(ROLE_KEY) : null;
+  storedSession.value = document.documentElement.hasAttribute("data-session");
+  storedRole.value = document.documentElement.hasAttribute("data-admin") ? "admin" : null;
 }
 
 let initialization: Promise<void> | null = null;
@@ -34,6 +34,7 @@ async function loadProfile(userId: string) {
   if (error) console.error("Error loading profile:", error);
   profile.value = data as Profile | null;
   if (profile.value) localStorage.setItem(ROLE_KEY, profile.value.role);
+  document.documentElement.toggleAttribute("data-admin", profile.value?.role === "admin");
 }
 
 async function setSession(next: Session | null) {
@@ -45,6 +46,7 @@ async function setSession(next: Session | null) {
     profile.value = null;
     storedRole.value = null;
     localStorage.removeItem(ROLE_KEY);
+    document.documentElement.removeAttribute("data-admin");
   }
 }
 

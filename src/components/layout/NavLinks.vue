@@ -13,6 +13,7 @@ defineProps<{ items: NavItem[]; currentPath: string; variant: "pill" | "drawer" 
       :href="item.href"
       class="flex items-center text-sm transition-colors"
       :class="[
+        item.className,
         variant === 'pill' ? 'gap-1.5 rounded-full px-3 py-2' : 'gap-3 rounded-lg border px-page py-3 hover:bg-card',
         isActive(item.path, currentPath)
           ? ['text-primary', variant === 'drawer' && 'border-primary/20 bg-card']
