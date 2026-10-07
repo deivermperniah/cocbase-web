@@ -1,5 +1,6 @@
 import { ref } from "vue";
 import { supabase } from "@/lib/supabase";
+import { getPublicUrl, removeImage } from "@/lib/storage";
 import { BASE_TYPES, type BaseStatus, type BaseType } from "@/lib/constants";
 
 export const pendingCount = ref(0);
@@ -44,4 +45,12 @@ export async function fetchUsedImageUrls() {
   const { data, error } = await supabase.from("bases").select("url_foto").not("url_foto", "is", null).limit(10000);
   if (error) throw error;
   return new Set((data ?? []).map((row) => row.url_foto as string));
+}
+
+export async function deleteStoredImage(path: string, inUse: boolean) {
+  if (inUse) {
+    const { error } = await supabase.from("bases").update({ url_foto: null }).eq("url_foto", getPublicUrl(path));
+    if (error) throw error;
+  }
+  await removeImage(path);
 }

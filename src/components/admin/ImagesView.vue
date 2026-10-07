@@ -2,14 +2,18 @@
 import { computed, ref } from "vue";
 import IconImage from "~icons/ph/image";
 import IconServer from "~icons/ph/hard-drives";
+import IconTrash from "~icons/ph/trash";
 import AuthGate from "@/components/auth/AuthGate.vue";
 import AppButton from "@/components/ui/AppButton.vue";
 import Badge from "@/components/ui/Badge.vue";
 import CardSkeletonGrid from "@/components/ui/CardSkeletonGrid.vue";
+import ConfirmModal from "@/components/ui/ConfirmModal.vue";
 import EmptyState from "@/components/ui/EmptyState.vue";
+import IconButton from "@/components/ui/IconButton.vue";
 import PageHeader from "@/components/ui/PageHeader.vue";
-import { fetchUsedImageUrls } from "@/lib/admin";
+import { deleteStoredImage, fetchUsedImageUrls } from "@/lib/admin";
 import { listImages, type StoredImage } from "@/lib/storage";
+import { toast } from "@/lib/toast";
 
 const PAGE_SIZE = 24;
 
@@ -20,6 +24,8 @@ const hasMore = ref(false);
 const loading = ref(true);
 const loadingMore = ref(false);
 const loadError = ref(false);
+const deleteTarget = ref<StoredImage | null>(null);
+const isDeleting = ref(false);
 
 const totalMb = computed(() => (images.value.reduce((sum, img) => sum + img.size, 0) / (1024 * 1024)).toFixed(2));
 
@@ -55,6 +61,25 @@ async function load() {
     loadError.value = true;
   } finally {
     loading.value = false;
+  }
+}
+
+async function confirmDelete() {
+  const image = deleteTarget.value;
+  if (!image) return;
+
+  isDeleting.value = true;
+  try {
+    await deleteStoredImage(image.name, isInUse(image));
+    images.value = images.value.filter((img) => img.name !== image.name);
+    offset.value = Math.max(0, offset.value - 1);
+    deleteTarget.value = null;
+    toast.success("Imagen eliminada");
+  } catch (error) {
+    console.error("Error deleting image:", error);
+    toast.error("No se pudo eliminar la imagen");
+  } finally {
+    isDeleting.value = false;
   }
 }
 </script>
@@ -101,6 +126,7 @@ async function load() {
             </div>
             <div class="flex min-h-[68px] items-center gap-3 p-page">
               <h3 class="flex-1 truncate text-sm text-white group-hover:text-primary">{{ img.name }}</h3>
+              <IconButton :icon="IconTrash" tone="danger" @click="deleteTarget = img" />
             </div>
           </div>
         </div>
@@ -109,6 +135,24 @@ async function load() {
           <AppButton variant="outline" :loading="loadingMore" @click="loadMore">Mostrar más</AppButton>
         </div>
       </template>
+
+      <ConfirmModal
+        :open="deleteTarget !== null"
+        title="Eliminar"
+        label="Imagen seleccionada:"
+        :detail="deleteTarget?.name"
+        confirm-text="Eliminar"
+        :loading="isDeleting"
+        @close="deleteTarget = null"
+        @confirm="confirmDelete"
+      >
+        <p
+          v-if="deleteTarget && isInUse(deleteTarget)"
+          class="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-400"
+        >
+          Esta imagen está en uso. La base que la usa quedará sin foto.
+        </p>
+      </ConfirmModal>
     </div>
   </AuthGate>
 </template>
