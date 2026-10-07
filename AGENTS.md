@@ -29,14 +29,14 @@
 ## Convenciones
 
 - Las consultas a Supabase van solo en `src/lib/`, nunca directamente en los componentes.
-- Las islas que usan Supabase o auth van con `client:only="vue"`; el resto con `client:load`. Los componentes Vue solo de presentación se usan en `.astro` sin directiva.
-- Las páginas privadas envuelven su contenido en `<AuthGate access="auth|user|admin|guest">` y cargan datos en `@ready`.
+- Las islas usan `client:load` (no `client:only`), para que su estado inicial (títulos, textos y skeletons) salga en el HTML. Los componentes Vue solo de presentación se usan en `.astro` sin directiva.
+- Las páginas privadas usan `<AuthGate access="auth|user|admin|guest">` para redirigir y cargar datos en `@ready`. Solo envuelve contenido que depende de datos; el contenido estático va fuera y se ve siempre.
 - La navegación es con `<a href>` y `window.location`; no hay router.
 - Iconos en `.astro`: usar el wrapper `<Icon icon={...} />`. En Vue, el componente del icono directamente.
 - Imágenes en `.astro`: `<Image>` de `astro:assets`. En Vue, `import img from "...webp"` y usar `img.src`.
 - Colores con los tokens del tema (`primary`, `card`, `chrome`, `secondary`, `border`, `muted-foreground`), no con colores sueltos. Los listados en cuadrícula usan la clase `card-grid`.
-- Carga de contenido con skeletons (clase `skeleton` o `CardSkeletonGrid`, una sola fila). El spinner solo va en botones de acción (`AppButton` con `loading`).
-- Nada debe mostrar un estado de sesión equivocado mientras carga: usar `authReady` o un skeleton hasta conocer la sesión.
+- Los textos y el contenido estático siempre se ven, también mientras carga. Los skeletons (clase `skeleton` o `CardSkeletonGrid`, una sola fila) son solo para datos que vienen de Supabase. El spinner solo va en botones de acción (`AppButton` con `loading`).
+- Nada debe mostrar un estado de sesión equivocado mientras carga: el header usa la sesión y el rol guardados en el navegador (`restoreStoredAuth`) hasta que Supabase confirma.
 - Variables de entorno con prefijo `PUBLIC_` y declaradas en `src/env.d.ts`.
 - Textos de la interfaz en español; código (nombres, variables) en inglés.
 
