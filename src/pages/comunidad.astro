@@ -1,0 +1,8 @@
+---
+import MainLayout from "@/layouts/MainLayout.astro";
+import ReviewView from "@/components/admin/ReviewView.vue";
+---
+
+<MainLayout title="Comunidad">
+  <ReviewView client:only="vue" />
+</MainLayout>

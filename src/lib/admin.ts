@@ -29,3 +29,13 @@ export async function fetchDashboardStats() {
     byType: Object.fromEntries(BASE_TYPES.map((type, i) => [type, byType[i] ?? 0])) as Record<BaseType, number>,
   };
 }
+
+export async function reviewBase(id: string, status: "approved" | "rejected", note: string | null = null) {
+  const { data, error } = await supabase
+    .from("bases")
+    .update({ status, reviewed_at: new Date().toISOString(), review_note: note })
+    .eq("id", id)
+    .select("id");
+  if (error || !data?.length) throw error ?? new Error("Base no actualizada");
+  pendingCount.value = Math.max(0, pendingCount.value - 1);
+}

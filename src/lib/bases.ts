@@ -75,6 +75,16 @@ export async function fetchApprovedBases(filters: { level: number | null; type: 
   return { bases: (data ?? []) as unknown as Base[], total: count ?? 0 };
 }
 
+export async function fetchPendingBases() {
+  const { data, error } = await supabase
+    .from("bases")
+    .select(BASE_COLUMNS)
+    .eq("status", "pending")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as unknown as Base[];
+}
+
 export async function fetchMyBases(userId: string) {
   const { data, error } = await supabase
     .from("bases")
