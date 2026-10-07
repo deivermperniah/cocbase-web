@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import IconMenu from "~icons/ph/list";
 import IconDownload from "~icons/ph/download-simple";
 import IconSignIn from "~icons/ph/sign-in";
@@ -7,13 +7,18 @@ import AppButton from "@/components/ui/AppButton.vue";
 import Logo from "@/components/ui/Logo.vue";
 import AccountMenu from "@/components/layout/AccountMenu.vue";
 import NavLinks from "@/components/layout/NavLinks.vue";
+import { pendingCount, refreshPendingCount } from "@/lib/admin";
 import { initializeAuth, isAdmin, session } from "@/lib/auth";
 import { getNavItems } from "@/lib/navigation";
 
 defineProps<{ currentPath: string }>();
 
 const isMenuOpen = ref(false);
-const navItems = computed(() => getNavItems(Boolean(session.value), isAdmin.value));
+const navItems = computed(() => getNavItems(Boolean(session.value), isAdmin.value, pendingCount.value));
+
+watch(isAdmin, (admin) => {
+  if (admin) refreshPendingCount().catch((error) => console.error("Error fetching pending count:", error));
+});
 
 onMounted(() => initializeAuth().catch((error) => console.error("Error initializing auth:", error)));
 </script>

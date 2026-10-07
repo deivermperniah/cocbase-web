@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CountBadge from "@/components/ui/CountBadge.vue";
 import { isActive, type NavItem } from "@/lib/navigation";
 
 defineProps<{ items: NavItem[]; currentPath: string; variant: "pill" | "drawer" }>();
@@ -20,6 +21,7 @@ defineProps<{ items: NavItem[]; currentPath: string; variant: "pill" | "drawer" 
     >
       <component :is="item.icon" v-if="variant === 'drawer'" class="h-5 w-5 shrink-0" />
       {{ item.name }}
+      <CountBadge :count="item.badge" :class="variant === 'drawer' && 'ml-auto'" />
     </a>
   </nav>
 </template>

@@ -11,16 +11,17 @@ export interface NavItem {
   icon: Component;
   path: string;
   href: string;
+  badge?: number;
 }
 
-export function getNavItems(signedIn: boolean, admin: boolean): NavItem[] {
+export function getNavItems(signedIn: boolean, admin: boolean, pending: number): NavItem[] {
   const privateHref = (path: string) => (signedIn ? path : loginUrl(path));
   return [
     { name: "Inicio", icon: IconHouse, path: "/", href: "/" },
     { name: "Bases", icon: IconLayers, path: "/bases", href: "/bases" },
     { name: "Favoritos", icon: IconHeart, path: "/favoritos", href: privateHref("/favoritos") },
     admin
-      ? { name: "Panel", icon: IconDashboard, path: "/panel", href: "/panel" }
+      ? { name: "Panel", icon: IconDashboard, path: "/panel", href: "/panel", badge: pending }
       : { name: "Contribuir", icon: IconUpload, path: "/contribuir", href: privateHref("/contribuir") },
   ];
 }
