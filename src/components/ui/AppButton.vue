@@ -20,7 +20,7 @@ const variants = {
   primary: "bg-primary text-black hover:bg-yellow-300 shadow-xl shadow-primary/10",
   secondary: "bg-secondary border border-border text-muted-foreground hover:text-white",
   outline: "border-2 border-primary text-primary hover:bg-primary/10",
-  danger: "bg-red-600 text-white hover:bg-red-500 shadow-xl shadow-red-600/20",
+  danger: "border border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20",
 };
 
 const sizes = {
