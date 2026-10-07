@@ -1,14 +1,10 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import IconLogOut from "~icons/ph/sign-out";
+import IconUser from "~icons/ph/user";
 import AppButton from "@/components/ui/AppButton.vue";
 import Badge from "@/components/ui/Badge.vue";
 import { isAdmin, profile, signOut, user } from "@/lib/auth";
-
-const avatars = Object.values(
-  import.meta.glob<{ src: string }>("@/assets/images/avatars/*.webp", { eager: true, import: "default" }),
-);
-const avatar = avatars[Math.floor(Math.random() * avatars.length)]?.src;
 
 const isOpen = ref(false);
 const isSigningOut = ref(false);
@@ -24,10 +20,10 @@ async function handleSignOut() {
   <div class="relative flex items-center">
     <button
       type="button"
-      class="h-9 w-9 cursor-pointer overflow-hidden rounded-full border border-muted-foreground/40 bg-secondary hover:border-muted-foreground"
+      class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-muted-foreground/40 bg-secondary text-muted-foreground hover:border-primary hover:text-primary"
       @click="isOpen = !isOpen"
     >
-      <img :src="avatar" alt="" width="36" height="36" class="h-full w-full object-cover" />
+      <IconUser class="h-5 w-5" />
     </button>
 
     <template v-if="isOpen">
