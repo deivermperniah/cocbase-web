@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import IconLayers from "~icons/ph/stack";
 import IconPlus from "~icons/ph/plus";
 import IconClipboard from "~icons/ph/clipboard-text";
 import IconImage from "~icons/ph/image";
@@ -49,7 +48,6 @@ function handleNewBase() {
   <div class="space-y-page">
     <PageHeader title="Panel">
       <template v-if="!loading || stats" #actions>
-        <AppButton href="/bases" variant="outline" :icon="IconLayers" class="hidden sm:flex">Ver bases</AppButton>
         <AppButton :icon="IconPlus" @click="isNewBaseOpen = true">Nueva base</AppButton>
       </template>
     </PageHeader>
