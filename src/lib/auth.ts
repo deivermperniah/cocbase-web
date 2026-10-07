@@ -13,6 +13,7 @@ export type Access = "auth" | "admin" | "user" | "guest";
 export const session = ref<Session | null>(null);
 export const user = ref<User | null>(null);
 export const profile = ref<Profile | null>(null);
+export const authReady = ref(false);
 
 export const isAdmin = computed(() => profile.value?.role === "admin");
 
@@ -32,16 +33,19 @@ async function setSession(next: Session | null) {
 }
 
 export function initializeAuth() {
-  initialization ??= supabase.auth.getSession().then(async ({ data }) => {
-    await setSession(data.session);
-    supabase.auth.onAuthStateChange((_event, next) => {
-      if (next?.user.id === user.value?.id) {
-        session.value = next;
-        return;
-      }
-      setTimeout(() => setSession(next), 0);
-    });
-  });
+  initialization ??= supabase.auth
+    .getSession()
+    .then(async ({ data }) => {
+      await setSession(data.session);
+      supabase.auth.onAuthStateChange((_event, next) => {
+        if (next?.user.id === user.value?.id) {
+          session.value = next;
+          return;
+        }
+        setTimeout(() => setSession(next), 0);
+      });
+    })
+    .finally(() => (authReady.value = true));
   return initialization;
 }
 

@@ -14,16 +14,20 @@ export interface NavItem {
   badge?: number;
 }
 
-export function getNavItems(signedIn: boolean, admin: boolean, pending: number): NavItem[] {
+export function getNavItems(ready: boolean, signedIn: boolean, admin: boolean, pending: number): NavItem[] {
   const privateHref = (path: string) => (signedIn ? path : loginUrl(path));
-  return [
+  const items: NavItem[] = [
     { name: "Inicio", icon: IconHouse, path: "/", href: "/" },
     { name: "Bases", icon: IconLayers, path: "/bases", href: "/bases" },
     { name: "Favoritos", icon: IconHeart, path: "/favoritos", href: privateHref("/favoritos") },
+  ];
+  if (!ready) return items;
+  items.push(
     admin
       ? { name: "Panel", icon: IconDashboard, path: "/panel", href: "/panel", badge: pending }
       : { name: "Contribuir", icon: IconUpload, path: "/contribuir", href: privateHref("/contribuir") },
-  ];
+  );
+  return items;
 }
 
 export function isActive(path: string, current: string) {

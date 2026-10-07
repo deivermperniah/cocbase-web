@@ -8,13 +8,13 @@ import Logo from "@/components/ui/Logo.vue";
 import AccountMenu from "@/components/layout/AccountMenu.vue";
 import NavLinks from "@/components/layout/NavLinks.vue";
 import { pendingCount, refreshPendingCount } from "@/lib/admin";
-import { initializeAuth, isAdmin, session } from "@/lib/auth";
+import { authReady, initializeAuth, isAdmin, session } from "@/lib/auth";
 import { getNavItems } from "@/lib/navigation";
 
 defineProps<{ currentPath: string }>();
 
 const isMenuOpen = ref(false);
-const navItems = computed(() => getNavItems(Boolean(session.value), isAdmin.value, pendingCount.value));
+const navItems = computed(() => getNavItems(authReady.value, Boolean(session.value), isAdmin.value, pendingCount.value));
 
 watch(isAdmin, (admin) => {
   if (admin) refreshPendingCount().catch((error) => console.error("Error fetching pending count:", error));
@@ -31,7 +31,8 @@ onMounted(() => initializeAuth().catch((error) => console.error("Error initializ
     <NavLinks :items="navItems" :current-path="currentPath" variant="pill" />
     <div class="flex shrink-0 items-center gap-2">
       <AppButton href="/descargar" variant="outline" size="sm" :icon="IconDownload">Descargar app</AppButton>
-      <AccountMenu v-if="session" />
+      <div v-if="!authReady" class="skeleton h-9 w-9 rounded-full"></div>
+      <AccountMenu v-else-if="session" />
       <AppButton v-else href="/login" size="sm">Iniciar sesión</AppButton>
     </div>
   </header>
@@ -50,7 +51,8 @@ onMounted(() => initializeAuth().catch((error) => console.error("Error initializ
       >
         <IconDownload class="h-4 w-4" />
       </a>
-      <AccountMenu v-if="session" />
+      <div v-if="!authReady" class="skeleton h-9 w-9 rounded-full"></div>
+      <AccountMenu v-else-if="session" />
       <a v-else href="/login" class="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-black hover:bg-yellow-300">
         <IconSignIn class="h-5 w-5" />
       </a>
