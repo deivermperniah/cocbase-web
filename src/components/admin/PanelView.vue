@@ -47,7 +47,7 @@ function handleNewBase() {
 <template>
   <div class="space-y-page">
     <PageHeader title="Panel">
-      <template v-if="!loading || stats" #actions>
+      <template #actions>
         <AppButton :icon="IconPlus" @click="isNewBaseOpen = true">Nueva base</AppButton>
       </template>
     </PageHeader>
@@ -83,11 +83,11 @@ function handleNewBase() {
           </div>
         </div>
       </div>
-
-      <Modal :open="isNewBaseOpen" title="Nueva base" size="xl" @close="isNewBaseOpen = false">
-        <BaseForm @success="handleNewBase" />
-      </Modal>
     </AuthGate>
+
+    <Modal :open="isNewBaseOpen" title="Nueva base" size="xl" @close="isNewBaseOpen = false">
+      <BaseForm @success="handleNewBase" />
+    </Modal>
 
     <div class="space-y-3">
       <h2 class="text-base text-white">Gestión</h2>
